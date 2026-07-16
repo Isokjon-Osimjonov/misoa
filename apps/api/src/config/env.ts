@@ -56,7 +56,7 @@ const envSchema = z.object({
   DB_POOL_MAX: z.coerce.number().default(20),
   DB_POOL_IDLE_MS: z.coerce.number().default(30000),
   DB_TIMEOUT_MS: z.coerce.number().default(30000),
-  ADMIN_QUEUE_KEY: z.string().min(16).default('mira-queue-secret-key'),
+  ADMIN_QUEUE_KEY: z.string().min(16).default('misoa-queue-secret-key'),
 })
 
 const parsed = envSchema.safeParse(process.env)

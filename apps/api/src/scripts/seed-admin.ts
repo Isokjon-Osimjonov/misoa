@@ -13,8 +13,8 @@ import bcrypt from 'bcryptjs'
 import { pool } from '../config/db'
 
 async function seedAdmin() {
-  const email = 'admin@miracosmetics.uz'
-  const password = 'MiraAdmin2026!'
+  const email = 'admin@misoacosmetics.uz'
+  const password = 'MisoaAdmin2026!'
 
   const [existing] = await db.select().from(adminUsers).where(eq(adminUsers.email, email)).limit(1)
 

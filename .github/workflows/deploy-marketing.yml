@@ -39,7 +39,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: marketing/
-          remote_path: /opt/mira/marketing/
+          remote_path: /opt/misoa/marketing/
           remote_host: ${{ secrets.VPS_HOST }}
           remote_port: ${{ secrets.VPS_PORT }}
           remote_user: ${{ secrets.VPS_USER }}

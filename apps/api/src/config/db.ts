@@ -10,7 +10,7 @@ export const pool = new Pool({
   idleTimeoutMillis: env.DB_POOL_IDLE_MS,
   connectionTimeoutMillis: 5000,
   statement_timeout: env.DB_TIMEOUT_MS,
-  application_name: 'mira-api',
+  application_name: 'misoa-api',
 })
 
 pool.on('connect', () => {

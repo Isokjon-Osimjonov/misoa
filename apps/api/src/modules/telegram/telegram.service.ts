@@ -78,7 +78,7 @@ QOIDA - aynan shu formatda yoz:
 
 Faqat MATN qismini yoz.
 Narxlar, telefon, linklar QO'SHMA.
-Hashtaglar: #${product.brandName?.replace(/\s+/g, '') || 'MiraCosmetics'} #Kosmetika
+Hashtaglar: #${product.brandName?.replace(/\s+/g, '') || 'MisoaCosmetics'} #Kosmetika
 Uzbek tilida yoz. Emoji ishlatish mumkin.
 Maksimal 5 qator.
 `

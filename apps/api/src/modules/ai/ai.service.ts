@@ -312,7 +312,7 @@ QOIDALAR:
 6. Narxni ikka valyutada ko'rsatish
 7. Oxirida CTA: "📦 Buyurtma berish uchun: /start"
 8. shortCaption: max 800 belgi (rasm uchun)
-9. hashtags: 5-7 ta, #MiraCosmetics majburiy
+9. hashtags: 5-7 ta, #MisoaCosmetics majburiy
 
 JSON:
 {

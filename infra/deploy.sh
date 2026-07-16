@@ -88,7 +88,7 @@ done
 if [ "$ADMIN_HEALTH_OK" = false ]; then
   echo "WARNING: admin failed health check after update."
   echo "Admin panel may be down — check manually:"
-  echo "  docker logs mira_admin_prod"
+  echo "  docker logs misoa_admin_prod"
   # Note: we don't exit 1 here or roll back API deploy —
   # admin failing shouldn't block/rollback a successful
   # API deploy, they're independent concerns. Just warn.

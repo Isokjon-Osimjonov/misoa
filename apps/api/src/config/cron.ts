@@ -140,7 +140,7 @@ export function initCronJobs(): void {
 
 export async function backupDatabase(): Promise<void> {
   const timestamp = new Date().toISOString().slice(0, 10)
-  const filename = `mira_backup_${timestamp}.sql`
+  const filename = `misoa_backup_${timestamp}.sql`
   const filepath = `/tmp/${filename}`
 
   try {

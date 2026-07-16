@@ -1,7 +1,7 @@
 import type { Response } from 'express'
 import { env } from '../config/env'
 
-const REFRESH_COOKIE = 'mira_refresh'
+const REFRESH_COOKIE = 'misoa_refresh'
 
 const isProd = env.NODE_ENV === 'production'
 
@@ -10,7 +10,7 @@ export function setRefreshCookie(res: Response, token: string): void {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
-    domain: isProd ? '.miracosmetics.uz' : undefined,
+    domain: isProd ? '.misoacosmetics.uz' : undefined,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   })
@@ -21,7 +21,7 @@ export function clearRefreshCookie(res: Response): void {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
-    domain: isProd ? '.miracosmetics.uz' : undefined,
+    domain: isProd ? '.misoacosmetics.uz' : undefined,
     path: '/',
   })
 }

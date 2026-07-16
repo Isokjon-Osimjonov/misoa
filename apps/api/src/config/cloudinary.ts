@@ -12,11 +12,11 @@ export { cloudinary }
 
 // Folder strategy — all uploads go to organized subfolders
 export const UPLOAD_FOLDERS = {
-  products: 'mira/products',
-  receipts: 'mira/receipts',
-  expenses: 'mira/expenses',
-  telegram: 'mira/telegram',
-  profiles: 'mira/profiles',
+  products: 'misoa/products',
+  receipts: 'misoa/receipts',
+  expenses: 'misoa/expenses',
+  telegram: 'misoa/telegram',
+  profiles: 'misoa/profiles',
 } as const
 
 export type UploadFolder = keyof typeof UPLOAD_FOLDERS

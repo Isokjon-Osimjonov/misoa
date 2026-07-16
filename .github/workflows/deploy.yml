@@ -33,7 +33,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/mira
+            cd /opt/misoa
             git pull origin main
             cd infra
             export IMAGE_TAG=${{ github.event.inputs.image_tag }}

@@ -105,7 +105,7 @@ async function getOrderSequence(tx: any): Promise<string> {
     })
     .returning()
 
-  return `MIRA-${yy}${mm}${dd}-${seq.lastSeq.toString().padStart(4, '0')}`
+  return `MISOA-${yy}${mm}${dd}-${seq.lastSeq.toString().padStart(4, '0')}`
 }
 
 async function fetchOrderItemsForCheckout(
@@ -2252,7 +2252,7 @@ export async function getInvoiceData(orderId: string, userId: string, isAdmin: b
     },
     company: {
       name: 'Misoa Market',
-      website: 'miracosmetics.uz',
+      website: 'misoacosmetics.uz',
       telegram: '@misoa_cosmetics_bot',
     },
     exchangeRate: rate

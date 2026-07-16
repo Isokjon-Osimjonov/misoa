@@ -482,7 +482,7 @@ export async function generateCouponCode() {
   let exists = true
   while (exists) {
     code =
-      'MIRA' +
+      'MISOA' +
       Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
     const [row] = await db
       .select({ id: coupons.id })

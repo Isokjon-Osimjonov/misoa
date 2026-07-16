@@ -70,7 +70,7 @@ export async function uploadReceipt(req: Request, res: Response, next: NextFunct
     try {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: 'mira/receipts',
+          folder: 'misoa/receipts',
           resource_type: 'auto',
         },
         (error, result) => {
@@ -115,7 +115,7 @@ export async function uploadAvatar(req: Request, res: Response, next: NextFuncti
       // Upload to Cloudinary using stream
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: 'mira/avatars',
+          folder: 'misoa/avatars',
           resource_type: 'image',
           transformation: [{ width: 500, height: 500, crop: 'limit' }],
         },
@@ -160,7 +160,7 @@ export async function uploadBanner(req: Request, res: Response, next: NextFuncti
     try {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: 'mira/banners',
+          folder: 'misoa/banners',
           resource_type: 'auto',
         },
         (error, result) => {
