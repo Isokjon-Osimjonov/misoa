@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16
+    container_name: misoa_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: misoacosmetics2117
+      POSTGRES_DB: misoa_db
+    ports:
+      - '127.0.0.1:5435:5432'
+    volumes:
+      - misoa_postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: misoa_redis_dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - '127.0.0.1:6381:6379'
+    volumes:
+      - misoa_redis_dev_data:/data
+
+volumes:
+  misoa_postgres_dev_data:
+  misoa_redis_dev_data:

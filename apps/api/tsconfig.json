@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "../../dist/apps/api",
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../libs/db/src/**/*.ts",
+    "../../libs/shared-types/src/**/*.ts",
+    "../../libs/shared-utils/src/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

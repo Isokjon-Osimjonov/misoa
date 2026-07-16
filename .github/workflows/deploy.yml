@@ -1,0 +1,42 @@
+# IMPORTANT: Before manually running this workflow,
+# confirm the "Build and Push Images" workflow has
+# ALREADY completed successfully for the commit you
+# intend to deploy. Running this before the build
+# finishes will deploy a STALE image. There is
+# currently no automated dependency between these
+# two workflows.
+
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag to deploy (default: latest)'
+        required: false
+        default: 'latest'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Set lowercase repo owner
+        id: vars
+        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/mira
+            git pull origin main
+            cd infra
+            export IMAGE_TAG=${{ github.event.inputs.image_tag }}
+            export GITHUB_REPOSITORY_OWNER=${{ steps.vars.outputs.owner }}
+            chmod +x deploy.sh
+            ./deploy.sh

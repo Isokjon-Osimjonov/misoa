@@ -1,0 +1,60 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+.expo
+android
+ios
+google-services.json
+
+# Nx cache
+.nx/cache
+.nx/workspace-data
+
+# Environment
+.env
+.env.local
+.env.production
+!.env.example
+!.env.production.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage
+
+# Editor
+.vscode
+.idea
+*.swp
+
+vite.config.*.timestamp*
+
+# Expo
+node_modules/
+.expo/
+.yarn/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+cache/
+
+.claude/settings.local.json
+.secrets
