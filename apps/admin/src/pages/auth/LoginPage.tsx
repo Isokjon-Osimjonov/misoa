@@ -44,8 +44,8 @@ export function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: import.meta.env.DEV ? 'admin@miracosmetics.uz' : '',
-      password: import.meta.env.DEV ? 'MiraAdmin2026!' : '',
+      email: import.meta.env.DEV ? 'admin@misoacosmetics.uz' : '',
+      password: import.meta.env.DEV ? 'MisoaAdmin2026!' : '',
     },
   })
 
@@ -159,7 +159,7 @@ export function LoginPage() {
               <input
                 {...register('email')}
                 type="email"
-                placeholder="admin@miracosmetics.uz"
+                placeholder="admin@misoacosmetics.uz"
                 disabled={!!lockedUntil}
                 className="mt-1 w-full h-9 px-3 rounded-lg
                            border-[0.5px] border-border text-sm
@@ -202,7 +202,7 @@ export function LoginPage() {
         {/* Credentials hint (dev only) */}
         {import.meta.env.DEV && (
           <p className="text-center text-xs text-gray-400 mt-4">
-            admin@miracosmetics.uz / MiraAdmin2026!
+            admin@misoacosmetics.uz / MisoaAdmin2026!
           </p>
         )}
       </div>

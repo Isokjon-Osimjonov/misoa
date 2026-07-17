@@ -326,7 +326,7 @@ export function AdminsPage() {
               <Input
                 {...register('email')}
                 type="email"
-                placeholder="admin@miracosmetics.uz"
+                placeholder="admin@misoacosmetics.uz"
                 className="h-9 text-sm rounded-lg border-[0.5px]"
               />
               {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
