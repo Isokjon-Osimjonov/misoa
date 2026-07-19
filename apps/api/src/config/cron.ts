@@ -162,7 +162,7 @@ export async function backupDatabase(): Promise<void> {
 
     // Send to admin Telegram group
     await bot.api.sendDocument(env.ADMIN_GROUP_CHAT_ID, new InputFile(gzPath, `${filename}.gz`), {
-      caption: `🗄 <b>DB Backup</b>\n📅 ${timestamp}\n📦 ${sizeMB} MB`,
+      caption: `🗄 <b>Misoa DB Backup</b>\n📅 ${timestamp}\n📦 ${sizeMB} MB`,
       parse_mode: 'HTML',
     })
 
@@ -171,6 +171,6 @@ export async function backupDatabase(): Promise<void> {
     logger.info(`Backup yuborildi: ${sizeMB} MB`)
   } catch (err: any) {
     logger.error({ err: err.message }, 'Backup error')
-    await sendAdminAlert(`❌ DB backup xatolik: ${err.message}`)
+    await sendAdminAlert(`❌ Misoa DB backup xatolik:\n${err.message}`)
   }
 }
