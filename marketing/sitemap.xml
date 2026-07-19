@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://misoa.uz/</loc>
-    <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://misoa.uz/privacy.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://misoa.uz/privacy</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://misoa.uz/terms.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://misoa.uz/terms</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://misoa.uz/sale-terms.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://misoa.uz/sale-terms</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://misoa.uz/delete-account</loc>
+    <priority>0.6</priority>
   </url>
 </urlset>
