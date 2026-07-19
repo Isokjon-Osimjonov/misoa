@@ -38,6 +38,7 @@ export const inventoryBatches = pgTable(
     costCurrency: varchar('cost_currency', { length: 3 }).default('KRW').notNull(),
     expiryDate: date('expiry_date'),
     receivedAt: timestamp('received_at', { withTimezone: true }).defaultNow().notNull(),
+    location: varchar('location', { length: 20 }).default('KOR_WAREHOUSE').notNull(),
     notes: text('notes'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
