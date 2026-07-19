@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ShoppingBag, Plus, Trash2 } from 'lucide-react'
+import { ShoppingBag, Plus, Trash2, Banknote, CreditCard, FileText, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 import { walkInSalesApi } from '../../api/walk-in-sales.api'
 import { productsApi } from '../../api/products.api'
@@ -92,22 +92,57 @@ export default function WalkInSalesPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-          <p className="text-sm text-muted-foreground">💵 Naqd</p>
-          <p className="text-xl font-bold">{summary?.totalCash?.toLocaleString() || 0} UZS</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {/* Naqd */}
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-green-100 rounded-lg shrink-0">
+            <Banknote className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-green-600">Naqd pul</p>
+            <p className="text-lg font-bold text-green-700">
+              {summary?.totalCash?.toLocaleString() || 0} UZS
+            </p>
+          </div>
         </div>
-        <div className="p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-          <p className="text-sm text-muted-foreground">💳 Karta</p>
-          <p className="text-xl font-bold">{summary?.totalCard?.toLocaleString() || 0} UZS</p>
+
+        {/* Karta */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+            <CreditCard className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-blue-600">Karta</p>
+            <p className="text-lg font-bold text-blue-700">
+              {summary?.totalCard?.toLocaleString() || 0} UZS
+            </p>
+          </div>
         </div>
-        <div className="p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-          <p className="text-sm text-muted-foreground">📋 Nasiya</p>
-          <p className="text-xl font-bold">{summary?.totalDebt?.toLocaleString() || 0} UZS</p>
+
+        {/* Nasiya */}
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-orange-100 rounded-lg shrink-0">
+            <FileText className="w-5 h-5 text-orange-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-orange-600">Nasiya</p>
+            <p className="text-lg font-bold text-orange-700">
+              {summary?.totalDebt?.toLocaleString() || 0} UZS
+            </p>
+          </div>
         </div>
-        <div className="p-4 border rounded-md shadow-sm bg-primary text-primary-foreground">
-          <p className="text-sm opacity-90">📊 Jami daromad</p>
-          <p className="text-xl font-bold">{summary?.totalRevenue?.toLocaleString() || 0} UZS</p>
+
+        {/* Jami */}
+        <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-pink-100 rounded-lg shrink-0">
+            <TrendingUp className="w-5 h-5 text-pink-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-pink-600">Jami daromad</p>
+            <p className="text-lg font-bold text-pink-700">
+              {summary?.totalRevenue?.toLocaleString() || 0} UZS
+            </p>
+          </div>
         </div>
       </div>
 

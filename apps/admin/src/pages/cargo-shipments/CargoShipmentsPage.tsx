@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Package, Plus, Search, Trash2, Eye, CheckCircle2 } from 'lucide-react'
+import { Package, Plus, Search, Trash2, Eye, CheckCircle2, Truck, PackageCheck } from 'lucide-react'
 import { toast } from 'sonner'
 import { cargoShipmentsApi } from '../../api/cargo-shipments.api'
 import { productsApi } from '../../api/products.api'
@@ -86,6 +86,10 @@ export default function CargoShipmentsPage() {
     }
   })
 
+  const sentCount = shipments?.filter((s: any) => s.status === 'SENT').length ?? 0
+  const arrivedCount = shipments?.filter((s: any) => s.status === 'ARRIVED').length ?? 0
+  const totalCount = shipments?.length ?? 0
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -95,6 +99,47 @@ export default function CargoShipmentsPage() {
         <Button onClick={() => setShowForm(true)}>
           <Plus className="w-4 h-4 mr-2" /> Yangi kargo
         </Button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        {/* Yo'lda */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-yellow-100 rounded-lg shrink-0">
+            <Truck className="w-5 h-5 text-yellow-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-yellow-600">Yo'lda</p>
+            <p className="text-lg font-bold text-yellow-700">
+              {sentCount} ta
+            </p>
+          </div>
+        </div>
+
+        {/* Yetib keldi */}
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-green-100 rounded-lg shrink-0">
+            <PackageCheck className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-green-600">Yetib keldi</p>
+            <p className="text-lg font-bold text-green-700">
+              {arrivedCount} ta
+            </p>
+          </div>
+        </div>
+
+        {/* Jami mahsulotlar */}
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg shrink-0">
+            <Package className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-purple-600">Jami jo'natmalar</p>
+            <p className="text-lg font-bold text-purple-700">
+              {totalCount} ta
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-2">
