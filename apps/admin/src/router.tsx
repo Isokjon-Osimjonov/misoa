@@ -31,7 +31,8 @@ import { SystemHealthPage } from './pages/system/SystemHealthPage'
 import { NotFoundPage } from './pages/errors/NotFoundPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { RequirePermission } from './components/RequirePermission'
-
+import CargoShipmentsPage from './pages/cargo-shipments/CargoShipmentsPage'
+import WalkInSalesPage from './pages/walk-in-sales/WalkInSalesPage'
 // For TanStack Router we define the root route and children
 const rootRoute = createRootRoute()
 
@@ -382,6 +383,30 @@ const systemRoute = createRoute({
   ),
 })
 
+const cargoShipmentsRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/cargo-shipments',
+  component: () => (
+    <ErrorBoundary>
+      <RequirePermission resource="inventory">
+        <CargoShipmentsPage />
+      </RequirePermission>
+    </ErrorBoundary>
+  ),
+})
+
+const walkInSalesRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/walk-in-sales',
+  component: () => (
+    <ErrorBoundary>
+      <RequirePermission resource="inventory">
+        <WalkInSalesPage />
+      </RequirePermission>
+    </ErrorBoundary>
+  ),
+})
+
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '*',
@@ -421,6 +446,8 @@ const routeTree = rootRoute.addChildren([
     profileRoute,
     auditRoute,
     systemRoute,
+    cargoShipmentsRoute,
+    walkInSalesRoute,
     // Add other routes here as they are created
   ]),
   notFoundRoute,

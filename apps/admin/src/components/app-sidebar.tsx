@@ -85,6 +85,13 @@ const navMain: {
     ],
   },
   {
+    title: 'UZB Filiali',
+    items: [
+      { title: "Kargo jo'natmalar", url: '/cargo-shipments', icon: Package, resource: 'inventory' },
+      { title: 'Sotuvlar', url: '/walk-in-sales', icon: ShoppingBag, resource: 'orders' }
+    ]
+  },
+  {
     title: 'Tizim',
     items: [
       { title: 'Sozlamalar', url: '/settings', icon: Settings2, resource: 'settings' },
