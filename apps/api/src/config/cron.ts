@@ -144,6 +144,14 @@ export async function backupDatabase(): Promise<void> {
   const filepath = `/tmp/${filename}`
 
   try {
+    // Cleanup any leftover files
+    try {
+      fs.unlinkSync(filepath)
+    } catch {}
+    try {
+      fs.unlinkSync(`${filepath}.gz`)
+    } catch {}
+
     // Run pg_dump directly
     execSync(
       `pg_dump "${env.DATABASE_URL}"` +
@@ -153,7 +161,7 @@ export async function backupDatabase(): Promise<void> {
     )
 
     // Gzip
-    execSync(`gzip ${filepath}`)
+    execSync(`gzip -f ${filepath}`)
     const gzPath = `${filepath}.gz`
 
     // Get file size
