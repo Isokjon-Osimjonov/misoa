@@ -758,3 +758,72 @@ export async function checkAllProductsStock(): Promise<void> {
     threshold,
   }, 'Stock check completed')
 }
+
+export async function getUzbStock(params: {
+  page: number
+  limit: number
+  search?: string
+}) {
+  const page = params.page || 1
+  const limit = params.limit || 20
+  const offset = (page - 1) * limit
+
+  let searchCondition = sql`1=1`
+  if (params.search) {
+    searchCondition = ilike(products.name, `%${params.search}%`)
+  }
+
+  const dataSq = db
+    .select({
+      id: products.id,
+      name: products.name,
+      brandName: products.brandName,
+      imageUrl: sql`${products.imageUrls}[1]`.as('image_url'),
+      uzbQty: sql<number>`COALESCE(SUM(${inventoryBatches.currentQty}), 0)`.as('uzb_qty'),
+    })
+    .from(products)
+    .leftJoin(
+      inventoryBatches,
+      and(
+        eq(inventoryBatches.productId, products.id),
+        eq(inventoryBatches.location, 'UZB_STORE')
+      )
+    )
+    .where(
+      and(
+        eq(products.isActive, true),
+        isNull(products.deletedAt),
+        searchCondition
+      )
+    )
+    .groupBy(products.id, products.name, products.brandName, products.imageUrls)
+    .having(sql`COALESCE(SUM(${inventoryBatches.currentQty}), 0) >= 0`)
+    .orderBy(sql`uzb_qty ASC`)
+    .limit(limit)
+    .offset(offset)
+
+  const countSq = db
+    .select({ count: sql<number>`count(distinct ${products.id})` })
+    .from(products)
+    .leftJoin(
+      inventoryBatches,
+      and(
+        eq(inventoryBatches.productId, products.id),
+        eq(inventoryBatches.location, 'UZB_STORE')
+      )
+    )
+    .where(
+      and(
+        eq(products.isActive, true),
+        isNull(products.deletedAt),
+        searchCondition
+      )
+    )
+
+  const [data, [{ count }]] = await Promise.all([dataSq, countSq])
+
+  return {
+    data: data.map(d => ({ ...d, uzbQty: Number(d.uzbQty) })),
+    total: Number(count),
+  }
+}

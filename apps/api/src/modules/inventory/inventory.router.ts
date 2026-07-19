@@ -5,6 +5,7 @@ import { requirePermission } from '../../middleware/auth'
 const router = Router()
 
 // All inventory routes require admin permissions
+router.get('/uzb-stock', requirePermission('uzb_stock', 'read'), ctrl.getUzbStock)
 router.get('/stock', requirePermission('inventory', 'read'), ctrl.getStockSummary)
 router.post('/batches', requirePermission('inventory', 'write'), ctrl.createBatch)
 router.get('/batches/:productId', requirePermission('inventory', 'read'), ctrl.getBatchesByProduct)

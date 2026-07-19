@@ -33,6 +33,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { RequirePermission } from './components/RequirePermission'
 import CargoShipmentsPage from './pages/cargo-shipments/CargoShipmentsPage'
 import WalkInSalesPage from './pages/walk-in-sales/WalkInSalesPage'
+import UzbStockPage from './pages/uzb-stock/UzbStockPage'
 // For TanStack Router we define the root route and children
 const rootRoute = createRootRoute()
 
@@ -388,7 +389,7 @@ const cargoShipmentsRoute = createRoute({
   path: '/cargo-shipments',
   component: () => (
     <ErrorBoundary>
-      <RequirePermission resource="inventory">
+      <RequirePermission resource="cargo_shipments">
         <CargoShipmentsPage />
       </RequirePermission>
     </ErrorBoundary>
@@ -400,8 +401,20 @@ const walkInSalesRoute = createRoute({
   path: '/walk-in-sales',
   component: () => (
     <ErrorBoundary>
-      <RequirePermission resource="inventory">
+      <RequirePermission resource="walk_in_sales">
         <WalkInSalesPage />
+      </RequirePermission>
+    </ErrorBoundary>
+  ),
+})
+
+const uzbStockRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/uzb-stock',
+  component: () => (
+    <ErrorBoundary>
+      <RequirePermission resource="uzb_stock">
+        <UzbStockPage />
       </RequirePermission>
     </ErrorBoundary>
   ),
@@ -448,6 +461,7 @@ const routeTree = rootRoute.addChildren([
     systemRoute,
     cargoShipmentsRoute,
     walkInSalesRoute,
+    uzbStockRoute,
     // Add other routes here as they are created
   ]),
   notFoundRoute,

@@ -19,6 +19,18 @@ export async function getStockSummary(req: Request, res: Response, next: NextFun
   }
 }
 
+export async function getUzbStock(req: Request, res: Response, next: NextFunction) {
+  try {
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 20
+    const search = req.query.search as string | undefined
+    const result = await service.getUzbStock({ page, limit, search })
+    res.json({ data: result.data, meta: { total: result.total, page, limit }, error: null })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export async function getWriteOffReasons(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await service.getWriteOffReasons()

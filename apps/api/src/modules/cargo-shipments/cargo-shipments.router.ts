@@ -7,7 +7,7 @@ export const cargoShipmentsRouter = Router()
 
 cargoShipmentsRouter.get(
   '/',
-  requirePermission('inventory', 'read'),
+  requirePermission('cargo_shipments', 'read'),
   async (req, res) => {
     try {
       const page = Number(req.query.page) || 1
@@ -24,7 +24,7 @@ cargoShipmentsRouter.get(
 
 cargoShipmentsRouter.get(
   '/:id',
-  requirePermission('inventory', 'read'),
+  requirePermission('cargo_shipments', 'read'),
   async (req, res) => {
     try {
       const data = await service.getCargoShipment(req.params.id)
@@ -38,7 +38,7 @@ cargoShipmentsRouter.get(
 
 cargoShipmentsRouter.post(
   '/',
-  requirePermission('inventory', 'write'),
+  requirePermission('cargo_shipments', 'write'),
   async (req, res) => {
     try {
       const validated = createCargoShipmentSchema.parse(req.body)
@@ -56,7 +56,7 @@ cargoShipmentsRouter.post(
 
 cargoShipmentsRouter.patch(
   '/:id/arrive',
-  requirePermission('inventory', 'write'),
+  requirePermission('cargo_shipments', 'write'),
   async (req, res) => {
     try {
       const data = await service.markCargoArrived(req.params.id, req.user!.sub)
@@ -69,7 +69,7 @@ cargoShipmentsRouter.patch(
 
 cargoShipmentsRouter.delete(
   '/:id',
-  requirePermission('inventory', 'write'),
+  requirePermission('cargo_shipments', 'write'),
   async (req, res) => {
     try {
       await service.deleteCargoShipment(req.params.id)

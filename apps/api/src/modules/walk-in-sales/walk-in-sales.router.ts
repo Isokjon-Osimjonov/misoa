@@ -7,7 +7,7 @@ export const walkInSalesRouter = Router()
 
 walkInSalesRouter.get(
   '/',
-  requirePermission('inventory', 'read'),
+  requirePermission('walk_in_sales', 'read'),
   async (req, res) => {
     try {
       const page = Number(req.query.page) || 1
@@ -26,7 +26,7 @@ walkInSalesRouter.get(
 
 walkInSalesRouter.get(
   '/summary',
-  requirePermission('inventory', 'read'),
+  requirePermission('walk_in_sales', 'read'),
   async (req, res) => {
     try {
       const from = req.query.from ? new Date(req.query.from as string) : new Date(0)
@@ -42,7 +42,7 @@ walkInSalesRouter.get(
 
 walkInSalesRouter.get(
   '/:id',
-  requirePermission('inventory', 'read'),
+  requirePermission('walk_in_sales', 'read'),
   async (req, res) => {
     try {
       const data = await service.getWalkInSale(req.params.id)
@@ -56,7 +56,7 @@ walkInSalesRouter.get(
 
 walkInSalesRouter.post(
   '/',
-  requirePermission('inventory', 'write'),
+  requirePermission('walk_in_sales', 'write'),
   async (req, res) => {
     try {
       const validated = createWalkInSaleSchema.parse(req.body)

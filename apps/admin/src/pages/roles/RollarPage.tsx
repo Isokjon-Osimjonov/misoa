@@ -39,6 +39,9 @@ const PERMISSION_MODULES = [
   { module: 'roles', label: 'Rollar', icon: '🔐' },
   { module: 'suppliers', label: "Ta'minotchilar", icon: '🚚' },
   { module: 'purchase_orders', label: 'Xarid buyurtmalari', icon: '🛒' },
+  { module: 'cargo_shipments', label: "Kargo jo'natmalar", icon: '📦' },
+  { module: 'walk_in_sales', label: 'UZB Sotuvlar', icon: '🛍' },
+  { module: 'uzb_stock', label: 'UZB Ombor', icon: '🏪' },
 ]
 
 const roleSchema = z.object({

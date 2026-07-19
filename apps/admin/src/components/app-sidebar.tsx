@@ -21,6 +21,7 @@ import {
   FileText,
   Activity,
   ExternalLink,
+  Warehouse,
 } from 'lucide-react'
 import { NavMain } from './nav-main'
 import { NavUser } from './nav-user'
@@ -87,8 +88,9 @@ const navMain: {
   {
     title: 'UZB Filiali',
     items: [
-      { title: "Kargo jo'natmalar", url: '/cargo-shipments', icon: Package, resource: 'inventory' },
-      { title: 'Sotuvlar', url: '/walk-in-sales', icon: ShoppingBag, resource: 'orders' }
+      { title: "Kargo jo'natmalar", url: '/cargo-shipments', icon: Package, resource: 'cargo_shipments' },
+      { title: 'Sotuvlar', url: '/walk-in-sales', icon: ShoppingBag, resource: 'walk_in_sales' },
+      { title: 'UZB Ombor', url: '/uzb-stock', icon: Warehouse, resource: 'uzb_stock' }
     ]
   },
   {

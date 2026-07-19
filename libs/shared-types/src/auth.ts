@@ -12,6 +12,9 @@ export const ALL_RESOURCES = [
   'roles',
   'suppliers',
   'purchase_orders',
+  'cargo_shipments',
+  'walk_in_sales',
+  'uzb_stock',
 ] as const
 
 export type AppResource = (typeof ALL_RESOURCES)[number]
