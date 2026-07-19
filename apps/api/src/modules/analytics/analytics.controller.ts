@@ -102,3 +102,13 @@ export async function exportCSV(req: Request, res: Response, next: NextFunction)
     next(err)
   }
 }
+
+export async function getProfitUzb(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { from, to } = req.query as { from: string; to: string }
+    const data = await service.getProfitUzb(from, to)
+    res.json({ data, error: null })
+  } catch (err) {
+    next(err)
+  }
+}

@@ -5,6 +5,9 @@ import { db } from '../../config/db'
 import { orders, products, customers, coupons } from '@misoa/db'
 import { ilike, or, desc, sql, eq } from 'drizzle-orm'
 
+import { walkInSalesRouter } from '../walk-in-sales/walk-in-sales.router'
+import { cargoShipmentsRouter } from '../cargo-shipments/cargo-shipments.router'
+
 const router = Router()
 
 router.get('/search', requireAdmin, async (req, res) => {
@@ -96,5 +99,8 @@ router.post('/backup/trigger', requireSuperAdmin, async (req, res) => {
     res.status(500).json({ data: null, error: { message: err.message, code: 'INTERNAL_ERROR' } })
   }
 })
+
+router.use('/cargo-shipments', cargoShipmentsRouter)
+router.use('/walk-in-sales', walkInSalesRouter)
 
 export default router

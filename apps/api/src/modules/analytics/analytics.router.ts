@@ -16,5 +16,6 @@ router.get('/customers', ctrl.getCustomers)
 router.get('/coupons', ctrl.getCouponStats)
 router.get('/coupon-performance', ctrl.getCouponPerformance)
 router.get('/export', ctrl.exportCSV)
+router.get('/profit-uzb', ctrl.getProfitUzb)
 
 export default router

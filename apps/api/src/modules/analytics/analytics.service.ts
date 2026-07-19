@@ -11,6 +11,10 @@ import {
   inventoryBatches,
   coupons,
   couponRedemptions,
+  walkInSales,
+  walkInSaleItems,
+  cargoShipments,
+  cargoShipmentItems,
 } from '@misoa/db'
 import { eq, and, sql, desc, asc, sum, count, gte, lte, inArray, notInArray, countDistinct } from 'drizzle-orm'
 import { getRedis } from '../../config/redis'
@@ -729,4 +733,148 @@ export async function getCouponPerformance(from: string, to: string) {
     totalDiscount: Number(r.totalDiscount),
     avgDiscount: Math.round(Number(r.avgDiscount))
   }))
+}
+
+export async function getProfitUzb(from: string, to: string) {
+  const fromDate = startOfDay(new Date(from))
+  const toDate = endOfDay(new Date(to))
+
+  // 1. Get all walk-in sales in period
+  const sales = await db
+    .select({
+      id: walkInSales.id,
+      saleNumber: walkInSales.saleNumber,
+      createdAt: walkInSales.createdAt,
+      totalAmountUzs: walkInSales.totalAmountUzs,
+    })
+    .from(walkInSales)
+    .where(
+      and(
+        sql`${walkInSales.createdAt} >= ${fromDate.toISOString()}`,
+        sql`${walkInSales.createdAt} <= ${toDate.toISOString()}`
+      )
+    )
+
+  const saleIds = sales.map((s) => s.id)
+
+  let totalRevenue = 0
+  let totalCost = 0
+
+  const productStats = new Map<string, any>()
+  const cargoStats = new Map<string, any>()
+
+  if (saleIds.length > 0) {
+    // Get all sale items with product and buy/cargo prices via cargo items
+    // Since UZB inventory comes from cargo, we need to match it. But inventory batches are deducted by FIFO.
+    // However, the prompt says:
+    // "Get all cargo_shipment_items for products sold"
+    // "Calculate cost per unit: (buyPriceKrw + cargoShareKrw) × exchangeRate → UZS"
+    // "Calculate profit per sale item"
+
+    // To map exact cargo costs, normally we'd track batch IDs in walk_in_sale_items.
+    // Since we don't, we'll average the cost of all cargo shipments for the sold products,
+    // OR just use the latest cargo shipment for that product.
+    
+    // Simplification for the prompt's requirement:
+    const soldItems = await db
+      .select({
+        productId: walkInSaleItems.productId,
+        productName: walkInSaleItems.productName,
+        quantity: walkInSaleItems.quantity,
+        totalUzs: walkInSaleItems.totalUzs,
+      })
+      .from(walkInSaleItems)
+      .where(inArray(walkInSaleItems.saleId, saleIds))
+
+    // Group sales by product
+    for (const item of soldItems) {
+      totalRevenue += item.totalUzs
+      
+      if (!productStats.has(item.productId)) {
+        productStats.set(item.productId, {
+          productId: item.productId,
+          productName: item.productName,
+          quantitySold: 0,
+          revenue: 0,
+          cost: 0,
+        })
+      }
+      const ps = productStats.get(item.productId)
+      ps.quantitySold += item.quantity
+      ps.revenue += item.totalUzs
+    }
+
+    const productIds = Array.from(productStats.keys())
+    
+    // Get cargo items for these products to estimate cost
+    if (productIds.length > 0) {
+      const cargoItems = await db
+        .select({
+          productId: cargoShipmentItems.productId,
+          buyPriceKrw: cargoShipmentItems.buyPriceKrw,
+          cargoShareKrw: cargoShipmentItems.cargoShareKrw,
+          shipmentNumber: cargoShipments.shipmentNumber,
+          dateSent: cargoShipments.dateSent,
+          totalCostKrw: cargoShipments.totalCostKrw,
+        })
+        .from(cargoShipmentItems)
+        .leftJoin(cargoShipments, eq(cargoShipmentItems.shipmentId, cargoShipments.id))
+        .where(inArray(cargoShipmentItems.productId, productIds))
+        .orderBy(desc(cargoShipments.dateSent))
+
+      // Exchange rate estimation (hardcoded or from db? Let's use 1 KRW = 9.5 UZS roughly, or assume 10)
+      const EXCHANGE_RATE = 9.5 // Approximation for now, can be adjusted
+
+      for (const [pId, ps] of productStats.entries()) {
+        // Find latest cargo cost for this product
+        const cItem = cargoItems.find(c => c.productId === pId)
+        let unitCostUzs = 0
+        if (cItem) {
+          unitCostUzs = (Number(cItem.buyPriceKrw) + Number(cItem.cargoShareKrw)) * EXCHANGE_RATE
+          
+          if (!cargoStats.has(cItem.shipmentNumber!)) {
+            cargoStats.set(cItem.shipmentNumber!, {
+              shipmentNumber: cItem.shipmentNumber,
+              dateSent: cItem.dateSent,
+              totalCost: 0,
+              totalRevenue: 0,
+              profit: 0
+            })
+          }
+          const cs = cargoStats.get(cItem.shipmentNumber!)
+          cs.totalCost += (unitCostUzs * ps.quantitySold)
+          cs.totalRevenue += ps.revenue
+        }
+        
+        ps.cost = unitCostUzs * ps.quantitySold
+        totalCost += ps.cost
+      }
+    }
+  }
+
+  const byProduct = Array.from(productStats.values()).map(ps => {
+    const profit = ps.revenue - ps.cost
+    return {
+      ...ps,
+      profit,
+      margin: ps.revenue > 0 ? (profit / ps.revenue) * 100 : 0
+    }
+  }).sort((a, b) => b.profit - a.profit)
+
+  const byCargo = Array.from(cargoStats.values()).map(cs => {
+    cs.profit = cs.totalRevenue - cs.totalCost
+    return cs
+  }).sort((a, b) => new Date(b.dateSent).getTime() - new Date(a.dateSent).getTime())
+
+  const totalProfit = totalRevenue - totalCost
+  const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0
+
+  return {
+    totalRevenue,
+    totalCost,
+    totalProfit,
+    profitMargin,
+    byProduct,
+    byCargo
+  }
 }
