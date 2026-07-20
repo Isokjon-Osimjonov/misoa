@@ -9,10 +9,10 @@ import { ErrorBoundary } from '../components/ui/ErrorBoundary'
 import { useNetworkStatus } from '../components/ui/NoInternet'
 import NoInternet from '../components/ui/NoInternet'
 import { useAuthStore } from '../lib/auth-store'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { registerForPushNotifications, setupNotificationListeners } from '../lib/push-notifications'
-import { useRouter, Redirect, useRootNavigationState } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
+import { useRouter } from 'expo-router'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 // Inner component — has access to QueryClientProvider
 function AppContent() {
@@ -55,7 +55,14 @@ function AppContent() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   )
 }
@@ -69,42 +76,14 @@ export default function RootLayout() {
 
   const initialize = useAuthStore((s) => s.initialize)
   const authLoading = useAuthStore((s) => s.isLoading)
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  const [onboardingChecked, setOnboardingChecked] = useState(false)
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
-  const router = useRouter()
-
-  const rootNavState = useRootNavigationState()
 
   useEffect(() => {
     initialize()
   }, [])
 
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      try {
-        // TEMP: force reset for testing
-        await SecureStore.deleteItemAsync('onboarding_complete')
-        
-        const seen = await SecureStore.getItemAsync('onboarding_complete')
-        
-        console.log('🔍 onboarding_complete value:', seen)
-        console.log('🔍 hasSeenOnboarding will be:', seen === 'true')
-        
-        setHasSeenOnboarding(seen === 'true')
-      } catch(e) {
-        console.log('❌ SecureStore error:', e)
-        setHasSeenOnboarding(false)
-      } finally {
-        setOnboardingChecked(true)
-      }
-    }
-    checkOnboarding()
-  }, [])
-
   return (
     <QueryClientProvider client={queryClient}>
-      {(!fontsLoaded || authLoading || !onboardingChecked || !rootNavState?.key) ? (
+      {(!fontsLoaded || authLoading) ? (
         <SafeAreaProvider>
           <View style={{
             flex: 1,
@@ -127,10 +106,6 @@ export default function RootLayout() {
             />
           </View>
         </SafeAreaProvider>
-      ) : !hasSeenOnboarding ? (
-        <Redirect href="/onboarding" />
-      ) : !isAuthenticated ? (
-        <Redirect href="/auth/login" />
       ) : (
         <ErrorBoundary>
           <AppContent />
@@ -139,4 +114,3 @@ export default function RootLayout() {
     </QueryClientProvider>
   )
 }
-
