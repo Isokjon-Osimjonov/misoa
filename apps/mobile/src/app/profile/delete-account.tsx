@@ -29,10 +29,10 @@ export default function DeleteAccountScreen() {
   const clearCart = useCartStore((s) => s.clearCart)
   const { toast, showToast, hideToast } = useToast()
 
-  const isMatched = confirmText === "O'CHIRISH"
+  const isConfirmed = confirmText.trim().toLowerCase() === "o'chirish"
 
   const handleDelete = async () => {
-    if (!isMatched) return
+    if (!isConfirmed) return
 
     setLoading(true)
     try {
@@ -102,7 +102,13 @@ export default function DeleteAccountScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Tasdiqlash uchun "O'CHIRISH" so'zini kiriting</Text>
+              <Text style={styles.inputLabel}>
+                Tasdiqlash uchun{' '}
+                <Text style={{fontWeight: 'bold'}}>
+                  O'CHIRISH
+                </Text>
+                {' '}deb yozing:
+              </Text>
               <TextInput
                 style={styles.input}
                 value={confirmText}
@@ -116,8 +122,8 @@ export default function DeleteAccountScreen() {
 
           <View style={styles.footer}>
             <TouchableOpacity
-              style={[styles.deleteBtn, (!isMatched || loading) && styles.deleteBtnDisabled]}
-              disabled={!isMatched || loading}
+              style={[styles.deleteBtn, (!isConfirmed || loading) && styles.deleteBtnDisabled]}
+              disabled={!isConfirmed || loading}
               onPress={handleDelete}
             >
               {loading ? (
