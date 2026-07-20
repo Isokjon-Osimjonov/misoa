@@ -16,7 +16,7 @@ import { Feather } from '@expo/vector-icons'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCartStore } from '../../lib/cart-store'
 import { useAuthStore } from '../../lib/auth-store'
-import { requireAuth } from '../../lib/require-auth'
+import { useRequireAuth } from '../../hooks/useRequireAuth'
 import { useExchangeStore } from '../../lib/exchange-store'
 import { formatKRW, formatUZS, krwToUzs } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
@@ -31,6 +31,7 @@ export default function CartScreen() {
   const insets = useSafeAreaInsets()
   const { cart, isLoading, fetchCart, updateItem, removeItem, clearCart } = useCartStore()
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const { requireAuth } = useRequireAuth()
   const customer = useAuthStore((s) => s.customer)
   const exchangeRate = useExchangeStore((s) => s.rate)
   const showUzs = customer?.phoneRegion === 'UZB'
@@ -283,12 +284,10 @@ export default function CartScreen() {
             label="Buyurtma berish"
             disabled={items.length === 0 || items.some((i) => !i.inStock) || isBelowMin}
             onPress={() => {
-              if (
-                !requireAuth(useAuthStore.getState().isAuthenticated, router, '/checkout')
-              )
-                return
-              router.push({
-                pathname: '/checkout',
+              requireAuth(() => {
+                router.push({
+                  pathname: '/checkout',
+                })
               })
             }}
           />

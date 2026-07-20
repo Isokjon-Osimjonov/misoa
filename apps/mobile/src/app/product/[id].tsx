@@ -25,7 +25,7 @@ import { formatKRW, formatUZS, krwToUzs } from '../../lib/price'
 import SkeletonLoader from '../../components/ui/SkeletonLoader'
 import { Toast, useToast } from '../../components/ui/Toast'
 import CartBadgeIcon from '../../components/ui/CartBadgeIcon'
-import { requireAuth } from '../../lib/require-auth'
+import { useRequireAuth } from '../../hooks/useRequireAuth'
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -34,6 +34,7 @@ const WaitlistButton = ({ productId, showToast }: { productId: string; showToast
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    // Only check waitlist status if auth store exists, no need for requireAuth here
     if (!useAuthStore.getState().isAuthenticated) return
 
     waitlistService
@@ -44,30 +45,32 @@ const WaitlistButton = ({ productId, showToast }: { productId: string; showToast
       .catch(() => {})
   }, [productId])
 
+  const { requireAuth } = useRequireAuth()
+
   const handlePress = async () => {
     if (isOnWaitlist) return
-    if (!requireAuth(useAuthStore.getState().isAuthenticated, router, `/product/${productId}`))
-      return
-
-    setIsLoading(true)
-    try {
-      const result = await waitlistService.addToWaitlist(productId)
-      if (result.inStock) {
-        showToast("Mahsulot mavjud! Savatga qo'shishingiz mumkin", 'info')
-      } else {
-        setIsOnWaitlist(true)
-        showToast("Kutish ro'yxatiga qo'shildingiz ✓", 'success')
+    
+    requireAuth(async () => {
+      setIsLoading(true)
+      try {
+        const result = await waitlistService.addToWaitlist(productId)
+        if (result.inStock) {
+          showToast("Mahsulot mavjud! Savatga qo'shishingiz mumkin", 'info')
+        } else {
+          setIsOnWaitlist(true)
+          showToast("Kutish ro'yxatiga qo'shildingiz ✓", 'success')
+        }
+      } catch (err: any) {
+        const code = err?.response?.data?.error?.code
+        if (code === 'WAITLIST_ALREADY_EXISTS') {
+          setIsOnWaitlist(true)
+        } else {
+          showToast(err?.response?.data?.error?.message ?? 'Xatolik', 'error')
+        }
+      } finally {
+        setIsLoading(false)
       }
-    } catch (err: any) {
-      const code = err?.response?.data?.error?.code
-      if (code === 'WAITLIST_ALREADY_EXISTS') {
-        setIsOnWaitlist(true)
-      } else {
-        showToast(err?.response?.data?.error?.message ?? 'Xatolik', 'error')
-      }
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   return (
@@ -97,6 +100,7 @@ const WaitlistButton = ({ productId, showToast }: { productId: string; showToast
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams()
   const insets = useSafeAreaInsets()
+  const { requireAuth } = useRequireAuth()
   const customer = useAuthStore((s) => s.customer)
   const exchangeRate = useExchangeStore((s) => s.rate)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -127,27 +131,29 @@ export default function ProductDetailScreen() {
   const isOutOfStock = totalStock === 0
 
   const handleAddToCart = async () => {
-    if (isAdding || !id || isOutOfStock) return
-    setIsAdding(true)
-    try {
-      await addItem(id as string, 1)
-    } catch (err: any) {
-      const code = err?.response?.data?.error?.code
-      if (code === 'REGION_MISMATCH') {
-        showToast('Savatda boshqa hududdan mahsulot bor', 'error')
-      } else {
-        showToast(err?.response?.data?.error?.message ?? "Savatga qo'shib bo'lmadi", 'error')
+    requireAuth(async () => {
+      if (isAdding || !id || isOutOfStock) return
+      setIsAdding(true)
+      try {
+        await addItem(id as string, 1)
+      } catch (err: any) {
+        const code = err?.response?.data?.error?.code
+        if (code === 'REGION_MISMATCH') {
+          showToast('Savatda boshqa hududdan mahsulot bor', 'error')
+        } else {
+          showToast(err?.response?.data?.error?.message ?? "Savatga qo'shib bo'lmadi", 'error')
+        }
+      } finally {
+        setIsAdding(false)
       }
-    } finally {
-      setIsAdding(false)
-    }
+    })
   }
 
   const handleWishlistToggle = () => {
     if (!product) return
-    if (!requireAuth(useAuthStore.getState().isAuthenticated, router, `/product/${product.id}`))
-      return
-    toggleWishlist(product.id)
+    requireAuth(() => {
+      toggleWishlist(product.id)
+    })
   }
 
   if (isLoading) {

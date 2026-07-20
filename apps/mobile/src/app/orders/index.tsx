@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { router, useFocusEffect } from 'expo-router'
 import { orderService } from '../../services/order.service'
 import { useAuthStore } from '../../lib/auth-store'
-import { requireAuth } from '../../lib/require-auth'
+import { useRequireAuth } from '../../hooks/useRequireAuth'
 import { formatKRW, formatDate, formatCountdown } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
@@ -51,6 +51,7 @@ function SkeletonLoader() {
 
 export default function OrdersScreen() {
   const [refreshing, setRefreshing] = useState(false)
+  const { requireAuth } = useRequireAuth()
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['orders'],
@@ -60,8 +61,9 @@ export default function OrdersScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!requireAuth(useAuthStore.getState().isAuthenticated, router, '/orders')) return
-      refetch()
+      requireAuth(() => {
+        refetch()
+      })
     }, [refetch])
   )
 

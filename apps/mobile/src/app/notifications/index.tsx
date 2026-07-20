@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { router, useFocusEffect } from 'expo-router'
 import { notificationService, Notification } from '../../services/notification.service'
 import { useAuthStore } from '../../lib/auth-store'
-import { requireAuth } from '../../lib/require-auth'
+import { useRequireAuth } from '../../hooks/useRequireAuth'
 import { formatDate } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
 import EmptyState from '../../components/ui/EmptyState'
@@ -52,6 +52,7 @@ const TYPE_CONFIG: Record<string, { icon: string; color: string; bg: string }> =
 export default function NotificationsScreen() {
   const [refreshing, setRefreshing] = useState(false)
   const queryClient = useQueryClient()
+  const { requireAuth } = useRequireAuth()
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['notifications'],
@@ -61,8 +62,9 @@ export default function NotificationsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!requireAuth(useAuthStore.getState().isAuthenticated, router, '/notifications')) return
-      refetch()
+      requireAuth(() => {
+        refetch()
+      })
     }, [refetch])
   )
 

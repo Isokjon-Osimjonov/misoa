@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import { tokens } from '../../lib/tokens'
 import PhoneInput, { validatePhone, getFullPhone } from '../../components/ui/PhoneInput'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import { authService } from '../../services/auth.service'
+import { Feather } from '@expo/vector-icons'
 
 export default function LoginScreen() {
   const { returnTo } = useLocalSearchParams()
@@ -47,6 +48,12 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity
+        onPress={() => router.replace('/(tabs)/home')}
+        style={styles.backButton}>
+        <Feather name="arrow-left" size={24} color={tokens.colors.text} />
+      </TouchableOpacity>
+      
       <View style={styles.top}>
         <Image source={require('../../../assets/icon.png')} style={styles.logo} />
         <Text style={styles.title}>Kirish</Text>
@@ -76,6 +83,13 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.bottom}>
+        <TouchableOpacity
+          onPress={() => router.replace('/(tabs)/home')}
+          style={styles.guestButton}>
+          <Text style={styles.guestText}>
+            Mehmon sifatida davom etish
+          </Text>
+        </TouchableOpacity>
         <Text style={styles.bottomText}>Telegram orqali OTP kodi yuboriladi</Text>
       </View>
     </SafeAreaView>
@@ -86,6 +100,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.white,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: tokens.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: tokens.colors.border,
   },
   top: {
     paddingTop: 60,
@@ -119,6 +147,21 @@ const styles = StyleSheet.create({
   bottom: {
     marginTop: 16,
     alignItems: 'center',
+    paddingBottom: 24,
+  },
+  guestButton: {
+    marginBottom: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    backgroundColor: tokens.colors.surface,
+    borderWidth: 1,
+    borderColor: tokens.colors.border,
+  },
+  guestText: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: 14,
+    color: tokens.colors.primary,
   },
   bottomText: {
     fontFamily: 'Inter_400Regular',
