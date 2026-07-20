@@ -29,31 +29,31 @@ type Slide = {
 
 const slides: Slide[] = [
   {
-    bg: '#FCE7F3',
+    bg: '#EDE9FE', // violet-100
     statusBar: 'dark-content',
-    titleColor: '#500724',
-    subtitleColor: '#9D174D',
-    counterColor: '#9D174D',
+    titleColor: '#2E1065', // violet-950
+    subtitleColor: '#6D28D9', // violet-700
+    counterColor: '#6D28D9',
     imageUrl: require('../../assets/onb1.png'),
-    title: 'MIRA\nMARKET',
+    title: 'MISOA\nMARKET',
     subtitle: 'KOREYA MAHSULOTLARI\nENG YAXSHI NARXDA',
   },
   {
-    bg: '#FFF5F9',
+    bg: '#F5F3FF', // violet-50
     statusBar: 'dark-content',
-    titleColor: '#500724',
-    subtitleColor: '#9D174D',
-    counterColor: '#9D174D',
+    titleColor: '#2E1065',
+    subtitleColor: '#6D28D9',
+    counterColor: '#6D28D9',
     imageUrl: require('../../assets/onb2.png'),
     title: 'TEZ\nYETKAZIB',
     subtitle: "O'ZBEKISTONGA ISHONCHLI\nVA TEZ YETKAZIB BERISH",
   },
   {
-    bg: '#FCE7F3',
+    bg: '#EDE9FE', // violet-100
     statusBar: 'dark-content',
-    titleColor: '#500724',
-    subtitleColor: '#9D174D',
-    counterColor: '#9D174D',
+    titleColor: '#2E1065',
+    subtitleColor: '#6D28D9',
+    counterColor: '#6D28D9',
     imageUrl: require('../../assets/onb4.png'),
     title: 'BOSHLASH',
     subtitle: "RO'YXATDAN O'TING VA\nBIRINCHI BUYURTMA BERING",
