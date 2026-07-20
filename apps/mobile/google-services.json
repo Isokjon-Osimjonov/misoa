@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32584112152",
+    "project_id": "misoa-market",
+    "storage_bucket": "misoa-market.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32584112152:android:0b511defe731104d6b8b6d",
+        "android_client_info": {
+          "package_name": "uz.misoacosmetics.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBE0894F2m56sgUGp8IpPhikKvoWH6YFxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
