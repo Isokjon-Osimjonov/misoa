@@ -1,125 +1,225 @@
 <!doctype html>
 <html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foydalanish shartlari — Misoa Market</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --primary: #FF0071;
-      --primary-light: #fff0f7;
-      --primary-dark: #CC005A;
-      --secondary: #7C3AED;
-      --text: #111827;
-      --text-muted: #6B7280;
-      --border: #E5E7EB;
-      --bg: #FFFFFF;
-      --bg-soft: #F9FAFB;
-      --radius: 12px;
-      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; color: var(--text); background-color: var(--bg-soft); line-height: 1.6; }
-    a { text-decoration: none; color: inherit; }
-    
-    /* Header */
-    header { background-color: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    nav { display: flex; justify-content: space-between; align-items: center; height: 80px; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    .logo { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-    .nav-links a { font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--primary); }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foydalanish shartlari — Misoa Market</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="./favicon.png" />
 
-    /* Content */
-    main { max-width: 800px; margin: 60px auto; padding: 40px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
-    h1 { font-size: 32px; margin-bottom: 32px; color: var(--primary); }
-    h2 { font-size: 20px; margin-top: 32px; margin-bottom: 16px; color: var(--text); }
-    p, ul { margin-bottom: 16px; color: var(--text-muted); }
-    ul { padding-left: 24px; }
-    li { margin-bottom: 8px; }
+    <style>
+      :root {
+        --primary: #ff0071;
+        --primary-light: #fff0f7;
+        --primary-dark: #cc005a;
+        --secondary: #7c3aed;
+        --text: #111827;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --bg: #ffffff;
+        --bg-soft: #f9fafb;
+        --radius: 12px;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-    /* Footer */
-    footer { background: var(--bg); border-top: 1px solid var(--border); padding: 64px 24px; text-align: center; margin-top: 60px; }
-    footer p { color: var(--text-muted); margin-bottom: 24px; }
-    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-    .footer-links a, footer p a { color: var(--text-muted); font-weight: 500; }
-    .footer-links a:hover, footer p a:hover { color: var(--primary); }
-    
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      main { margin: 20px; padding: 24px; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <nav>
-      <a href="/" class="logo">Misoa</a>
-      <div class="nav-links">
-        <a href="/privacy">Maxfiylik</a>
-        <a href="/terms">Shartlar</a>
-        <a href="mailto:support@misoacosmetics.uz">Aloqa</a>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text);
+        background-color: var(--bg-soft);
+        line-height: 1.6;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* Header */
+      header {
+        background-color: var(--bg);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 80px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .logo {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        letter-spacing: -0.5px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      .nav-links a {
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      /* Content */
+      main {
+        max-width: 800px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      h1 {
+        font-size: 32px;
+        margin-bottom: 32px;
+        color: var(--primary);
+      }
+      h2 {
+        font-size: 20px;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+      p,
+      ul {
+        margin-bottom: 16px;
+        color: var(--text-muted);
+      }
+      ul {
+        padding-left: 24px;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 64px 24px;
+        text-align: center;
+        margin-top: 60px;
+      }
+      footer p {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .footer-links a,
+      footer p a {
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .footer-links a:hover,
+      footer p a:hover {
+        color: var(--primary);
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        main {
+          margin: 20px;
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/" class="logo">Misoa</a>
+        <div class="nav-links">
+          <a href="/privacy">Maxfiylik</a>
+          <a href="/terms">Shartlar</a>
+          <a href="mailto:support@misoacosmetics.uz">Aloqa</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Foydalanish shartlari</h1>
+
+      <h2>1. Umumiy qoidalar</h2>
+      <p>Misoa Market ilovasidan foydalanish quyidagi shartlarga roziligingizni bildiradi.</p>
+
+      <h2>2. Xizmat tavsifi</h2>
+      <p>Misoa Market — Koreya kosmetikasini O'zbekistonga yetkazib berish platformasi.</p>
+
+      <h2>3. Foydalanuvchi majburiyatlari</h2>
+      <ul>
+        <li>To'g'ri ma'lumot kiritish</li>
+        <li>Buyurtmani o'z vaqtida to'lash</li>
+        <li>To'lov kvitansiyasini yuklash</li>
+      </ul>
+
+      <h2>4. To'lov shartlari</h2>
+      <ul>
+        <li>To'lov bank o'tkazmasi orqali</li>
+        <li>To'lov muddati: 24 soat</li>
+        <li>Muddati o'tsa buyurtma bekor</li>
+      </ul>
+
+      <h2>5. Yetkazib berish</h2>
+      <ul>
+        <li>Korea → O'zbekiston: 7-14 kun</li>
+        <li>Kargo orqali yetkazish</li>
+        <li>Aniq sana cargo jadvaliga bog'liq</li>
+      </ul>
+
+      <h2>6. Qaytarish siyosati</h2>
+      <ul>
+        <li>Original mahsulot bo'lmasa to'liq qaytarish</li>
+        <li>Shikastlangan mahsulot uchun almashtirish yoki qaytarish</li>
+      </ul>
+
+      <h2>7. Mas'uliyatni cheklash</h2>
+      <p>Bojxona kechikishlari uchun Misoa javobgar emas.</p>
+
+      <h2>8. Aloqa</h2>
+      <p>
+        <a href="mailto:support@misoacosmetics.uz" style="color: var(--primary)"
+          >support@misoacosmetics.uz</a
+        >
+      </p>
+    </main>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/privacy">Maxfiylik siyosati</a>
+        <a href="/terms">Foydalanish shartlari</a>
+        <a href="/sale-terms">Savdo shartlari</a>
+        <a href="/delete-account">Akkauntni o'chirish</a>
       </div>
-    </nav>
-  </header>
-
-  <main>
-    <h1>Foydalanish shartlari</h1>
-
-    <h2>1. Umumiy qoidalar</h2>
-    <p>Misoa Market ilovasidan foydalanish quyidagi shartlarga roziligingizni bildiradi.</p>
-
-    <h2>2. Xizmat tavsifi</h2>
-    <p>Misoa Market — Koreya kosmetikasini O'zbekistonga yetkazib berish platformasi.</p>
-
-    <h2>3. Foydalanuvchi majburiyatlari</h2>
-    <ul>
-      <li>To'g'ri ma'lumot kiritish</li>
-      <li>Buyurtmani o'z vaqtida to'lash</li>
-      <li>To'lov kvitansiyasini yuklash</li>
-    </ul>
-
-    <h2>4. To'lov shartlari</h2>
-    <ul>
-      <li>To'lov bank o'tkazmasi orqali</li>
-      <li>To'lov muddati: 24 soat</li>
-      <li>Muddati o'tsa buyurtma bekor</li>
-    </ul>
-
-    <h2>5. Yetkazib berish</h2>
-    <ul>
-      <li>Korea → O'zbekiston: 7-14 kun</li>
-      <li>Kargo orqali yetkazish</li>
-      <li>Aniq sana cargo jadvaliga bog'liq</li>
-    </ul>
-
-    <h2>6. Qaytarish siyosati</h2>
-    <ul>
-      <li>Original mahsulot bo'lmasa to'liq qaytarish</li>
-      <li>Shikastlangan mahsulot uchun almashtirish yoki qaytarish</li>
-    </ul>
-
-    <h2>7. Mas'uliyatni cheklash</h2>
-    <p>Bojxona kechikishlari uchun Misoa javobgar emas.</p>
-
-    <h2>8. Aloqa</h2>
-    <p><a href="mailto:support@misoacosmetics.uz" style="color: var(--primary);">support@misoacosmetics.uz</a></p>
-  </main>
-
-  <footer>
-    <div class="footer-links">
-      <a href="/privacy">Maxfiylik siyosati</a>
-      <a href="/terms">Foydalanish shartlari</a>
-      <a href="/sale-terms">Savdo shartlari</a>
-      <a href="/delete-account">Akkauntni o'chirish</a>
-    </div>
-    <p>
-      <a href="https://t.me/misoa_cosmetics_bot">Telegram</a> |
-      <a href="mailto:support@misoacosmetics.uz">support@misoacosmetics.uz</a>
-    </p>
-    <p>© 2026 Misoa Market</p>
-  </footer>
-</body>
+      <p>
+        <a href="https://t.me/misoa_cosmetics_bot">Telegram</a> |
+        <a href="mailto:support@misoacosmetics.uz">support@misoacosmetics.uz</a>
+      </p>
+      <p>© 2026 Misoa Market</p>
+    </footer>
+  </body>
 </html>
