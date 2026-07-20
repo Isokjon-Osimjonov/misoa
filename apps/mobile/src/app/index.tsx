@@ -1,10 +1,13 @@
-import { Redirect } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { router } from 'expo-router'
+import { useEffect, useState, useRef } from 'react'
 import * as SecureStore from 'expo-secure-store'
+import { useAuthStore } from '../lib/auth-store'
 
 export default function Index() {
   const [checked, setChecked] = useState(false)
   const [hasSeenOnboarding, setHasSeen] = useState(false)
+  const { isLoading } = useAuthStore()
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
     const check = async () => {
@@ -23,14 +26,19 @@ export default function Index() {
     check()
   }, [])
 
-  if (!checked) return null
+  useEffect(() => {
+    if (hasRedirected.current) return
+    if (!checked || isLoading) return
+    
+    hasRedirected.current = true
+    
+    if (!hasSeenOnboarding) {
+      router.replace('/onboarding')
+      return
+    }
+    
+    router.replace('/(tabs)/home')
+  }, [checked, isLoading, hasSeenOnboarding])
 
-  // First time → show onboarding
-  if (!hasSeenOnboarding) {
-    return <Redirect href="/onboarding" />
-  }
-
-  // NOT authenticated → still go HOME
-  // Guest mode - no forced login
-  return <Redirect href="/(tabs)/home" />
+  return null
 }
