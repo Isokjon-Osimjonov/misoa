@@ -1,5 +1,6 @@
 {
   "expo": {
+    "main": "expo-router/entry",
     "name": "Mobile",
     "slug": "@misoa/mobile",
     "version": "1.0.0",
