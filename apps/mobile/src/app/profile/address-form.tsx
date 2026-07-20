@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { tokens } from '../../lib/tokens'
 import { addressService, type JusoResult } from '../../services/address.service'
 import PrimaryButton from '../../components/ui/PrimaryButton'
+import { ScreenHeader } from '../../components/ui'
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? (
@@ -292,15 +293,7 @@ export default function AddressFormScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            {addressId ? 'Manzilni tahrirlash' : "Manzil qo'shish"}
-          </Text>
-          <View style={{ width: 40 }} />
-        </View>
+        <ScreenHeader title={addressId ? 'Manzilni tahrirlash' : "Manzil qo'shish"} />
 
         <ScrollView
           ref={scrollViewRef}
@@ -552,26 +545,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   scroll: {
     flex: 1,

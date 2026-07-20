@@ -3,6 +3,7 @@ import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Linking } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { router } from 'expo-router'
+import { ScreenHeader } from '../../components/ui'
 import { tokens } from '../../lib/tokens'
 
 const FAQS = [
@@ -41,13 +42,7 @@ export default function HelpScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Yordam</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <ScreenHeader title="Yordam" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* CONTACT SECTION */}
@@ -131,25 +126,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   scrollContent: {
     paddingBottom: 100,

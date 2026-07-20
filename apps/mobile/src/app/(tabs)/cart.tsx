@@ -25,6 +25,7 @@ import { productService, calculateKorCargo } from '../../services/product.servic
 import { useQuery } from '@tanstack/react-query'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
+import { ScreenHeader } from '../../components/ui'
 import api from '../../lib/api'
 
 export default function CartScreen() {
@@ -139,9 +140,7 @@ export default function CartScreen() {
   if (items.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Savat</Text>
-        </View>
+        <ScreenHeader title="Savat" showBack={false} />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <EmptyState
             icon="shopping-bag"
@@ -158,14 +157,17 @@ export default function CartScreen() {
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Savat</Text>
-          {items.length > 0 && (
-            <TouchableOpacity onPress={handleClearCart}>
-              <Text style={styles.clearBtn}>Tozalash</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <ScreenHeader 
+          title="Savat" 
+          showBack={false} 
+          rightElement={
+            items.length > 0 ? (
+              <TouchableOpacity onPress={handleClearCart}>
+                <Text style={{ fontSize: 13, color: tokens.colors.primary }}>Tozalash</Text>
+              </TouchableOpacity>
+            ) : undefined
+          } 
+        />
       </SafeAreaView>
 
       <ScrollView
@@ -306,24 +308,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    margin: 'auto',
-  },
-  clearBtn: {
-    fontSize: 13,
-    color: tokens.colors.primary,
   },
   emptyContainer: {
     flex: 1,

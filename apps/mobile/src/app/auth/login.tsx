@@ -48,12 +48,10 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        onPress={() => router.replace('/(tabs)/home')}
-        style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.replace('/(tabs)/home')} style={styles.backButton}>
         <Feather name="arrow-left" size={24} color={tokens.colors.text} />
       </TouchableOpacity>
-      
+
       <View style={styles.top}>
         <Image source={require('../../../assets/icon.png')} style={styles.logo} />
         <Text style={styles.title}>Kirish</Text>
@@ -83,12 +81,8 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.bottom}>
-        <TouchableOpacity
-          onPress={() => router.replace('/(tabs)/home')}
-          style={styles.guestButton}>
-          <Text style={styles.guestText}>
-            Mehmon sifatida davom etish
-          </Text>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/home')} style={styles.guestButton}>
+          <Text style={styles.guestText}>Mehmon sifatida davom etish</Text>
         </TouchableOpacity>
         <Text style={styles.bottomText}>Telegram orqali OTP kodi yuboriladi</Text>
       </View>
@@ -121,14 +115,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 72,
-    height: 72,
+    width: 90,
+    height: 90,
     borderRadius: 12,
   },
   title: {
     fontFamily: 'Inter_400Regular',
     fontWeight: '500',
-    fontSize: 28,
+    fontSize: 24,
     color: tokens.colors.text,
     marginTop: 24,
   },
@@ -155,8 +149,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     backgroundColor: tokens.colors.surface,
-    borderWidth: 1,
-    borderColor: tokens.colors.border,
   },
   guestText: {
     fontFamily: 'Inter_500Medium',

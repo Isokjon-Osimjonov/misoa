@@ -24,6 +24,7 @@ import { boxService, type Box } from '../../services/box.service'
 import { cartService } from '../../services/cart.service'
 import { orderService } from '../../services/order.service'
 import { uploadService } from '../../services/upload.service'
+import { ScreenHeader } from '../../components/ui'
 import api from '../../lib/api'
 
 interface OrderResult {
@@ -370,19 +371,10 @@ function CheckoutScreen() {
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       {/* HEADER */}
-      <View style={styles.header}>
-        {!orderResult ? (
-          <Pressable onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color={tokens.colors.text} />
-          </Pressable>
-        ) : (
-          <View style={{ width: 24 }} />
-        )}
-        <Text style={styles.headerTitle}>
-          {orderResult ? "To'lov" : 'Buyurtma'}
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <ScreenHeader 
+        title={orderResult ? "To'lov" : 'Buyurtma'} 
+        showBack={!orderResult} 
+      />
 
       <ScrollView
         ref={scrollRef}
@@ -1032,20 +1024,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: tokens.colors.border,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: tokens.colors.text,
   },
   scroll: { flex: 1 },
   section: {

@@ -21,6 +21,7 @@ import { uploadService } from '../../services/upload.service'
 import api from '../../lib/api'
 import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
+import { ScreenHeader } from '../../components/ui'
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? (
@@ -129,13 +130,7 @@ export default function EditProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profilni tahrirlash</Text>
-          <View style={{ width: 40 }} />
-        </View>
+        <ScreenHeader title="Profilni tahrirlash" />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -215,26 +210,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   scrollContent: {
     paddingHorizontal: 24,

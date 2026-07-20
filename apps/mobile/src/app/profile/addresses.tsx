@@ -16,6 +16,7 @@ import { tokens } from '../../lib/tokens'
 import { addressService, type Address } from '../../services/address.service'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
+import { ScreenHeader } from '../../components/ui'
 
 export default function AddressesScreen() {
   const queryClient = useQueryClient()
@@ -114,18 +115,17 @@ export default function AddressesScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Manzillarim</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/profile/address-form')}
-          style={styles.addBtn}
-        >
-          <Feather name="plus" size={22} color={tokens.colors.primary} />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title="Manzillarim"
+        rightElement={
+          <TouchableOpacity
+            onPress={() => router.push('/profile/address-form')}
+            style={styles.addBtn}
+          >
+            <Feather name="plus" size={22} color={tokens.colors.primary} />
+          </TouchableOpacity>
+        }
+      />
 
       {isLoading ? (
         <View style={styles.center}>
@@ -158,26 +158,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   addBtn: {
     width: 40,

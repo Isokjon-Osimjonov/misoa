@@ -1,0 +1,96 @@
+import React from 'react'
+import {
+  View, Text, TouchableOpacity,
+  StyleSheet, ViewStyle
+} from 'react-native'
+import { Feather } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
+import { tokens } from '../../lib/tokens'
+
+interface ScreenHeaderProps {
+  title: string
+  onBack?: () => void
+  showBack?: boolean
+  rightElement?: React.ReactNode
+  style?: ViewStyle
+}
+
+export function ScreenHeader({
+  title,
+  onBack,
+  showBack = true,
+  rightElement,
+  style,
+}: ScreenHeaderProps) {
+  const router = useRouter()
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack()
+    } else {
+      router.back()
+    }
+  }
+
+  return (
+    <View style={[styles.header, style]}>
+      {/* Left - back button or spacer */}
+      {showBack ? (
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={handleBack}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Feather
+            name="chevron-left"
+            size={24}
+            color={tokens.colors.text}
+          />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.backBtn} />
+      )}
+
+      {/* Center - title always centered */}
+      <Text
+        style={styles.headerTitle}
+        numberOfLines={1}>
+        {title}
+      </Text>
+
+      {/* Right - action or spacer */}
+      <View style={styles.rightSlot}>
+        {rightElement ?? null}
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: tokens.colors.background,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '500',
+    color: tokens.colors.text,
+    textAlign: 'center',
+  },
+  rightSlot: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})

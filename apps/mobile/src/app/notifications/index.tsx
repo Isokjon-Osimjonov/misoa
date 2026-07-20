@@ -10,6 +10,7 @@ import { useRequireAuth } from '../../hooks/useRequireAuth'
 import { formatDate } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
 import EmptyState from '../../components/ui/EmptyState'
+import { ScreenHeader } from '../../components/ui'
 
 const TYPE_CONFIG: Record<string, { icon: string; color: string; bg: string }> = {
   ORDER_STATUS: {
@@ -136,19 +137,16 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Bildirishnomalar</Text>
-        {unreadCount > 0 ? (
-          <TouchableOpacity onPress={() => markAllRead.mutate()}>
-            <Feather name="check-circle" size={22} color={tokens.colors.primary} />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 60 }} />
-        )}
-      </View>
+      <ScreenHeader 
+        title="Bildirishnomalar" 
+        rightElement={
+          unreadCount > 0 ? (
+            <TouchableOpacity onPress={() => markAllRead.mutate()}>
+              <Feather name="check-circle" size={22} color={tokens.colors.primary} />
+            </TouchableOpacity>
+          ) : undefined
+        } 
+      />
 
       {isLoading && !refreshing ? (
         <View style={styles.center}>
@@ -185,26 +183,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: tokens.colors.background,
-  },
-  backBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   markAllText: {
     fontSize: 12,

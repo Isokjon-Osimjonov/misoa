@@ -23,6 +23,7 @@ import { ProductCard } from '../../components/ui/ProductCard'
 import SkeletonLoader from '../../components/ui/SkeletonLoader'
 import EmptyState from '../../components/ui/EmptyState'
 import { tokens } from '../../lib/tokens'
+import { ScreenHeader } from '../../components/ui'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const CARD_WIDTH = (SCREEN_WIDTH - 48 - 12) / 2
@@ -87,10 +88,8 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
+      <ScreenHeader title="Qidiruv" style={{ backgroundColor: tokens.colors.surface }} />
+      <View style={{ paddingHorizontal: 16, paddingBottom: 12, backgroundColor: tokens.colors.surface }}>
         <View style={styles.searchBox}>
           <Feather name="search" size={16} color={tokens.colors.textMuted} />
           <TextInput
@@ -232,20 +231,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: tokens.colors.surface,
-    gap: 10,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   searchBox: {
     flex: 1,

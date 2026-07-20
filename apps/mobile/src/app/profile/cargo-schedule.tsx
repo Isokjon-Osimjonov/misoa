@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { tokens } from '../../lib/tokens'
 import { cargoDateService } from '../../services/cargo-date.service'
+import { ScreenHeader } from '../../components/ui'
 
 function formatDateUzbek(isoString: string) {
   const date = new Date(isoString)
@@ -48,7 +49,11 @@ function formatDateUzbek(isoString: string) {
 }
 
 export default function CargoScheduleScreen() {
-  const { data: dates = [], isLoading, refetch } = useQuery({
+  const {
+    data: dates = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['cargo-dates'],
     queryFn: cargoDateService.getUpcoming,
     staleTime: 5 * 60 * 1000,
@@ -64,12 +69,7 @@ export default function CargoScheduleScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Yuk jadvali</Text>
-      </View>
+      <ScreenHeader title="Yuk jadvali" />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -122,25 +122,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: tokens.colors.background,
-  },
-  backBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    marginLeft: 12,
   },
   subtitleContainer: {
     paddingHorizontal: 24,

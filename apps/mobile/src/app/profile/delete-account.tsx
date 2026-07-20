@@ -19,6 +19,7 @@ import { useCartStore } from '../../lib/cart-store'
 import { useWishlistStore } from '../../lib/wishlist-store'
 import { Toast, useToast } from '../../components/ui/Toast'
 import { tokens } from '../../lib/tokens'
+import { ScreenHeader } from '../../components/ui'
 
 export default function DeleteAccountScreen() {
   const [confirmText, setConfirmText] = useState('')
@@ -63,13 +64,7 @@ export default function DeleteAccountScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={24} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hisobni o'chirish</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <ScreenHeader title="Hisobni o'chirish" />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -143,27 +138,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: tokens.colors.white,
-    borderBottomWidth: 0.5,
-    borderBottomColor: tokens.colors.border,
-  },
-  backBtn: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: tokens.colors.text,
-  },
-  placeholder: {
-    width: 32,
   },
   content: {
     flex: 1,

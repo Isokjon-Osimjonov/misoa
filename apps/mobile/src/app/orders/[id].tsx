@@ -22,6 +22,7 @@ import { tokens } from '../../lib/tokens'
 import { formatKRW, formatUZS, formatCountdown, krwToUzs } from '../../lib/price'
 import { useAuthStore } from '../../lib/auth-store'
 import { useExchangeStore } from '../../lib/exchange-store'
+import { ScreenHeader } from '../../components/ui'
 import api from '../../lib/api'
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
@@ -227,15 +228,10 @@ export default function OrderDetailScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>#{order.orderNumber}</Text>
-          <StatusBadge status={order.status} />
-        </View>
-      </View>
+      <ScreenHeader 
+        title={`#${order.orderNumber}`}
+        rightElement={<StatusBadge status={order.status} />}
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -582,28 +578,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: tokens.colors.background,
-  },
-  backBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-  },
-  headerTitleContainer: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: tokens.colors.text,
   },
   statusBadge: {
     borderRadius: 12,

@@ -19,6 +19,7 @@ import { useCartStore } from '../../lib/cart-store'
 import { ProductCard } from '../../components/ui/ProductCard'
 import { Toast, useToast } from '../../components/ui/Toast'
 import EmptyState from '../../components/ui/EmptyState'
+import { ScreenHeader } from '../../components/ui'
 
 export default function WishlistScreen() {
   const { items, isLoading, fetchWishlist } = useWishlistStore()
@@ -63,14 +64,7 @@ export default function WishlistScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={24} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sevimlilar</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeader title="Sevimlilar" />
 
       {items.length === 0 && !isLoading ? (
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -126,25 +120,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: tokens.colors.background,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter_600SemiBold',
-    color: tokens.colors.text,
   },
   listContent: {
     padding: 16,

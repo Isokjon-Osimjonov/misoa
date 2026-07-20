@@ -12,6 +12,7 @@ import { formatKRW, formatDate, formatCountdown } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
+import { ScreenHeader } from '../../components/ui'
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
   PENDING_PAYMENT: { label: "To'lov kutilmoqda", bg: '#FFF7ED', color: '#C2410C' },
@@ -113,13 +114,7 @@ export default function OrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Feather name="arrow-left" size={22} color={tokens.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Buyurtmalarim</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <ScreenHeader title="Buyurtmalarim" />
 
       {isLoading && !refreshing ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
@@ -161,26 +156,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: tokens.colors.background,
-  },
-  backBtn: {
-    width: 24,
-    height: 40,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    textAlign: 'center',
   },
   listContent: {
     paddingHorizontal: 24,
