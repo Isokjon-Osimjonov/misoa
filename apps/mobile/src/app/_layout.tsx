@@ -9,9 +9,10 @@ import { ErrorBoundary } from '../components/ui/ErrorBoundary'
 import { useNetworkStatus } from '../components/ui/NoInternet'
 import NoInternet from '../components/ui/NoInternet'
 import { useAuthStore } from '../lib/auth-store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { registerForPushNotifications, setupNotificationListeners } from '../lib/push-notifications'
 import { useRouter } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
 
 // Inner component — has access to QueryClientProvider
 function AppContent() {
@@ -68,12 +69,31 @@ export default function RootLayout() {
 
   const initialize = useAuthStore((s) => s.initialize)
   const authLoading = useAuthStore((s) => s.isLoading)
+  const [onboardingChecked, setOnboardingChecked] = useState(false)
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
 
   useEffect(() => {
     initialize()
   }, [])
 
-  if (!fontsLoaded || authLoading) {
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        // TEMP: force onboarding for testing
+        // Remove before production build
+        await SecureStore.deleteItemAsync('onboarding_complete')
+        const seen = await SecureStore.getItemAsync('onboarding_complete')
+        setHasSeenOnboarding(seen === 'true')
+      } catch {
+        setHasSeenOnboarding(false)
+      } finally {
+        setOnboardingChecked(true)
+      }
+    }
+    checkOnboarding()
+  }, [])
+
+  if (!fontsLoaded || authLoading || !onboardingChecked) {
     return (
       <SafeAreaProvider>
         <View style={{
@@ -96,6 +116,16 @@ export default function RootLayout() {
             color="#7C3AED"
           />
         </View>
+      </SafeAreaProvider>
+    )
+  }
+
+  if (!hasSeenOnboarding) {
+    return (
+      <SafeAreaProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        </Stack>
       </SafeAreaProvider>
     )
   }

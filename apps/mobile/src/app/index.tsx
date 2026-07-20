@@ -1,30 +1,11 @@
-import { useEffect } from 'react'
-import { View } from 'react-native'
-import { useRouter } from 'expo-router'
-import * as ExpoStorage from 'expo-secure-store'
+import { Redirect } from 'expo-router'
+import { useAuthStore } from '../lib/auth-store'
 
-export default function IndexScreen() {
-  const router = useRouter()
-
-  useEffect(() => {
-    checkOnboarding()
-  }, [])
-
-  async function checkOnboarding() {
-    const seenOnboarding = await ExpoStorage.getItemAsync('onboarding_complete')
-    if (!seenOnboarding) {
-      router.replace('/onboarding')
-    } else {
-      router.replace('/(tabs)/home')
-    }
+export default function Index() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)/home" />
   }
-
-  // Brief transparent screen while
-  // useEffect fires
-  return (
-    <View style={{
-      flex: 1,
-      backgroundColor: '#ffffff'
-    }} />
-  )
+  return <Redirect href="/auth/login" />
 }
