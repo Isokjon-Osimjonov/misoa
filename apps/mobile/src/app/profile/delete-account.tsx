@@ -22,14 +22,14 @@ import { tokens } from '../../lib/tokens'
 import { ScreenHeader } from '../../components/ui'
 
 export default function DeleteAccountScreen() {
-  const [confirmText, setConfirmText] = useState('')
+  const [isConfirmed, setIsConfirmed] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const logout = useAuthStore((s) => s.logout)
   const clearCart = useCartStore((s) => s.clearCart)
   const { toast, showToast, hideToast } = useToast()
 
-  const isConfirmed = confirmText.trim().toLowerCase() === "o'chirish"
+
 
   const handleDelete = async () => {
     if (!isConfirmed) return
@@ -101,23 +101,17 @@ export default function DeleteAccountScreen() {
               </View>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Tasdiqlash uchun{' '}
-                <Text style={{fontWeight: 'bold'}}>
-                  O'CHIRISH
-                </Text>
-                {' '}deb yozing:
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setIsConfirmed(!isConfirmed)}
+            >
+              <View style={[styles.checkbox, isConfirmed && styles.checkboxChecked]}>
+                {isConfirmed && <Feather name="check" size={14} color="white" />}
+              </View>
+              <Text style={styles.checkboxLabel}>
+                Akkauntimni o'chirishni tasdiqlaymen
               </Text>
-              <TextInput
-                style={styles.input}
-                value={confirmText}
-                onChangeText={setConfirmText}
-                placeholder="O'CHIRISH"
-                autoCapitalize="characters"
-                autoCorrect={false}
-              />
-            </View>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
@@ -129,7 +123,7 @@ export default function DeleteAccountScreen() {
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.deleteBtnText}>Hisobni o'chirish</Text>
+                <Text style={styles.deleteBtnText}>Akkauntni o'chirish</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -187,23 +181,29 @@ const styles = StyleSheet.create({
     color: '#991B1B',
     lineHeight: 20,
   },
-  inputContainer: {
-    marginTop: 16,
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
   },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: tokens.colors.text,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
     borderColor: tokens.colors.border,
-    borderRadius: 8,
-    padding: 14,
-    fontSize: 16,
-    backgroundColor: tokens.colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkboxChecked: {
+    backgroundColor: '#DC2626',
+    borderColor: '#DC2626',
+  },
+  checkboxLabel: {
+    fontSize: 15,
     color: tokens.colors.text,
+    flex: 1,
   },
   footer: {
     padding: 24,
