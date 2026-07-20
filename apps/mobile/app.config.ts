@@ -4,6 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Misoa Market',
   slug: 'misoa-market',
+  owner: 'isokjon',
   scheme: 'misoa-market',
   version: '1.0.0',
   orientation: 'portrait',
@@ -17,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   notification: {
     icon: './assets/notification-icon.png',
-    color: '#E11D74',
+    color: '#7C3AED',
     androidMode: 'default',
   },
   ios: {
@@ -34,11 +35,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
   android: {
-    googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+    googleServicesFile: './google-services.json',
     package: 'uz.misoa.app',
+    versionCode: 1,
     adaptiveIcon: {
-      foregroundImage: './assets/icon.png',
-      backgroundColor: '#FFFFFF',
+      foregroundImage: './assets/adaptive-icon.png',
+      backgroundColor: '#FF0071',
     },
     permissions: ['CAMERA', 'READ_EXTERNAL_STORAGE', 'RECEIVE_BOOT_COMPLETED', 'VIBRATE'],
   },
@@ -59,7 +61,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-notifications',
       {
         icon: './assets/notification-icon.png',
-        color: '#E11D74',
+        color: '#7C3AED',
         sounds: [],
       },
     ],
@@ -67,6 +69,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.misoa.uz/api/v1',
     botUsername: process.env.EXPO_PUBLIC_BOT_USERNAME,
-    eas: { projectId: '95de2ad4-6355-4322-af4e-a56b3629a2be' },
+    eas: { projectId: '587f17a9-a943-43ed-8d06-2d040b255da9' },
   },
 })
