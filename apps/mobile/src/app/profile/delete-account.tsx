@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
@@ -32,11 +33,13 @@ export default function DeleteAccountScreen() {
 
 
   const handleDelete = async () => {
-    if (!isConfirmed) return
+    if (!isConfirmed || loading) return
 
     setLoading(true)
     try {
-      await authService.deleteAccount()
+      console.log('🗑 Starting delete...')
+      const result = await authService.deleteAccount()
+      console.log('✅ Delete result:', JSON.stringify(result))
 
       // Clear local stores
       await logout()
@@ -55,8 +58,20 @@ export default function DeleteAccountScreen() {
       showToast("Hisobingiz o'chirildi", 'success')
 
       router.replace('/auth/login')
-    } catch (e: any) {
-      showToast(e.response?.data?.error?.message || 'Xatolik yuz berdi', 'error')
+    } catch (err: any) {
+      console.log('❌ Delete error:', err)
+      console.log('❌ Error message:', err?.message)
+      console.log('❌ Error response:', JSON.stringify(err?.response?.data))
+      console.log('❌ Error status:', err?.response?.status)
+
+      // Show error to user properly
+      Alert.alert(
+        'Xatolik',
+        err?.response?.data?.error?.message ||
+          err?.message ||
+          "Akkauntni o'chirish imkonsiz. Qayta urining.",
+        [{ text: 'OK' }]
+      )
     } finally {
       setLoading(false)
     }
