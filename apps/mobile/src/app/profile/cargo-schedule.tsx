@@ -130,10 +130,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: tokens.colors.textMuted,
+    margin: 'auto',
   },
   emptyState: {
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 240,
   },
   emptyTitle: {
     fontSize: 16,

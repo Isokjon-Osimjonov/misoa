@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     androidMode: 'default',
   },
   ios: {
-    bundleIdentifier: 'uz.misoa.app',
+    bundleIdentifier: 'uz.misoacosmetics.app',
     buildNumber: '1',
     appleTeamId: '47779M8Z2K',
     supportsTablet: false,
@@ -36,7 +36,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     googleServicesFile: './google-services.json',
-    package: 'uz.misoa.app',
+    package: 'uz.misoacosmetics.app',
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',

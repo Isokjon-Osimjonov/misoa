@@ -28,12 +28,19 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 400,
           "resizeMode": "contain",
           "backgroundColor": "#FFFFFF"
         }
       ]
     ],
-    "owner": "isoqjon"
+    "owner": "isokjon",
+    "extra": {
+      "apiUrl": "https://api.misoa.uz/api/v1",
+      "router": {},
+      "eas": {
+        "projectId": "587f17a9-a943-43ed-8d06-2d040b255da9"
+      }
+    }
   }
 }
