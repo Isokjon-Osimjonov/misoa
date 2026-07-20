@@ -11,7 +11,7 @@ import NoInternet from '../components/ui/NoInternet'
 import { useAuthStore } from '../lib/auth-store'
 import { useEffect, useState } from 'react'
 import { registerForPushNotifications, setupNotificationListeners } from '../lib/push-notifications'
-import { useRouter } from 'expo-router'
+import { useRouter, Redirect, useRootNavigationState } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 
 // Inner component — has access to QueryClientProvider
@@ -74,6 +74,8 @@ export default function RootLayout() {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
   const router = useRouter()
 
+  const rootNavState = useRootNavigationState()
+
   useEffect(() => {
     initialize()
   }, [])
@@ -100,25 +102,9 @@ export default function RootLayout() {
     checkOnboarding()
   }, [])
 
-  useEffect(() => {
-    if (!fontsLoaded || authLoading || !onboardingChecked) return
-    
-    if (!hasSeenOnboarding) {
-      router.replace('/onboarding')
-      return
-    }
-    
-    if (!isAuthenticated) {
-      router.replace('/auth/login')
-      return
-    }
-    
-    router.replace('/(tabs)/home')
-  }, [onboardingChecked, hasSeenOnboarding, isAuthenticated, fontsLoaded, authLoading])
-
   return (
     <QueryClientProvider client={queryClient}>
-      {(!fontsLoaded || authLoading || !onboardingChecked) ? (
+      {(!fontsLoaded || authLoading || !onboardingChecked || !rootNavState?.key) ? (
         <SafeAreaProvider>
           <View style={{
             flex: 1,
@@ -141,6 +127,10 @@ export default function RootLayout() {
             />
           </View>
         </SafeAreaProvider>
+      ) : !hasSeenOnboarding ? (
+        <Redirect href="/onboarding" />
+      ) : !isAuthenticated ? (
+        <Redirect href="/auth/login" />
       ) : (
         <ErrorBoundary>
           <AppContent />
