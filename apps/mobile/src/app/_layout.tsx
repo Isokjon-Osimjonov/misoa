@@ -93,48 +93,42 @@ export default function RootLayout() {
     checkOnboarding()
   }, [])
 
-  if (!fontsLoaded || authLoading || !onboardingChecked) {
-    return (
-      <SafeAreaProvider>
-        <View style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#ffffff'
-        }}>
-          <Text style={{
-            fontSize: 24,
-            fontWeight: '700',
-            color: '#7C3AED',
-            marginBottom: 24,
-            letterSpacing: -0.5,
-          }}>
-            Misoa Market
-          </Text>
-          <ActivityIndicator
-            size="small"
-            color="#7C3AED"
-          />
-        </View>
-      </SafeAreaProvider>
-    )
-  }
-
-  if (!hasSeenOnboarding) {
-    return (
-      <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        </Stack>
-      </SafeAreaProvider>
-    )
-  }
-
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AppContent />
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      {(!fontsLoaded || authLoading || !onboardingChecked) ? (
+        <SafeAreaProvider>
+          <View style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#ffffff'
+          }}>
+            <Text style={{
+              fontSize: 24,
+              fontWeight: '700',
+              color: '#7C3AED',
+              marginBottom: 24,
+              letterSpacing: -0.5,
+            }}>
+              Misoa Market
+            </Text>
+            <ActivityIndicator
+              size="small"
+              color="#7C3AED"
+            />
+          </View>
+        </SafeAreaProvider>
+      ) : !hasSeenOnboarding ? (
+        <SafeAreaProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          </Stack>
+        </SafeAreaProvider>
+      ) : (
+        <ErrorBoundary>
+          <AppContent />
+        </ErrorBoundary>
+      )}
+    </QueryClientProvider>
   )
 }
