@@ -69,8 +69,10 @@ export default function RootLayout() {
 
   const initialize = useAuthStore((s) => s.initialize)
   const authLoading = useAuthStore((s) => s.isLoading)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const [onboardingChecked, setOnboardingChecked] = useState(false)
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     initialize()
@@ -79,12 +81,17 @@ export default function RootLayout() {
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
-        // TEMP: force onboarding for testing
-        // Remove before production build
+        // TEMP: force reset for testing
         await SecureStore.deleteItemAsync('onboarding_complete')
+        
         const seen = await SecureStore.getItemAsync('onboarding_complete')
+        
+        console.log('🔍 onboarding_complete value:', seen)
+        console.log('🔍 hasSeenOnboarding will be:', seen === 'true')
+        
         setHasSeenOnboarding(seen === 'true')
-      } catch {
+      } catch(e) {
+        console.log('❌ SecureStore error:', e)
         setHasSeenOnboarding(false)
       } finally {
         setOnboardingChecked(true)
@@ -92,6 +99,22 @@ export default function RootLayout() {
     }
     checkOnboarding()
   }, [])
+
+  useEffect(() => {
+    if (!fontsLoaded || authLoading || !onboardingChecked) return
+    
+    if (!hasSeenOnboarding) {
+      router.replace('/onboarding')
+      return
+    }
+    
+    if (!isAuthenticated) {
+      router.replace('/auth/login')
+      return
+    }
+    
+    router.replace('/(tabs)/home')
+  }, [onboardingChecked, hasSeenOnboarding, isAuthenticated, fontsLoaded, authLoading])
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -118,12 +141,6 @@ export default function RootLayout() {
             />
           </View>
         </SafeAreaProvider>
-      ) : !hasSeenOnboarding ? (
-        <SafeAreaProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          </Stack>
-        </SafeAreaProvider>
       ) : (
         <ErrorBoundary>
           <AppContent />
@@ -132,3 +149,4 @@ export default function RootLayout() {
     </QueryClientProvider>
   )
 }
+
