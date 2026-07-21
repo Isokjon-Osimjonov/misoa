@@ -27,7 +27,7 @@ import { ScreenHeader } from '../../components/ui'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const CARD_WIDTH = (SCREEN_WIDTH - 48 - 12) / 2
-const HISTORY_KEY = 'mira_search_history'
+const HISTORY_KEY = 'misoa_search_history'
 const MAX_HISTORY = 8
 
 export default function SearchScreen() {
@@ -89,7 +89,9 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* HEADER */}
       <ScreenHeader title="Qidiruv" style={{ backgroundColor: tokens.colors.surface }} />
-      <View style={{ paddingHorizontal: 16, paddingBottom: 12, backgroundColor: tokens.colors.surface }}>
+      <View
+        style={{ paddingHorizontal: 16, paddingBottom: 12, backgroundColor: tokens.colors.surface }}
+      >
         <View style={styles.searchBox}>
           <Feather name="search" size={16} color={tokens.colors.textMuted} />
           <TextInput
@@ -119,9 +121,7 @@ export default function SearchScreen() {
       </View>
 
       {/* HINT */}
-      {searchQuery.length === 1 && (
-        <Text style={styles.hint}>Kamida 2 ta belgi kiriting</Text>
-      )}
+      {searchQuery.length === 1 && <Text style={styles.hint}>Kamida 2 ta belgi kiriting</Text>}
 
       {/* HISTORY / NO QUERY */}
       {!showResults && searchQuery.length !== 1 && (
@@ -151,7 +151,12 @@ export default function SearchScreen() {
                 >
                   <Feather name="clock" size={14} color={tokens.colors.textMuted} />
                   <Text style={styles.historyText}>{item}</Text>
-                  <Feather name="arrow-up-left" size={14} color={tokens.colors.textLight} style={{ marginLeft: 'auto' }} />
+                  <Feather
+                    name="arrow-up-left"
+                    size={14}
+                    color={tokens.colors.textLight}
+                    style={{ marginLeft: 'auto' }}
+                  />
                 </Pressable>
               ))}
             </View>
@@ -180,12 +185,8 @@ export default function SearchScreen() {
       {showEmpty && (
         <View style={styles.emptyState}>
           <Feather name="search" size={48} color={tokens.colors.border} />
-          <Text style={styles.emptyTitle}>
-            {`"${debouncedQuery}" bo'yicha`} natija topilmadi
-          </Text>
-          <Text style={styles.emptySubtitle}>
-            Boshqa kalit so'z yoki brend nomi kiriting
-          </Text>
+          <Text style={styles.emptyTitle}>{`"${debouncedQuery}" bo'yicha`} natija topilmadi</Text>
+          <Text style={styles.emptySubtitle}>Boshqa kalit so'z yoki brend nomi kiriting</Text>
           {history.length > 0 && (
             <Text style={styles.emptyHint}>
               Oldingi qidiruvlarni ko'rish uchun maydonni bo'shating

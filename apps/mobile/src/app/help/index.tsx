@@ -77,14 +77,14 @@ export default function HelpScreen() {
 
           <TouchableOpacity
             style={styles.contactCard}
-            onPress={() => Linking.openURL('https://instagram.com/mira_cosmetics')}
+            onPress={() => Linking.openURL('https://instagram.com/misoa_cosmetics')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#FCE4EC' }]}>
               <Feather name="instagram" size={20} color="#E1306C" />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Instagram</Text>
-              <Text style={styles.contactSub}>@mira_cosmetics</Text>
+              <Text style={styles.contactSub}>@misoa_cosmetics</Text>
             </View>
             <Feather name="chevron-right" size={20} color={tokens.colors.textLight} />
           </TouchableOpacity>
