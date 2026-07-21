@@ -64,6 +64,7 @@ export async function createManual(req: Request, res: Response) {
         error: { message: "Ma'lumotlar noto'g'ri", code: 'VALIDATION_ERROR', details: e.errors },
       })
     }
+    console.error('[ExchangeRatesController] Error:', e)
     return res
       .status(e.status ?? 500)
       .json({ data: null, error: { message: e.message, code: e.code ?? 'INTERNAL_ERROR' } })

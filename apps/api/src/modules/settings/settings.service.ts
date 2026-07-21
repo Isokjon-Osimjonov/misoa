@@ -11,9 +11,10 @@ export async function getSettings() {
   const cached = await cacheGet<any>(CACHE_KEY)
   if (cached) return cached
 
-  const [row] = await db.select().from(settings).limit(1)
+  let [row] = await db.select().from(settings).limit(1)
   if (!row) {
-    throw { status: 500, code: 'SETTINGS_NOT_FOUND', message: 'Tizim sozlamalari topilmadi' }
+    const inserted = await db.insert(settings).values({}).returning()
+    row = inserted[0]
   }
 
   await cacheSet(CACHE_KEY, row, CACHE_TTL.SETTINGS)
