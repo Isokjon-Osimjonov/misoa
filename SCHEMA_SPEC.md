@@ -920,14 +920,14 @@ Constraints:
 
 ```
 Purpose: Core order record — created when customer submits checkout
-Number: MIRA-{YY}{MM}{DD}-{4_digit_seq} e.g. MIRA-260529-0001 (per-day sequence)
+Number: Misoa-{YY}{MM}{DD}-{4_digit_seq} e.g. Misoa-260529-0001 (per-day sequence)
 Region: profile_region from customer, delivery_region per this order (can differ)
 Auto-cancel: payment_deadline — if receipt not uploaded by deadline → CANCELED
 Timer restart: When admin rejects payment → payment_deadline updated to NOW + timeout
 
 Fields:
   id                    uuid PK defaultRandom
-  order_number          varchar(20) UNIQUE NOT NULL  -- MIRA-260529-0001
+  order_number          varchar(20) UNIQUE NOT NULL  -- Misoa-260529-0001
   customer_id           uuid NOT NULL FK→customers.id RESTRICT
 
   -- Region
@@ -1028,7 +1028,7 @@ Indexes:
   created_at_idx: on created_at
 
 Business Rules:
-  - order_number auto-generated: MIRA-{YY}{MM}{DD}-{seq} (seq resets daily)
+  - order_number auto-generated: Misoa-{YY}{MM}{DD}-{seq} (seq resets daily)
   - payment_deadline = created_at + settings.payment_timeout_minutes
   - On payment rejection: payment_deadline = now + settings.payment_timeout_minutes
   - stock_reservations.expires_at = order.payment_deadline
@@ -1417,7 +1417,7 @@ Fields:
   id               uuid PK defaultRandom
   chat_id          varchar(50) UNIQUE NOT NULL  -- Telegram chat ID (e.g. -1001234567890)
   channel_name     varchar(200) NOT NULL
-  channel_username varchar(100) nullable        -- @mira_cosmetics_uz
+  channel_username varchar(100) nullable        -- @misoa_cosmetics_uz
   region_code      varchar(5) nullable          -- UZB/KOR/null (all)
   is_active        boolean default true NOT NULL
   added_by         uuid nullable FK→admin_users.id SET NULL
@@ -1706,8 +1706,8 @@ export * from './notifications'
 
 ```
 Purpose: Atomic daily sequence counter for order numbers
-Pattern: MIRA-{YY}{MM}{DD}-{4_digit_seq_zero_padded}
-Example: MIRA-260529-0001, MIRA-260529-0042
+Pattern: Misoa-{YY}{MM}{DD}-{4_digit_seq_zero_padded}
+Example: Misoa-260529-0001, Misoa-260529-0042
 
 UPSERT on order creation:
   INSERT INTO daily_order_sequences (date, last_seq)

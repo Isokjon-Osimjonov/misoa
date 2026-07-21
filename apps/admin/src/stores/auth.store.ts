@@ -30,7 +30,7 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions
 
-export const authChannel = typeof window !== 'undefined' ? new BroadcastChannel('mira_auth') : null
+export const authChannel = typeof window !== 'undefined' ? new BroadcastChannel('misoa_auth') : null
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthStore>()(
       },
     }),
     {
-      name: 'mira-admin-auth',
+      name: 'misoa-admin-auth',
       storage: createJSONStorage(() => localStorage),
 
       // Only persist these fields (isAuthenticated is DERIVED)

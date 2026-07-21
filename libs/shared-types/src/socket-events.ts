@@ -11,7 +11,7 @@ export interface SocketEvents {
 
   'order:new': {
     orderId: string
-    orderNumber: string // MIRA-260529-0001
+    orderNumber: string // Misoa-260529-0001
     customerId: string
     customerName: string
     region: 'UZB' | 'KOR'
@@ -169,7 +169,7 @@ export interface TelegramNotifications {
     paymentDeadlineMinutes: number
     // Message:
     // ✅ Buyurtmangiz qabul qilindi!
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // 💰 ₩144,200
     // ⏰ To'lovni 30 daqiqa ichida yuklang
   }
@@ -179,7 +179,7 @@ export interface TelegramNotifications {
     orderNumber: string
     minutesRemaining: number
     // Message:
-    // ⚠️ Diqqat! Buyurtma #MIRA-260529-0001
+    // ⚠️ Diqqat! Buyurtma #Misoa-260529-0001
     // To'lovni yuklashga 10 daqiqa qoldi!
     // Aks holda buyurtma bekor qilinadi.
   }
@@ -189,7 +189,7 @@ export interface TelegramNotifications {
     orderNumber: string
     // Message:
     // 💚 To'lovingiz tasdiqlandi!
-    // 📦 #MIRA-260529-0001 tayyorlanmoqda
+    // 📦 #Misoa-260529-0001 tayyorlanmoqda
   }
 
   'customer.payment_rejected': {
@@ -198,7 +198,7 @@ export interface TelegramNotifications {
     reason: string
     // Message:
     // ❌ To'lov kvitansiyasi rad etildi
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // 💬 Sabab: {reason}
     // 🔄 Iltimos, qayta yuklang
   }
@@ -209,7 +209,7 @@ export interface TelegramNotifications {
     trackingNumber: string | null
     // Message:
     // 🚀 Buyurtmangiz yo'lda!
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // 🔍 Kuzatuv raqami: {trackingNumber}
   }
 
@@ -218,7 +218,7 @@ export interface TelegramNotifications {
     orderNumber: string
     // Message:
     // 🎉 Buyurtmangiz yetib keldi!
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // Xaridingizdan mamnun bo'lishingizni umid qilamiz 🌸
   }
 
@@ -228,7 +228,7 @@ export interface TelegramNotifications {
     reason: 'auto_cancel' | 'admin_cancel' | 'customer_cancel'
     // Message:
     // ❌ Buyurtma bekor qilindi
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
   }
 
   'customer.stock_back': {
@@ -256,7 +256,7 @@ export interface TelegramNotifications {
     // Message:
     // 🛒 YANGI BUYURTMA!
     // ━━━━━━━━━━━━━━━━━━━━
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // 👤 Isokjon +998901234567
     // 🌍 UZB | 3 ta mahsulot
     // 💰 ₩144,200
@@ -271,9 +271,9 @@ export interface TelegramNotifications {
     paymentAmount: string // formatted with currency
     // Message:
     // 💳 TO'LOV YUKLANDI!
-    // 📦 #MIRA-260529-0001 — Isokjon
+    // 📦 #Misoa-260529-0001 — Isokjon
     // 🏦 Korean Bank: ₩144,200
-    // ✅ Tekshiring: admin.miracosmetics.uz
+    // ✅ Tekshiring: admin.misoacosmetics.uz
   }
 
   'admin.low_stock_alert': {
@@ -286,7 +286,7 @@ export interface TelegramNotifications {
     // ⚠️ STOK KAMAYDI!
     // 💄 COSRX Snail Mucin Serum
     // 📊 Qoldi: 5 dona (limit: 10)
-    // 🔗 Yangilash: admin.miracosmetics.uz/inventory
+    // 🔗 Yangilash: admin.misoacosmetics.uz/inventory
   }
 
   'admin.out_of_stock': {
@@ -304,7 +304,7 @@ export interface TelegramNotifications {
     reason: string
     // Message:
     // ⏰ Buyurtma avtomatik bekor qilindi
-    // 📦 #MIRA-260529-0001
+    // 📦 #Misoa-260529-0001
     // Sabab: To'lov muddati o'tdi
   }
 

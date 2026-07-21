@@ -1,84 +1,85 @@
 <!doctype html>
 <html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sahifa topilmadi — Misoa Market</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,
+    initial-scale=1.0"
+    />
+    <title>Sahifa topilmadi — Misoa Market</title>
     <link rel="icon" type="image/png" href="./favicon.png" />
 
-  <style>
-    :root {
-      --primary: #FF0071;
-      --primary-dark: #CC005A;
-      --text: #111827;
-      --text-muted: #6B7280;
-      --bg: #FFFFFF;
-      --radius: 12px;
-    }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'Inter', sans-serif; 
-      color: var(--text); 
-      background-color: var(--bg); 
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    a { text-decoration: none; color: inherit; }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-    }
-
-    h1 {
-      font-size: 120px;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1;
-      margin-bottom: 24px;
-    }
-
-    h2 {
-      font-size: 32px;
-      margin-bottom: 16px;
-    }
-
-    p {
-      color: var(--text-muted);
-      font-size: 18px;
-      margin-bottom: 40px;
-      max-width: 400px;
-    }
-
-    .cta-btn {
-      background-color: var(--primary);
-      color: #fff !important;
-      padding: 14px 28px;
-      border-radius: var(--radius);
-      font-weight: 600;
-      transition: background-color 0.2s, transform 0.2s;
-    }
-
-    .cta-btn:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-2px);
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>404</h1>
-    <h2>Sahifa topilmadi</h2>
-    <p>Siz qidirayotgan sahifa mavjud emas yoki ko'chirilgan.</p>
-    <a href="https://misoa.uz" class="cta-btn">Bosh sahifaga qaytish</a>
-  </main>
-</body>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #fafafa;
+        color: #111;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .container {
+        text-align: center;
+        max-width: 400px;
+      }
+      .brand {
+        font-size: 24px;
+        font-weight: 700;
+        color: #3a0211;
+        margin-bottom: 48px;
+        letter-spacing: -0.5px;
+      }
+      .code {
+        font-size: 72px;
+        font-weight: 700;
+        color: #e5e7eb;
+        line-height: 1;
+        margin-bottom: 16px;
+      }
+      .title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 12px;
+      }
+      .description {
+        font-size: 15px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 40px;
+      }
+      .home-btn {
+        display: inline-block;
+        background: #3a0211;
+        color: white;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .home-btn:hover {
+        background: #3a0211;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="brand">Misoa Market</div>
+      <div class="code">404</div>
+      <div class="title">Sahifa topilmadi</div>
+      <div class="description">
+        Siz qidirgan sahifa mavjud emas yoki o'chirilgan bo'lishi mumkin.
+      </div>
+      <a href="/" class="home-btn"> Bosh sahifaga qaytish </a>
+    </div>
+  </body>
 </html>

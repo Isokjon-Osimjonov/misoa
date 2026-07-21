@@ -25,10 +25,9 @@ const getSocketUrl = () => {
 export const env = {
   apiUrl: (getApiUrl() as string) ?? '',
   socketUrl: (getSocketUrl() as string) ?? '',
-  appName: (import.meta.env.VITE_APP_NAME as string) ?? 'Mira Admin',
+  appName: (import.meta.env.VITE_APP_NAME as string) ?? 'Misoa Admin',
 } as const
 
 // Sanity check (dev only)
 if (import.meta.env.DEV) {
-
 }

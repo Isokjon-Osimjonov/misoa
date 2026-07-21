@@ -1010,7 +1010,7 @@ export function TelegramPage() {
               <Input
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
-                placeholder="@mira_channel yoki -1001234567890"
+                placeholder="@misoa_channel yoki -1001234567890"
                 className="h-9 text-sm rounded-lg border-[0.5px]"
               />
             </div>

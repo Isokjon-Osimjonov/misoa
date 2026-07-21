@@ -6,7 +6,7 @@ echo "Image tag: ${IMAGE_TAG:-latest}"
 
 # Determine which color is currently live by checking
 # which port Nginx upstream currently points to
-CURRENT_UPSTREAM=$(grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' \
+CURRENT_UPSTREAM=$(grep -oP 'server 127.0.0.1:\K[0-9]+(?=;)' \
   /etc/nginx/sites-available/api.misoa.uz || echo "4000")
 
 if [ "$CURRENT_UPSTREAM" = "4000" ]; then
@@ -53,12 +53,88 @@ fi
 
 echo "$IDLE_COLOR is healthy. Switching Nginx traffic..."
 
-# Flip Nginx upstream to the new color's port
-sudo sed -i "s/127.0.0.1:$LIVE_PORT/127.0.0.1:$IDLE_PORT/" \
-  /etc/nginx/sites-available/api.misoa.uz
+# Switch active port in upstream
+if [ "$IDLE_PORT" = "4000" ]; then
+  sudo bash -c "cat > \
+    /etc/nginx/sites-available/api.misoa.uz << 'NGINX'
+upstream misoa_api {
+    server 127.0.0.1:4000;
+    server 127.0.0.1:4001 backup;
+}
 
-sudo nginx -t
-sudo systemctl reload nginx
+server {
+    listen 80;
+    server_name api.misoa.uz;
+    return 301 https://\$host\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name api.misoa.uz;
+
+    ssl_certificate /etc/letsencrypt/live/misoa.uz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/misoa.uz/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://misoa_api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+        proxy_connect_timeout 60;
+    }
+}
+NGINX"
+else
+  sudo bash -c "cat > \
+    /etc/nginx/sites-available/api.misoa.uz << 'NGINX'
+upstream misoa_api {
+    server 127.0.0.1:4001;
+    server 127.0.0.1:4000 backup;
+}
+
+server {
+    listen 80;
+    server_name api.misoa.uz;
+    return 301 https://\$host\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name api.misoa.uz;
+
+    ssl_certificate /etc/letsencrypt/live/misoa.uz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/misoa.uz/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://misoa_api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+        proxy_connect_timeout 60;
+    }
+}
+NGINX"
+fi
+
+sudo nginx -t && sudo systemctl reload nginx
 
 echo "Traffic switched to $IDLE_COLOR (port $IDLE_PORT)."
 echo "Stopping old $LIVE_COLOR container in 10 seconds (safety window)..."
