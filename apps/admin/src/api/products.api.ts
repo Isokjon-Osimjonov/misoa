@@ -9,6 +9,7 @@ export const productsApi = {
       category?: string
       brand?: string
       isActive?: boolean | string
+      location?: string
     } = {}
   ) => {
     const res = await api.get('/admin/products', { params })

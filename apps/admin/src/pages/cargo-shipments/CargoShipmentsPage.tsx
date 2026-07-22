@@ -11,7 +11,7 @@ import { formatDate } from '../../utils/date'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
+import { ProductSearchSelect } from '../../components/ProductSearchSelect'
 const schema = z.object({
   shipmentNumber: z.string().min(1, 'Raqam kiritish shart'),
   dateSent: z.string(),
@@ -51,13 +51,6 @@ export default function CargoShipmentsPage() {
     name: 'items'
   })
 
-  const [productSearch, setProductSearch] = useState('')
-  const { data: productsData } = useQuery({
-    queryKey: ['products', productSearch],
-    queryFn: () => productsApi.list({ q: productSearch }),
-    enabled: productSearch.length > 1
-  })
-  const products = (productsData as any)?.items ?? []
 
   const createMutation = useMutation({
     mutationFn: cargoShipmentsApi.create,
@@ -234,28 +227,22 @@ export default function CargoShipmentsPage() {
 
               <div>
                 <Label>Mahsulot qo'shish</Label>
-                <div className="flex gap-2 mb-4 relative">
-                  <Input 
-                    placeholder="Mahsulot qidirish..." 
-                    value={productSearch} 
-                    onChange={e => setProductSearch(e.target.value)} 
+                <div className="mb-4">
+                  <ProductSearchSelect
+                    placeholder="Mahsulot qidirish..."
+                    onSelect={(p: any) => {
+                      const exists = fields.find((f: any) => f.productId === p.id)
+                      if (!exists) {
+                        append({ 
+                          productId: p.id, 
+                          productName: p.name, 
+                          quantity: 1, 
+                          buyPriceKrw: p.priceKrw ?? 0, 
+                          sellPriceUzs: p.priceUzs ?? 0 
+                        })
+                      }
+                    }}
                   />
-                  {productSearch.length > 1 && products.length > 0 && (
-                    <div className="absolute top-full left-0 w-full bg-background border rounded shadow-md z-10 max-h-48 overflow-y-auto mt-1">
-                      {products.map((p: any) => (
-                        <div 
-                          key={p.id} 
-                          className="p-2 hover:bg-muted cursor-pointer text-sm border-b"
-                          onClick={() => {
-                            append({ productId: p.id, productName: p.name, quantity: 1, buyPriceKrw: 0, sellPriceUzs: 0 })
-                            setProductSearch('')
-                          }}
-                        >
-                          {p.name} ({p.barcode})
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2 border rounded-md p-4 bg-muted/20">

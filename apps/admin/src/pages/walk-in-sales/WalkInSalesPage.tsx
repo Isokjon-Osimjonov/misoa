@@ -11,7 +11,7 @@ import { formatDate } from '../../utils/date'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
+import { ProductSearchSelect } from '../../components/ProductSearchSelect'
 const schema = z.object({
   paymentType: z.enum(['CASH', 'CARD', 'DEBT']),
   customerName: z.string().optional(),
@@ -60,14 +60,6 @@ export default function WalkInSalesPage() {
   const watchedItems = watch('items')
   const formTotalUzs = watchedItems.reduce((acc: number, item: any) => acc + ((Number(item.quantity) || 0) * (Number(item.priceUzs) || 0)), 0)
 
-  const [productSearch, setProductSearch] = useState('')
-  const { data: productsData } = useQuery({
-    queryKey: ['products-uzb', productSearch],
-    // Ideally this endpoint filters by location='UZB_STORE'. For now we just search normally and trust the user/API validation.
-    queryFn: () => productsApi.list({ q: productSearch }),
-    enabled: productSearch.length > 1
-  })
-  const products = (productsData as any)?.items ?? []
 
   const createMutation = useMutation({
     mutationFn: walkInSalesApi.create,
@@ -225,28 +217,17 @@ export default function WalkInSalesPage() {
 
               <div>
                 <Label>Mahsulot qo'shish (UZB ombor)</Label>
-                <div className="flex gap-2 mb-4 relative">
-                  <Input 
-                    placeholder="Mahsulot qidirish..." 
-                    value={productSearch} 
-                    onChange={e => setProductSearch(e.target.value)} 
+                <div className="mb-4">
+                  <ProductSearchSelect
+                    placeholder="UZB ombordan mahsulot qidiring..."
+                    filterUzbStock={true}
+                    onSelect={(p: any) => {
+                      const exists = fields.find((f: any) => f.productId === p.id)
+                      if (!exists) {
+                        append({ productId: p.id, productName: p.name, quantity: 1, priceUzs: p.priceUzs ?? 0 })
+                      }
+                    }}
                   />
-                  {productSearch.length > 1 && products.length > 0 && (
-                    <div className="absolute top-full left-0 w-full bg-background border rounded shadow-md z-10 max-h-48 overflow-y-auto mt-1">
-                      {products.map((p: any) => (
-                        <div 
-                          key={p.id} 
-                          className="p-2 hover:bg-muted cursor-pointer text-sm border-b"
-                          onClick={() => {
-                            append({ productId: p.id, productName: p.name, quantity: 1, priceUzs: 0 })
-                            setProductSearch('')
-                          }}
-                        >
-                          {p.name} ({p.barcode})
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2 border rounded-md p-4 bg-muted/20">
