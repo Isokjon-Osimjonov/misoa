@@ -131,22 +131,21 @@ export default function ProductDetailScreen() {
   const isOutOfStock = totalStock === 0
 
   const handleAddToCart = async () => {
-    requireAuth(async () => {
-      if (isAdding || !id || isOutOfStock) return
-      setIsAdding(true)
-      try {
-        await addItem(id as string, 1)
-      } catch (err: any) {
-        const code = err?.response?.data?.error?.code
-        if (code === 'REGION_MISMATCH') {
-          showToast('Savatda boshqa hududdan mahsulot bor', 'error')
-        } else {
-          showToast(err?.response?.data?.error?.message ?? "Savatga qo'shib bo'lmadi", 'error')
-        }
-      } finally {
-        setIsAdding(false)
+    if (isAdding || !id || isOutOfStock) return
+    setIsAdding(true)
+    try {
+      await addItem(id as string, 1)
+      showToast('Savatga qo\'shildi', 'success')
+    } catch (err: any) {
+      const code = err?.response?.data?.error?.code
+      if (code === 'REGION_MISMATCH') {
+        showToast('Savatda boshqa hududdan mahsulot bor', 'error')
+      } else {
+        showToast(err?.response?.data?.error?.message ?? "Savatga qo'shib bo'lmadi", 'error')
       }
-    })
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   const handleWishlistToggle = () => {
