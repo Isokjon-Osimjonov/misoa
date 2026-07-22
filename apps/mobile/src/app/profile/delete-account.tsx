@@ -37,9 +37,9 @@ export default function DeleteAccountScreen() {
 
     setLoading(true)
     try {
-      console.log('🗑 Starting delete...')
+      console.log('Starting delete...')
       const result = await authService.deleteAccount()
-      console.log('✅ Delete result:', JSON.stringify(result))
+      console.log('Delete result:', JSON.stringify(result))
 
       // Clear local stores
       await logout()
@@ -59,10 +59,10 @@ export default function DeleteAccountScreen() {
 
       router.replace('/auth/login')
     } catch (err: any) {
-      console.log('❌ Delete error:', err)
-      console.log('❌ Error message:', err?.message)
-      console.log('❌ Error response:', JSON.stringify(err?.response?.data))
-      console.log('❌ Error status:', err?.response?.status)
+      console.log('Delete error:', err)
+      console.log('Error message:', err?.message)
+      console.log('Error response:', JSON.stringify(err?.response?.data))
+      console.log('Error status:', err?.response?.status)
 
       // Show error to user properly
       Alert.alert(

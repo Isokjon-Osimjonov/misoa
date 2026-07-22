@@ -4,7 +4,13 @@ import {
   Image, ActivityIndicator,
   StyleSheet, Alert
 } from 'react-native'
-import { Feather } from '@expo/vector-icons'
+import {
+  Upload,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  Camera
+} from 'lucide-react-native'
 import { tokens } from '../../lib/tokens'
 import {
   pickAndProcessImage,
@@ -79,15 +85,15 @@ export function ReceiptUploader({
 
   const showSourcePicker = () => {
     Alert.alert(
-      'Kvitansiya',
-      'Qayerdan yuklaysiz?',
+      'Kvitansiya yuklash',
+      '',
       [
         {
-          text: '📷 Kamera',
+          text: 'Kamera',
           onPress: () => handlePick('camera')
         },
         {
-          text: '🖼 Galereya',
+          text: 'Galereya',
           onPress: () => handlePick('library')
         },
         {
@@ -106,15 +112,12 @@ export function ReceiptUploader({
         onPress={showSourcePicker}
         disabled={disabled}
         activeOpacity={0.7}>
-        <Feather name="image"
-          size={32}
+        <Upload
+          size={24}
           color={tokens.colors.textMuted}
         />
         <Text style={styles.placeholderText}>
           Kvitansiya yuklash
-        </Text>
-        <Text style={styles.placeholderSub}>
-          Rasm tanlang yoki suratga oling
         </Text>
       </TouchableOpacity>
     )
@@ -125,11 +128,11 @@ export function ReceiptUploader({
     return (
       <View style={styles.placeholder}>
         <ActivityIndicator
-          size="large"
+          size="small"
           color={tokens.colors.primary}
         />
         <Text style={styles.uploadingText}>
-          Yuklanmoqda...
+          Yuklanmoqda
         </Text>
       </View>
     )
@@ -143,16 +146,15 @@ export function ReceiptUploader({
           styles.errorContainer]}
         onPress={showSourcePicker}
         activeOpacity={0.7}>
-        <Feather name="alert-circle"
-          size={32}
-          color={tokens.colors.error
-            ?? '#EF4444'}
+        <AlertCircle
+          size={20}
+          color="#EF4444"
         />
         <Text style={styles.errorText}>
           {errorMsg ?? 'Xatolik yuz berdi'}
         </Text>
         <Text style={styles.retryText}>
-          Qayta urinish →
+          Qayta urinish
         </Text>
       </TouchableOpacity>
     )
@@ -166,108 +168,93 @@ export function ReceiptUploader({
         style={styles.preview}
         resizeMode="cover"
       />
-      <View style={styles.successBadge}>
-        <Feather name="check-circle"
-          size={16}
+      <View style={styles.successRow}>
+        <CheckCircle2
+          size={14}
           color="#10B981"
         />
         <Text style={styles.successText}>
           Yuklandi
         </Text>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+          onPress={showSourcePicker}
+          disabled={disabled}>
+          <RefreshCw
+            size={14}
+            color={tokens.colors.textMuted}
+          />
+          <Text style={styles.changeText}>
+            O'zgartirish
+          </Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.changeBtn}
-        onPress={showSourcePicker}
-        disabled={disabled}>
-        <Feather name="refresh-cw"
-          size={14}
-          color={tokens.colors.primary}
-        />
-        <Text style={styles.changeBtnText}>
-          Almashtirish
-        </Text>
-      </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   placeholder: {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: tokens.colors.border,
     borderStyle: 'dashed',
-    borderRadius: 12,
-    paddingVertical: 32,
-    paddingHorizontal: 16,
+    borderRadius: 10,
+    paddingVertical: 28,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: tokens.colors.surface,
-    gap: 8,
+    gap: 6,
   },
   placeholderText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: tokens.colors.text,
-  },
-  placeholderSub: {
-    fontSize: 13,
+    fontSize: 14,
+    fontWeight: '400',
     color: tokens.colors.textMuted,
-    textAlign: 'center',
   },
   uploadingText: {
-    fontSize: 14,
+    fontSize: 13,
     color: tokens.colors.textMuted,
-    marginTop: 12,
+    marginTop: 8,
   },
   errorContainer: {
-    borderColor: '#EF4444',
-    backgroundColor: '#FEF2F2',
+    borderColor: '#FCA5A5',
+    borderStyle: 'solid',
+    backgroundColor: '#FFF5F5',
   },
   errorText: {
     fontSize: 13,
     color: '#EF4444',
     textAlign: 'center',
+    paddingHorizontal: 16,
   },
   retryText: {
-    fontSize: 13,
+    fontSize: 12,
     color: tokens.colors.primary,
-    fontWeight: '500',
   },
   successContainer: {
-    borderRadius: 12,
+    borderRadius: 10,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#10B981',
   },
   preview: {
     width: '100%',
-    height: 200,
+    height: 180,
   },
-  successBadge: {
+  successRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: tokens.colors.surface,
     gap: 6,
-    padding: 10,
-    backgroundColor: '#F0FDF4',
   },
   successText: {
     fontSize: 13,
     color: '#10B981',
-    fontWeight: '500',
   },
-  changeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    backgroundColor: tokens.colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: tokens.colors.border,
-  },
-  changeBtnText: {
+  changeText: {
     fontSize: 13,
-    color: tokens.colors.primary,
-    fontWeight: '500',
+    color: tokens.colors.textMuted,
   },
 })
