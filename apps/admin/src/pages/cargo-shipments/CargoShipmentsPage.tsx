@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Package, Plus, Search, Trash2, Eye, CheckCircle2, Truck, PackageCheck } from 'lucide-react'
+import { Package, Plus, Search, Trash2, Eye, CheckCircle2, Truck, PackageCheck, DollarSign, BarChart3 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cargoShipmentsApi } from '../../api/cargo-shipments.api'
 import { productsApi } from '../../api/products.api'
@@ -11,7 +11,35 @@ import { formatDate } from '../../utils/date'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ProductSearchSelect } from '../../components/ProductSearchSelect'
+import { CargoShipmentDetail } from './CargoShipmentDetail'
+
+const CargoStatusBadge = ({ status }: { status: string }) => {
+  const config: Record<string, { label: string, className: string }> = {
+    SENT: {
+      label: "Yo'lda",
+      className: "bg-amber-50 text-amber-700 border border-amber-200"
+    },
+    ARRIVED: {
+      label: "Yetib keldi",
+      className: "bg-green-50 text-green-700 border border-green-200"
+    },
+    CANCELLED: {
+      label: "Bekor",
+      className: "bg-red-50 text-red-700 border border-red-200"
+    },
+  }
+  const current = config[status] ?? {
+    label: status,
+    className: "bg-gray-50 text-gray-700 border border-gray-200"
+  }
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${current.className}`}>
+      {current.label}
+    </span>
+  )
+}
 const schema = z.object({
   shipmentNumber: z.string().min(1, 'Raqam kiritish shart'),
   dateSent: z.string(),
@@ -30,6 +58,8 @@ export default function CargoShipmentsPage() {
   const qc = useQueryClient()
   const [filter, setFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [selectedShipment, setSelectedShipment] = useState<any>(null)
+  const [showDetail, setShowDetail] = useState(false)
   
   const { data: shipmentsData, isLoading } = useQuery({
     queryKey: ['cargo-shipments', filter],
@@ -79,9 +109,22 @@ export default function CargoShipmentsPage() {
     }
   })
 
-  const sentCount = shipments?.filter((s: any) => s.status === 'SENT').length ?? 0
-  const arrivedCount = shipments?.filter((s: any) => s.status === 'ARRIVED').length ?? 0
-  const totalCount = shipments?.length ?? 0
+  const stats = useMemo(() => {
+    const all = shipments ?? []
+    const sent = all.filter((s: any) => s.status === 'SENT')
+    const arrived = all.filter((s: any) => s.status === 'ARRIVED')
+    
+    const totalCargoKrw = all.reduce((sum: number, s: any) => sum + (s.cargoFeeKrw ?? 0), 0)
+    const totalItems = all.reduce((sum: number, s: any) => sum + (s.totalQuantity ?? 0), 0)
+
+    return {
+      sentCount: sent.length,
+      arrivedCount: arrived.length,
+      totalCount: all.length,
+      totalCargoKrw,
+      totalItems,
+    }
+  }, [shipments])
 
   return (
     <div className="p-6 space-y-6">
@@ -94,43 +137,54 @@ export default function CargoShipmentsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {/* Yo'lda */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center gap-3">
-          <div className="p-2 bg-yellow-100 rounded-lg shrink-0">
-            <Truck className="w-5 h-5 text-yellow-600" />
+      <div className="grid grid-cols-5 gap-3 mb-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-amber-100 rounded-lg shrink-0">
+            <Truck className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-xs font-medium text-yellow-600">Yo'lda</p>
-            <p className="text-lg font-bold text-yellow-700">
-              {sentCount} ta
-            </p>
+            <p className="text-xs font-medium text-amber-600">Yo'lda</p>
+            <p className="text-lg font-bold text-amber-700">{stats.sentCount} ta</p>
           </div>
         </div>
 
-        {/* Yetib keldi */}
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
           <div className="p-2 bg-green-100 rounded-lg shrink-0">
             <PackageCheck className="w-5 h-5 text-green-600" />
           </div>
           <div>
             <p className="text-xs font-medium text-green-600">Yetib keldi</p>
-            <p className="text-lg font-bold text-green-700">
-              {arrivedCount} ta
-            </p>
+            <p className="text-lg font-bold text-green-700">{stats.arrivedCount} ta</p>
           </div>
         </div>
 
-        {/* Jami mahsulotlar */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3">
-          <div className="p-2 bg-purple-100 rounded-lg shrink-0">
-            <Package className="w-5 h-5 text-purple-600" />
+        <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-violet-100 rounded-lg shrink-0">
+            <Package className="w-5 h-5 text-violet-600" />
           </div>
           <div>
-            <p className="text-xs font-medium text-purple-600">Jami jo'natmalar</p>
-            <p className="text-lg font-bold text-purple-700">
-              {totalCount} ta
-            </p>
+            <p className="text-xs font-medium text-violet-600">Jami jo'natmalar</p>
+            <p className="text-lg font-bold text-violet-700">{stats.totalCount} ta</p>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+            <DollarSign className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-blue-600">Jami kargo xarajat</p>
+            <p className="text-lg font-bold text-blue-700">₩{stats.totalCargoKrw.toLocaleString()}</p>
+          </div>
+        </div>
+
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg shrink-0">
+            <BarChart3 className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-purple-600">Jami mahsulotlar</p>
+            <p className="text-lg font-bold text-purple-700">{stats.totalItems} ta</p>
           </div>
         </div>
       </div>
@@ -166,17 +220,17 @@ export default function CargoShipmentsPage() {
                   <td className="p-3 font-medium">{s.shipmentNumber}</td>
                   <td className="p-3">{formatDate(s.dateSent)}</td>
                   <td className="p-3">
-                    {s.status === 'SENT' ? (
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">🟡 Yo'lda</span>
-                    ) : s.status === 'ARRIVED' ? (
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">🟢 Yetib keldi</span>
-                    ) : (
-                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">🔴 Bekor</span>
-                    )}
+                    <CargoStatusBadge status={s.status} />
                   </td>
-                  <td className="p-3">{s.itemCount} ta</td>
+                  <td className="p-3 text-sm">{s.totalQuantity ?? 0} ta</td>
                   <td className="p-3">₩{s.totalCostKrw?.toLocaleString()}</td>
                   <td className="p-3 flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      setSelectedShipment(s)
+                      setShowDetail(true)
+                    }}>
+                      <Eye className="w-4 h-4 mr-1" /> Ko'rish
+                    </Button>
                     {s.status === 'SENT' && (
                       <Button variant="outline" size="sm" onClick={() => {
                         if (confirm(`Kargo #${s.shipmentNumber} yetib kelganligini tasdiqlaysizmi? Barcha mahsulotlar UZB omboriga o'tkaziladi.`)) {
@@ -284,6 +338,22 @@ export default function CargoShipmentsPage() {
           </div>
         </div>
       )}
+
+      <Sheet open={showDetail} onOpenChange={setShowDetail}>
+        <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Jo'natma: {selectedShipment?.shipmentNumber}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            {selectedShipment && (
+              <CargoShipmentDetail
+                shipmentId={selectedShipment.id}
+                onClose={() => setShowDetail(false)}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

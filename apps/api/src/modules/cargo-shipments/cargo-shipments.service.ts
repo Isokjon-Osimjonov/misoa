@@ -99,11 +99,24 @@ export async function getCargoShipments(params: {
 
   const itemsQuery = await db
     .select({
-      shipment: cargoShipments,
-      itemCount: sql<number>`(SELECT COALESCE(SUM(quantity), 0) FROM cargo_shipment_items WHERE shipment_id = ${cargoShipments.id})`.mapWith(Number)
+      id: cargoShipments.id,
+      shipmentNumber: cargoShipments.shipmentNumber,
+      dateSent: cargoShipments.dateSent,
+      dateArrived: cargoShipments.dateArrived,
+      status: cargoShipments.status,
+      totalCostKrw: cargoShipments.totalCostKrw,
+      cargoFeeKrw: cargoShipments.cargoFeeKrw,
+      notes: cargoShipments.notes,
+      itemsCount: sql<number>`COUNT(DISTINCT ${cargoShipmentItems.id})`.mapWith(Number),
+      totalQuantity: sql<number>`COALESCE(SUM(${cargoShipmentItems.quantity}), 0)`.mapWith(Number),
     })
     .from(cargoShipments)
+    .leftJoin(
+      cargoShipmentItems,
+      eq(cargoShipmentItems.shipmentId, cargoShipments.id)
+    )
     .where(conditions)
+    .groupBy(cargoShipments.id)
     .orderBy(desc(cargoShipments.dateSent))
     .limit(limit)
     .offset(offset)
@@ -116,10 +129,7 @@ export async function getCargoShipments(params: {
   const total = Number(countRes?.count || 0)
 
   return {
-    data: itemsQuery.map(row => ({
-      ...row.shipment,
-      itemCount: row.itemCount
-    })),
+    data: itemsQuery,
     total
   }
 }
