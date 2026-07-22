@@ -73,8 +73,13 @@ export default function UzbStockPage() {
               items.map((item: any) => (
                 <tr key={item.id} className="border-t">
                   <td className="p-3">
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-10 h-10 object-cover rounded" />
+                    {item.imageUrl || item.images?.[0]?.url || item.image ? (
+                      <img 
+                        src={item.imageUrl ?? item.images?.[0]?.url ?? item.image} 
+                        alt={item.name} 
+                        className="w-10 h-10 object-cover rounded"
+                        onError={(e) => { e.currentTarget.style.display = 'none' }}
+                      />
                     ) : (
                       <div className="w-10 h-10 bg-muted rounded flex items-center justify-center text-xs">Rasm yo'q</div>
                     )}

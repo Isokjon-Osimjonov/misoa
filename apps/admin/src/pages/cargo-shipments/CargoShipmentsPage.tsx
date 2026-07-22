@@ -205,7 +205,7 @@ export default function CargoShipmentsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-background rounded-lg shadow-xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Yangi kargo</h2>
-            <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="space-y-6">
+            <form onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, dateSent: new Date(d.dateSent).toISOString() }))} className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <Label>Jo'natma raqami</Label>

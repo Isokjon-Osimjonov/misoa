@@ -778,7 +778,7 @@ export async function getUzbStock(params: {
       id: products.id,
       name: products.name,
       brandName: products.brandName,
-      imageUrl: sql`${products.imageUrls}[1]`.as('image_url'),
+      imageUrl: sql<string>`${products.imageUrls}->>0`.as('image_url'),
       uzbQty: sql<number>`COALESCE(SUM(${inventoryBatches.currentQty}), 0)`.as('uzb_qty'),
     })
     .from(products)
