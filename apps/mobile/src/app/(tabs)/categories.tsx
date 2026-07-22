@@ -70,22 +70,36 @@ export default function CategoriesScreen() {
     queryFn: productService.getCategories,
     staleTime: 5 * 60 * 1000,
   })
-  
+
   const categories = categoriesData ?? []
 
   // Init category from params
   useEffect(() => {
     if (params.categoryId && categories.length > 0) {
       // Need to find category in tree
-      let l1 = null, l2 = null, l3 = null
+      let l1 = null,
+        l2 = null,
+        l3 = null
       for (const root of categories) {
-        if (root.id === params.categoryId) { l1 = root; break }
+        if (root.id === params.categoryId) {
+          l1 = root
+          break
+        }
         if (root.children) {
           for (const child of root.children) {
-            if (child.id === params.categoryId) { l1 = root; l2 = child; break }
+            if (child.id === params.categoryId) {
+              l1 = root
+              l2 = child
+              break
+            }
             if (child.children) {
               for (const sub of child.children) {
-                if (sub.id === params.categoryId) { l1 = root; l2 = child; l3 = sub; break }
+                if (sub.id === params.categoryId) {
+                  l1 = root
+                  l2 = child
+                  l3 = sub
+                  break
+                }
               }
             }
           }
@@ -218,7 +232,11 @@ export default function CategoriesScreen() {
       {/* FILTER PILLS */}
       <View style={styles.filtersContainer}>
         {/* LEVEL 1 */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.pillsRow}
+        >
           <TouchableOpacity
             style={[styles.pill, activeCategoryId === null && styles.pillActive]}
             onPress={() => {
@@ -227,7 +245,9 @@ export default function CategoriesScreen() {
               setSelectedL3(null)
             }}
           >
-            <Text style={[styles.pillText, activeCategoryId === null && styles.pillTextActive]}>Hammasi</Text>
+            <Text style={[styles.pillText, activeCategoryId === null && styles.pillTextActive]}>
+              Hammasi
+            </Text>
           </TouchableOpacity>
           {categories.map((cat) => (
             <TouchableOpacity
@@ -235,7 +255,10 @@ export default function CategoriesScreen() {
               style={[styles.pill, selectedL1?.id === cat.id && styles.pillActive]}
               onPress={() => handleSelectL1(cat)}
             >
-              <Text style={[styles.pillText, selectedL1?.id === cat.id && styles.pillTextActive]} numberOfLines={1}>
+              <Text
+                style={[styles.pillText, selectedL1?.id === cat.id && styles.pillTextActive]}
+                numberOfLines={1}
+              >
                 {cat.name}
               </Text>
               {cat.children && cat.children.length > 0 && (
@@ -252,21 +275,34 @@ export default function CategoriesScreen() {
 
         {/* LEVEL 2 */}
         {selectedL1 && selectedL1.children && selectedL1.children.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.pillsRow, styles.pillsRowIndented]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.pillsRow, styles.pillsRowIndented]}
+          >
             {selectedL1.children.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
                 style={[styles.pill, styles.pillSm, selectedL2?.id === cat.id && styles.pillActive]}
                 onPress={() => handleSelectL2(cat)}
               >
-                <Text style={[styles.pillText, styles.pillTextSm, selectedL2?.id === cat.id && styles.pillTextActive]} numberOfLines={1}>
+                <Text
+                  style={[
+                    styles.pillText,
+                    styles.pillTextSm,
+                    selectedL2?.id === cat.id && styles.pillTextActive,
+                  ]}
+                  numberOfLines={1}
+                >
                   {cat.name}
                 </Text>
                 {cat.children && cat.children.length > 0 && (
                   <Feather
                     name={selectedL2?.id === cat.id ? 'chevron-up' : 'chevron-down'}
                     size={10}
-                    color={selectedL2?.id === cat.id ? tokens.colors.white : tokens.colors.textMuted}
+                    color={
+                      selectedL2?.id === cat.id ? tokens.colors.white : tokens.colors.textMuted
+                    }
                     style={{ marginLeft: 3 }}
                   />
                 )}
@@ -277,14 +313,25 @@ export default function CategoriesScreen() {
 
         {/* LEVEL 3 */}
         {selectedL2 && selectedL2.children && selectedL2.children.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.pillsRow, styles.pillsRowIndented]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.pillsRow, styles.pillsRowIndented]}
+          >
             {selectedL2.children.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
                 style={[styles.pill, styles.pillSm, selectedL3?.id === cat.id && styles.pillActive]}
                 onPress={() => handleSelectL3(cat)}
               >
-                <Text style={[styles.pillText, styles.pillTextSm, selectedL3?.id === cat.id && styles.pillTextActive]} numberOfLines={1}>
+                <Text
+                  style={[
+                    styles.pillText,
+                    styles.pillTextSm,
+                    selectedL3?.id === cat.id && styles.pillTextActive,
+                  ]}
+                  numberOfLines={1}
+                >
                   {cat.name}
                 </Text>
               </TouchableOpacity>
@@ -292,8 +339,6 @@ export default function CategoriesScreen() {
           </ScrollView>
         )}
       </View>
-      
-     
     </View>
   )
 
@@ -312,7 +357,11 @@ export default function CategoriesScreen() {
     }
     return (
       <View style={{ flex: 1, justifyContent: 'center', marginTop: 40 }}>
-        <EmptyState icon="package" heading="Mahsulot topilmadi" subtitle="Boshqa kategoriyani tanlang" />
+        <EmptyState
+          icon="package"
+          heading="Mahsulot topilmadi"
+          subtitle="Boshqa kategoriyani tanlang"
+        />
       </View>
     )
   }
@@ -339,7 +388,11 @@ export default function CategoriesScreen() {
         ListEmptyComponent={renderEmpty}
         ListFooterComponent={renderFooter}
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={tokens.colors.primary} />
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={tokens.colors.primary}
+          />
         }
         onEndReached={() => {
           if (hasNextPage && !isFetchingNextPage) {
@@ -362,13 +415,41 @@ export default function CategoriesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.background },
-  searchWrapper: { paddingHorizontal: tokens.spacing.lg, paddingTop: tokens.spacing.md, paddingBottom: tokens.spacing.sm },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', height: 48, borderRadius: 24, backgroundColor: tokens.colors.surface, paddingHorizontal: 16, gap: 8 },
+  searchWrapper: {
+    paddingHorizontal: tokens.spacing.lg,
+    paddingTop: tokens.spacing.md,
+    paddingBottom: tokens.spacing.sm,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: tokens.colors.surface,
+    paddingHorizontal: 16,
+    gap: 8,
+  },
   searchInput: { flex: 1, fontSize: 14, fontFamily: 'Inter_400Regular', color: tokens.colors.text },
   filtersContainer: { marginTop: tokens.spacing.sm, gap: 8 },
-  pillsRow: { paddingHorizontal: tokens.spacing.lg, gap: 8, paddingBottom: 2, flexDirection: 'row', alignItems: 'center' },
+  pillsRow: {
+    paddingHorizontal: tokens.spacing.lg,
+    gap: 8,
+    paddingBottom: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   pillsRowIndented: { paddingLeft: tokens.spacing.xl },
-  pill: { height: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: tokens.colors.surface, borderWidth: 0.5, borderColor: tokens.colors.border, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' },
+  pill: {
+    height: 36,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    backgroundColor: tokens.colors.surface,
+    borderWidth: 0.5,
+    borderColor: tokens.colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   pillSm: { height: 30, paddingHorizontal: 12, borderRadius: 15 },
   pillActive: { backgroundColor: tokens.colors.primary, borderWidth: 0 },
   pillText: { fontSize: 13, fontFamily: 'Inter_400Regular', color: tokens.colors.textSecondary },

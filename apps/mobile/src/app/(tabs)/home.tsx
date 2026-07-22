@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import {
-  ActivityIndicator,
   ScrollView,
   View,
   Text,
@@ -12,6 +11,7 @@ import {
   Linking,
   Animated,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
@@ -42,7 +42,7 @@ export default function HomeScreen() {
   const guestRegion = useRegionStore((s) => s.guestRegion)
   const activeRegion = customer?.phoneRegion || guestRegion
   const showUzs = activeRegion === 'UZB'
-  
+
   const setRate = useExchangeStore((s) => s.setRate)
   const addItem = useCartStore((s) => s.addItem)
   const [addingId, setAddingId] = useState<string | null>(null)
@@ -57,40 +57,7 @@ export default function HomeScreen() {
     fetchWishlist()
   }, [fetchCart, fetchWishlist])
 
-
   const [isRefreshing, setIsRefreshing] = useState(false)
-
-  const [allProductsPage, setAllProductsPage] = useState(1)
-  const [allProducts, setAllProducts] = useState<any[]>([])
-  const [hasMoreProducts, setHasMore] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-
-  const loadMoreProducts = async () => {
-    if (loadingMore || !hasMoreProducts) return
-    setLoadingMore(true)
-    try {
-      const result = await productService.getProducts({
-        page: allProductsPage,
-        limit: 20,
-        region: activeRegion as any,
-      })
-      const items = result.data ?? []
-      const total = result.meta?.total ?? 0
-      
-      if (allProducts.length + items.length >= total || items.length === 0) {
-        setHasMore(false)
-      }
-      setAllProducts((prev) => (allProductsPage === 1 ? items : [...prev, ...items]))
-      setAllProductsPage((p) => p + 1)
-    } finally {
-      setLoadingMore(false)
-    }
-  }
-
-  useEffect(() => {
-    loadMoreProducts()
-  }, [activeRegion])
-
 
   const {
     data: categoriesData,
@@ -114,7 +81,13 @@ export default function HomeScreen() {
     refetch: refetchNew,
   } = useQuery({
     queryKey: ['products', 'newest', activeRegion],
-    queryFn: () => productService.getProducts({ sort: 'newest', limit: 10, region: activeRegion, isNew: true } as any),
+    queryFn: () =>
+      productService.getProducts({
+        sort: 'newest',
+        limit: 10,
+        region: activeRegion,
+        isNew: true,
+      } as any),
     staleTime: 2 * 60 * 1000,
   })
 
@@ -124,7 +97,13 @@ export default function HomeScreen() {
     refetch: refetchBest,
   } = useQuery({
     queryKey: ['products', 'bestselling', activeRegion],
-    queryFn: () => productService.getProducts({ sort: 'bestselling', limit: 10, region: activeRegion, featured: true } as any),
+    queryFn: () =>
+      productService.getProducts({
+        sort: 'bestselling',
+        limit: 10,
+        region: activeRegion,
+        featured: true,
+      } as any),
     staleTime: 2 * 60 * 1000,
   })
 
@@ -144,6 +123,36 @@ export default function HomeScreen() {
   const banners = bannersData ?? []
   const newProducts = newProductsData?.data ?? []
   const bestsellerProducts = bestsellerData?.data ?? []
+
+  const [page, setPage] = useState(1)
+  const [allProducts, setAllProducts] = useState<any[]>([])
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const result = await productService.getProducts({
+        page,
+        limit: 20,
+        region: activeRegion,
+      } as any)
+      const newProds = result.data ?? []
+      if (newProds.length < 20) {
+        setHasMore(false)
+      }
+      setAllProducts((prev) => [...prev, ...newProds])
+      setPage((p) => p + 1)
+    } catch {
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  useEffect(() => {
+    loadMore()
+  }, [])
 
   useEffect(() => {
     if (banners.length <= 1) return
@@ -252,45 +261,27 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-            <FlatList
-        data={allProducts}
-        numColumns={2}
-        keyExtractor={(item) => item.id}
-        columnWrapperStyle={{ gap: 12, paddingHorizontal: 24, marginBottom: 12 }}
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            showUzs={showUzs}
-            onPress={() => router.push(`/product/${item.id}`)}
-            onAddToCart={() => handleAddToCart(item.id)}
-          />
-        )}
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.3}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        onScroll={({ nativeEvent }) => {
+          if (
+            nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >=
+            nativeEvent.contentSize.height - 400
+          ) {
+            loadMore()
+          }
+        }}
+        scrollEventThrottle={400}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
-            onRefresh={async () => {
-              setAllProductsPage(1)
-              setHasMore(true)
-              await handleRefresh()
-              await loadMoreProducts()
-            }}
+            onRefresh={handleRefresh}
             tintColor={tokens.colors.primary}
             colors={[tokens.colors.primary]}
           />
         }
-        ListFooterComponent={() =>
-          loadingMore ? (
-            <ActivityIndicator color={tokens.colors.primary} style={{ padding: 20 }} />
-          ) : !hasMoreProducts && allProducts.length > 0 ? (
-            <Text style={{ textAlign: 'center', margin: 20, color: tokens.colors.textMuted }}>
-              Barcha mahsulotlar ko'rsatildi
-            </Text>
-          ) : null
-        }
-        ListHeaderComponent={
-          <>
+      >
         {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -480,7 +471,7 @@ export default function HomeScreen() {
         </View>
 
         {/* BESTSELLERS */}
-        <View style={[styles.section, { marginBottom: 100 }]}>
+        <View style={[styles.section, { marginBottom: 20 }]}>
           <View style={styles.paddingX}>
             <SectionHeader
               title="Ommabop mahsulotlar"
@@ -536,15 +527,43 @@ export default function HomeScreen() {
           )}
         </View>
 
-        <View style={styles.section}>
+        {/* ALL PRODUCTS */}
+        <View style={[styles.section, { marginBottom: 40 }]}>
           <View style={styles.paddingX}>
             <SectionHeader title="Barcha mahsulotlar" />
           </View>
+          <FlatList
+            key="all-products-2col"
+            data={allProducts}
+            keyExtractor={(item, index) => item.id + '-' + index}
+            numColumns={2}
+            columnWrapperStyle={{ gap: 12, paddingHorizontal: 16 }}
+            scrollEnabled={false}
+            contentContainerStyle={{ gap: 12 }}
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                showUzs={showUzs}
+                onPress={() => router.push(`/product/${item.id}`)}
+                onAddToCart={() => handleAddToCart(item.id)}
+              />
+            )}
+          />
+          {allProducts.length > 0 && (
+            loadingMore ? (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+                <ActivityIndicator color={tokens.colors.primary} />
+              </View>
+            ) : hasMore ? (
+              <View style={{ height: 20 }} />
+            ) : (
+              <Text style={styles.endText}>
+                Barcha mahsulotlar ko'rsatildi
+              </Text>
+            )
+          )}
         </View>
-        <View style={{ height: 16 }} />
-        </>
-        }
-      />
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -556,6 +575,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 24,
+  },
+  endText: {
+    textAlign: 'center',
+    color: tokens.colors.textMuted,
+    fontSize: 13,
+    paddingVertical: 20,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
