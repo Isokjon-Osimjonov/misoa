@@ -21,7 +21,7 @@ export function AuthBottomSheet({ visible, onClose, message }: AuthBottomSheetPr
         <View style={styles.sheet}>
           <Text style={styles.title}>Kirish talab etiladi</Text>
           <Text style={styles.message}>{message}</Text>
-          
+
           <TouchableOpacity
             style={styles.primaryBtn}
             onPress={() => {
@@ -31,7 +31,7 @@ export function AuthBottomSheet({ visible, onClose, message }: AuthBottomSheetPr
           >
             <Text style={styles.primaryText}>Kirish</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.ghostBtn} onPress={onClose}>
             <Text style={styles.ghostText}>Hozir emas</Text>
           </TouchableOpacity>
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   primaryBtn: {
-    backgroundColor: '#FF0071',
+    backgroundColor: tokens.colors.primary,
     width: '100%',
     paddingVertical: 14,
     borderRadius: 12,

@@ -7,14 +7,14 @@ const storage = multer.memoryStorage()
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true)
     } else {
-      cb(new Error('Faqat image/jpeg, image/png, image/webp turlari ruxsat etilgan') as any)
+      cb(new Error('Faqat image/jpeg, image/png, image/webp, image/heic turlari ruxsat etilgan') as any)
     }
   },
 }).single('file')
@@ -25,12 +25,12 @@ const receiptUpload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf']
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true)
     } else {
       cb(
-        new Error('Faqat image/jpeg, image/png, image/webp yoki PDF turlari ruxsat etilgan') as any
+        new Error('Faqat image/jpeg, image/png, image/webp, image/heic yoki PDF turlari ruxsat etilgan') as any
       )
     }
   },
@@ -39,14 +39,14 @@ const receiptUpload = multer({
 const bannerUpload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true)
     } else {
-      cb(new Error('Faqat image/jpeg, image/png, image/webp turlari ruxsat etilgan') as any)
+      cb(new Error('Faqat image/jpeg, image/png, image/webp, image/heic turlari ruxsat etilgan') as any)
     }
   },
 }).single('banner')

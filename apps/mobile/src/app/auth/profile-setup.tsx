@@ -3,7 +3,7 @@ import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Pressable }
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
-import { pickAndProcessImage } from '../../utils/image.utils'
+import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
 import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import { Feather } from '@expo/vector-icons'
@@ -32,10 +32,17 @@ export default function ProfileSetupScreen() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const pickImage = async () => {
-    const uri = await pickAndProcessImage({ allowsEditing: true, aspect: [1, 1] })
-    if (uri) {
-      setPhoto(uri)
+  const pickImage = async (source: 'library' | 'camera' = 'library') => {
+    try {
+      const image = await pickAndProcessImage({ allowsEditing: true, source })
+      if (!image) return
+      
+      const result = await uploadImageToApi(image, '/upload/avatar')
+      if (result?.url) {
+        setPhoto(result.url)
+      }
+    } catch (err: any) {
+      Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
     }
   }
 
@@ -60,16 +67,7 @@ export default function ProfileSetupScreen() {
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null
 
       // Upload photo to Cloudinary if selected
-      let profileImageUrl: string | null = null
-      if (photo) {
-        try {
-          profileImageUrl = await uploadService.uploadAvatar(photo)
-        } catch (err) {
-          console.error('Avatar upload failed:', err)
-          // Photo upload failed — continue without it
-          // Don't block profile save for failed photo
-        }
-      }
+      let profileImageUrl: string | null = photo
 
       const updated = await customerService.updateProfile({
         firstName,
@@ -99,7 +97,7 @@ export default function ProfileSetupScreen() {
       </View>
 
       <View style={styles.avatarContainer}>
-        <Pressable onPress={pickImage} style={styles.avatarPicker}>
+        <Pressable onPress={() => pickImage()} style={styles.avatarPicker}>
           {photo ? (
             <Image source={{ uri: photo }} style={styles.avatarImage} />
           ) : (

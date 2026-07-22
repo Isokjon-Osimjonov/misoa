@@ -48,7 +48,8 @@ export default function CartScreen() {
   } | null>(null)
 
   useEffect(() => {
-    api.get('/settings/public-config')
+    api
+      .get('/settings/public-config')
       .then((res: any) => setMinOrderConfig(res.data.data))
       .catch(() => {})
   }, [])
@@ -101,33 +102,20 @@ export default function CartScreen() {
 
   const finalTotal = summary.subtotal + (korCargo ?? 0)
 
-  const minOrderKrw = region === 'KOR'
-    ? (minOrderConfig?.minOrderKorKrw ?? 0)
-    : 0
+  const minOrderKrw = region === 'KOR' ? (minOrderConfig?.minOrderKorKrw ?? 0) : 0
 
-  const minOrderUzbKrw = region === 'UZB'
-    && minOrderConfig?.minOrderUzbUzs
-    && minOrderConfig?.krwToUzs
-    ? Math.round(
-        minOrderConfig.minOrderUzbUzs
-          / minOrderConfig.krwToUzs)
-    : 0
+  const minOrderUzbKrw =
+    region === 'UZB' && minOrderConfig?.minOrderUzbUzs && minOrderConfig?.krwToUzs
+      ? Math.round(minOrderConfig.minOrderUzbUzs / minOrderConfig.krwToUzs)
+      : 0
 
-  const effectiveMinKrw =
-    region === 'KOR' ? minOrderKrw
-    : region === 'UZB' ? minOrderUzbKrw
-    : 0
+  const effectiveMinKrw = region === 'KOR' ? minOrderKrw : region === 'UZB' ? minOrderUzbKrw : 0
 
-  const cartSubtotal = items.reduce(
-    (sum, item) =>
-      sum + (item.unitPrice * item.quantity),
-    0)
+  const cartSubtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
 
-  const isBelowMin = effectiveMinKrw > 0
-    && cartSubtotal < effectiveMinKrw
+  const isBelowMin = effectiveMinKrw > 0 && cartSubtotal < effectiveMinKrw
 
-  const shortfall = isBelowMin
-    ? effectiveMinKrw - cartSubtotal : 0
+  const shortfall = isBelowMin ? effectiveMinKrw - cartSubtotal : 0
 
   if (isLoading && !cart) {
     return (
@@ -159,16 +147,18 @@ export default function CartScreen() {
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']}>
-        <ScreenHeader 
-          title="Savat" 
-          showBack={false} 
+        <ScreenHeader
+          title="Savat"
+          showBack={false}
           rightElement={
             items.length > 0 ? (
               <TouchableOpacity onPress={handleClearCart}>
-                <Text style={{ fontSize: 13, color: tokens.colors.primary }}>Tozalash</Text>
+                <Text style={{ fontSize: 13, color: tokens.colors.primary, width: 55 }}>
+                  Tozalash
+                </Text>
               </TouchableOpacity>
             ) : undefined
-          } 
+          }
         />
       </SafeAreaView>
 

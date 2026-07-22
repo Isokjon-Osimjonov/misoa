@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
-import { pickAndProcessImage, captureAndProcessImage } from '../../utils/image.utils'
+import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
 import { useAuthStore } from '../../lib/auth-store'
 import { useCartStore } from '../../lib/cart-store'
 import { tokens } from '../../lib/tokens'
@@ -284,22 +284,20 @@ function CheckoutScreen() {
     setCouponCode('')
   }
 
-  const handlePickReceipt = async () => {
-    const uri = await pickAndProcessImage()
-    if (uri) {
-      setReceiptUri(uri)
-    }
-  }
-
-  const handleCameraReceipt = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync()
-    if (status !== 'granted') {
-      Alert.alert('Kamera ruxsati kerak')
-      return
-    }
-    const uri = await captureAndProcessImage()
-    if (uri) {
-      setReceiptUri(uri)
+  const handlePickReceipt = async (source: 'library' | 'camera' = 'library') => {
+    try {
+      setReceiptUploading(true)
+      const image = await pickAndProcessImage({ source })
+      if (!image) return
+      
+      const result = await uploadImageToApi(image, '/upload/receipt')
+      if (result?.url) {
+        setReceiptUri(result.url)
+      }
+    } catch (err: any) {
+      Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
+    } finally {
+      setReceiptUploading(false)
     }
   }
 
@@ -327,15 +325,14 @@ function CheckoutScreen() {
       const order = res.order
 
       let uploaded = false
-      // Step 2: Upload receipt if selected
+      // Step 2: Attach receipt if already uploaded
       if (receiptUri) {
         try {
-          const receiptUrl = await uploadService.uploadReceipt(receiptUri)
           const paymentCurrency = region === 'UZB' ? 'UZS' : 'KRW'
-          await orderService.uploadReceipt(order.id, receiptUrl, Number(order.totalAmount), paymentCurrency)
+          await orderService.uploadReceipt(order.id, receiptUri, Number(order.totalAmount), paymentCurrency)
           uploaded = true
         } catch (e) {
-          Alert.alert('Diqqat', 'Buyurtma yaratildi, lekin kvitansiya yuklanmadi.')
+          Alert.alert('Diqqat', 'Buyurtma yaratildi, lekin kvitansiya ulanmadi.')
         }
       }
 
@@ -365,12 +362,11 @@ function CheckoutScreen() {
     if (!orderResult || !receiptUri) return
     setReceiptUploading(true)
     try {
-      const receiptUrl = await uploadService.uploadReceipt(receiptUri)
       const paymentCurrency = region === 'UZB' ? 'UZS' : 'KRW'
-      await orderService.uploadReceipt(orderResult.id, receiptUrl, orderResult.totalAmount, paymentCurrency)
+      await orderService.uploadReceipt(orderResult.id, receiptUri, orderResult.totalAmount, paymentCurrency)
       setReceiptUploaded(true)
     } catch (err: any) {
-      Alert.alert('Xatolik', 'Kvitansiya yuklanmadi')
+      Alert.alert('Xatolik', 'Kvitansiya ulanmadi')
     } finally {
       setReceiptUploading(false)
     }
@@ -733,10 +729,10 @@ function CheckoutScreen() {
                 </View>
               ) : (
                 <View style={styles.uploadRow}>
-                  <Pressable onPress={handlePickReceipt} style={styles.uploadBtn}>
+                  <Pressable onPress={() => handlePickReceipt('library')} style={styles.uploadBtn}>
                     <Text style={styles.uploadBtnText}>Galereyadan</Text>
                   </Pressable>
-                  <Pressable onPress={handleCameraReceipt} style={styles.uploadBtn}>
+                  <Pressable onPress={() => handlePickReceipt('camera')} style={styles.uploadBtn}>
                     <Text style={styles.uploadBtnText}>Kameradan</Text>
                   </Pressable>
                 </View>
@@ -956,7 +952,7 @@ function CheckoutScreen() {
 
                   <View style={styles.uploadRow}>
                     <Pressable
-                      onPress={handlePickReceipt}
+                      onPress={() => handlePickReceipt('library')}
                       style={styles.uploadBtn}>
                       <Feather
                         name="image"
@@ -968,7 +964,7 @@ function CheckoutScreen() {
                       </Text>
                     </Pressable>
                     <Pressable
-                      onPress={handleCameraReceipt}
+                      onPress={() => handlePickReceipt('camera')}
                       style={styles.uploadBtn}>
                       <Feather
                         name="camera"

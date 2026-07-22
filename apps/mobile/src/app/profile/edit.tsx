@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import * as ImagePicker from 'expo-image-picker'
-import { pickAndProcessImage } from '../../utils/image.utils'
+import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
 import { Feather } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { useAuthStore } from '../../lib/auth-store'
@@ -47,10 +47,17 @@ export default function EditProfileScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const pickAvatar = async () => {
-    const uri = await pickAndProcessImage({ allowsEditing: true, aspect: [1, 1] })
-    if (uri) {
-      setAvatarUri(uri)
+  const pickAvatar = async (source: 'library' | 'camera' = 'library') => {
+    try {
+      const image = await pickAndProcessImage({ allowsEditing: true, source })
+      if (!image) return
+      
+      const result = await uploadImageToApi(image, '/upload/avatar')
+      if (result?.url) {
+        setAvatarUri(result.url)
+      }
+    } catch (err: any) {
+      Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
     }
   }
 
@@ -93,8 +100,8 @@ export default function EditProfileScreen() {
     try {
       let profileImageUrl = customer?.profileImageUrl ?? null
 
-      if (avatarUri) {
-        profileImageUrl = await uploadService.uploadAvatar(avatarUri)
+      if (avatarUri && avatarUri !== customer?.profileImageUrl) {
+        profileImageUrl = avatarUri
       }
 
       const res = await api.patch('/auth/profile', {
@@ -142,7 +149,7 @@ export default function EditProfileScreen() {
                   <Text style={styles.initialsText}>{getInitials(customer?.firstName || '')}</Text>
                 </View>
               )}
-              <TouchableOpacity style={styles.pickBtn} onPress={pickAvatar} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.pickBtn} onPress={() => pickAvatar()} activeOpacity={0.8}>
                 <View style={styles.pickBtnInner}>
                   <Feather name="camera" size={14} color={tokens.colors.white} />
                 </View>
