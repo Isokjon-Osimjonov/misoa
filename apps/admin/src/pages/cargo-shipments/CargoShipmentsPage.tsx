@@ -229,7 +229,8 @@ export default function CargoShipmentsPage() {
                 <Label>Mahsulot qo'shish</Label>
                 <div className="mb-4">
                   <ProductSearchSelect
-                    placeholder="Mahsulot qidirish..."
+                    placeholder="Mahsulot tanlang..."
+                    selectedIds={fields.map((f: any) => f.productId)}
                     onSelect={(p: any) => {
                       const exists = fields.find((f: any) => f.productId === p.id)
                       if (!exists) {

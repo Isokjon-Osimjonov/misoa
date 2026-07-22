@@ -219,8 +219,9 @@ export default function WalkInSalesPage() {
                 <Label>Mahsulot qo'shish (UZB ombor)</Label>
                 <div className="mb-4">
                   <ProductSearchSelect
-                    placeholder="UZB ombordan mahsulot qidiring..."
+                    placeholder="UZB ombordan tanlang..."
                     filterUzbStock={true}
+                    selectedIds={fields.map((f: any) => f.productId)}
                     onSelect={(p: any) => {
                       const exists = fields.find((f: any) => f.productId === p.id)
                       if (!exists) {
