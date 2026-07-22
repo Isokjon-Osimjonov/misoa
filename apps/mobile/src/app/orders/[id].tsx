@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Fragment } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import {
   ScrollView,
   View,
@@ -7,17 +7,15 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  Linking,
   Modal,
   Pressable,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
-import { Ionicons, Feather } from '@expo/vector-icons'
-import { Eye, X } from 'lucide-react-native'
+import { Feather } from '@expo/vector-icons'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { router, useLocalSearchParams } from 'expo-router'
+import { useQuery } from '@tanstack/react-query'
+import { useLocalSearchParams } from 'expo-router'
 import { ReceiptUploader } from '../../components/ui/ReceiptUploader'
 import { orderService } from '../../services/order.service'
 import { tokens } from '../../lib/tokens'
@@ -46,11 +44,24 @@ const STEPS = [
   { key: 'DELIVERED', label: 'Yetkazildi' },
 ]
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, size = 'small' }: { status: string; size?: 'small' | 'large' }) {
   const config = STATUS_MAP[status] || { label: status, bg: '#F3F4F6', color: '#374151' }
+  const isLarge = size === 'large'
   return (
-    <View style={[styles.statusBadge, { backgroundColor: config.bg, marginTop: 4 }]}>
-      <Text style={[styles.statusText, { color: config.color }]}>{config.label}</Text>
+    <View style={[
+      styles.statusBadge, 
+      { backgroundColor: config.bg, marginTop: 4 },
+      isLarge && {
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        borderRadius: 8,
+      }
+    ]}>
+      <Text style={[
+        styles.statusText, 
+        { color: config.color },
+        isLarge && { fontSize: 13 }
+      ]}>{config.label}</Text>
     </View>
   )
 }
@@ -192,13 +203,17 @@ export default function OrderDetailScreen() {
       {/* HEADER */}
       <ScreenHeader
         title={`#${order.orderNumber}`}
-        rightElement={<StatusBadge status={order.status} />}
       />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
+        {/* Status badge - full width, prominent */}
+        <View style={styles.statusRow}>
+          <StatusBadge status={order.status} size="large" />
+        </View>
+
         {/* PAYMENT COUNTDOWN */}
         {(order.status === 'PENDING_PAYMENT' || order.status === 'PAYMENT_REJECTED') &&
           order.paymentDeadline && (
@@ -404,22 +419,13 @@ export default function OrderDetailScreen() {
                 }
               }}
               initialUrl={order?.paymentReceiptUrl ?? undefined}
-              disabled={!['PENDING_PAYMENT', 'PAYMENT_REJECTED', 'PAYMENT_SUBMITTED'].includes(order?.status)}
+              disabled={
+                !['PENDING_PAYMENT', 'PAYMENT_REJECTED', 'PAYMENT_SUBMITTED'].includes(
+                  order?.status
+                )
+              }
               onZoom={() => setShowReceiptModal(true)}
             />
-            {order?.paymentReceiptUrl && (
-              <TouchableOpacity
-                style={styles.viewReceiptBtn}
-                onPress={() => setShowReceiptModal(true)}>
-                <Eye
-                  size={16}
-                  color={tokens.colors.primary}
-                />
-                <Text style={styles.viewReceiptText}>
-                  Kvitansiyani ko'rish
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
         )}
 
@@ -474,10 +480,9 @@ export default function OrderDetailScreen() {
         visible={showReceiptModal}
         transparent
         animationType="fade"
-        onRequestClose={() => setShowReceiptModal(false)}>
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowReceiptModal(false)}>
+        onRequestClose={() => setShowReceiptModal(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowReceiptModal(false)}>
           <View style={styles.modalContent}>
             <Image
               source={{ uri: order?.paymentReceiptUrl ?? undefined }}
@@ -486,9 +491,8 @@ export default function OrderDetailScreen() {
             />
             <TouchableOpacity
               style={styles.closeModal}
-              onPress={() => setShowReceiptModal(false)}>
-              <X size={20} color="white" />
-            </TouchableOpacity>
+              onPress={() => setShowReceiptModal(false)}
+            ></TouchableOpacity>
           </View>
         </Pressable>
       </Modal>
@@ -497,6 +501,11 @@ export default function OrderDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  statusRow: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    alignItems: 'flex-start',
+  },
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
