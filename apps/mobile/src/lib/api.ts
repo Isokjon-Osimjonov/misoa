@@ -32,14 +32,21 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const original = error.config
+    const originalRequest = error.config
+
+    // CRITICAL: Skip if no auth header
+    // Guest requests should not redirect
+    if (!originalRequest.headers?.['Authorization'] &&
+        !originalRequest.headers?.['authorization']) {
+      return Promise.reject(error)
+    }
 
     if (
       error.response?.status === 401 &&
-      !original._retry &&
-      !original.url?.includes('/auth/refresh')
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/refresh')
     ) {
-      original._retry = true
+      originalRequest._retry = true
 
       try {
         const refreshToken = await SecureStore.getItemAsync('refreshToken')
@@ -86,8 +93,8 @@ api.interceptors.response.use(
         const { useAuthStore } = await import('./auth-store')
         useAuthStore.getState().setTokens?.(accessToken, newRefresh)
 
-        original.headers.Authorization = 'Bearer ' + accessToken
-        return api(original)
+        originalRequest.headers.Authorization = 'Bearer ' + accessToken
+        return api(originalRequest)
       } catch (refreshError) {
         await SecureStore.deleteItemAsync('accessToken')
         await SecureStore.deleteItemAsync('refreshToken')

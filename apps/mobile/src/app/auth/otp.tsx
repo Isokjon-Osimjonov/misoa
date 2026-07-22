@@ -26,12 +26,7 @@ export default function OtpScreen() {
 
   const [currentDeepLink, setCurrentDeepLink] = useState(deepLink ?? '')
 
-  // Guard: if params missing redirect back
-  useEffect(() => {
-    if (!phone || !deepLink) {
-      router.replace('/auth/login')
-    }
-  }, [phone, deepLink])
+  // Removed guard redirect to prevent login bug
 
   const extractToken = (url: string): string => {
     try {
