@@ -285,7 +285,7 @@ export default function ProfileScreen() {
           <View style={styles.headerRow}>
             <View style={styles.avatarContainer}>
               {customer.profileImageUrl ? (
-                <Image source={customer.profileImageUrl} style={styles.avatar} contentFit="cover" />
+                <Image source={{ uri: customer.profileImageUrl }} style={styles.avatar} contentFit="cover" />
               ) : (
                 <View style={styles.initialsContainer}>
                   <Text style={styles.initialsText}>{getInitials(customer.firstName)}</Text>

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
-import { router } from 'expo-router'
 import { ScreenHeader } from '../../components/ui'
 import { tokens } from '../../lib/tokens'
 
@@ -22,14 +21,6 @@ const FAQS = [
   {
     q: 'Kargo narxi qanday hisoblanadi?',
     a: "O'zbekistonga yetkazishda mahsulot og'irligi va tanlangan quti asosida hisoblanadi.",
-  },
-  {
-    q: 'Buyurtmani qanday bekor qilaman?',
-    a: "To'lov kutilayotgan holda Buyurtmalarim > Buyurtma > 'Buyurtmani bekor qilish' tugmasini bosing.",
-  },
-  {
-    q: 'Tovar qaytarish mumkinmi?',
-    a: "Tovar yetkazib berilgandan so'ng 7 kun ichida qaytarish so'rovi yuborishingiz mumkin. Telegram bot orqali biz bilan bog'laning.",
   },
 ]
 
@@ -116,7 +107,7 @@ export default function HelpScreen() {
           ))}
         </View>
 
-        <Text style={styles.versionText}>Misoa Market v1.0.0</Text>
+        <Text style={styles.versionText}>Misoa v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   )

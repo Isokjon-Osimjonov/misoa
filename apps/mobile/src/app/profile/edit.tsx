@@ -45,19 +45,45 @@ export default function EditProfileScreen() {
   const [lastName, setLastName] = useState(customer?.lastName ?? '')
   const [avatarUri, setAvatarUri] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const pickAvatar = async (source: 'library' | 'camera' = 'library') => {
     try {
-      const image = await pickAndProcessImage({ allowsEditing: true, source })
+      const image = await pickAndProcessImage({ source, allowsEditing: true })
       if (!image) return
-      
-      const result = await uploadImageToApi(image, '/upload/avatar')
-      if (result?.url) {
-        setAvatarUri(result.url)
+
+      setUploadingAvatar(true)
+
+      const result = await uploadImageToApi(
+        image,
+        '/upload/avatar',
+        'file'
+      )
+
+      console.log('Avatar upload result:', JSON.stringify(result))
+
+      const avatarUrl = result?.data?.url ?? result?.url ?? result?.data?.imageUrl
+
+      if (!avatarUrl) {
+        throw new Error('URL not in response')
       }
+
+      await api.patch('/auth/profile', {
+        profileImageUrl: avatarUrl
+      })
+      
+      if (customer) {
+        setCustomer({ ...customer, profileImageUrl: avatarUrl })
+      }
+
+      setAvatarUri(avatarUrl)
+      Alert.alert('Muvaffaqiyatli', 'Rasm yangilandi!')
     } catch (err: any) {
+      console.log('Avatar error:', err)
       Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
+    } finally {
+      setUploadingAvatar(false)
     }
   }
 
@@ -143,15 +169,24 @@ export default function EditProfileScreen() {
           <View style={styles.avatarSection}>
             <View style={styles.avatarContainer}>
               {avatarSource ? (
-                <Image source={avatarSource} style={styles.avatar} contentFit="cover" />
+                <Image
+                  source={{ uri: avatarSource }}
+                  style={styles.avatar}
+                  contentFit="cover"
+                  onError={() => setAvatarUri(null)}
+                />
               ) : (
                 <View style={styles.initialsContainer}>
                   <Text style={styles.initialsText}>{getInitials(customer?.firstName || '')}</Text>
                 </View>
               )}
-              <TouchableOpacity style={styles.pickBtn} onPress={() => pickAvatar()} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.pickBtn} onPress={() => pickAvatar()} activeOpacity={0.8} disabled={uploadingAvatar}>
                 <View style={styles.pickBtnInner}>
-                  <Feather name="camera" size={14} color={tokens.colors.white} />
+                  {uploadingAvatar ? (
+                    <ActivityIndicator size="small" color={tokens.colors.white} />
+                  ) : (
+                    <Feather name="camera" size={14} color={tokens.colors.white} />
+                  )}
                 </View>
               </TouchableOpacity>
             </View>

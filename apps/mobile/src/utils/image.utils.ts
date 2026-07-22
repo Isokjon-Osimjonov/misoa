@@ -23,6 +23,7 @@ export const pickAndProcessImage = async (options?: {
     ? await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
         allowsEditing: options?.allowsEditing ?? false,
+        aspect: options?.allowsEditing ? [1, 1] : undefined,
         quality: 1, // pick full quality
         exif: false,
         base64: false,
@@ -30,6 +31,7 @@ export const pickAndProcessImage = async (options?: {
     : await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: options?.allowsEditing ?? false,
+        aspect: options?.allowsEditing ? [1, 1] : undefined,
         quality: 1,
         exif: false,
         base64: false,
@@ -41,22 +43,49 @@ export const pickAndProcessImage = async (options?: {
   
   console.log('📷 Original image:', asset.uri, 'size:', asset.fileSize, 'type:', asset.mimeType)
 
-  // Process: compress + convert to JPEG
-  const processed = await ImageManipulator.manipulateAsync(
-    asset.uri,
-    [{ resize: { width: 1920 } }],
-    {
-      compress: 0.85,
-      format: ImageManipulator.SaveFormat.JPEG,
+  // If file is small enough skip compression
+  if (asset.fileSize && asset.fileSize < 500000) {
+    try {
+      const result = await ImageManipulator.manipulateAsync(
+        asset.uri,
+        [], // no resize
+        {
+          compress: 0.9,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      )
+      return {
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: `upload_${Date.now()}.jpg`,
+      }
+    } catch (err) {
+      console.log('❌ Manipulator error:', err)
+      return { uri: asset.uri, type: 'image/jpeg', name: `upload_${Date.now()}.jpg` }
     }
-  )
-  
-  console.log('✅ Processed image:', processed.uri, 'size:', processed.width, '×', processed.height)
-  
-  return {
-    uri: processed.uri,
-    type: 'image/jpeg',
-    name: `upload_${Date.now()}.jpg`,
+  }
+
+  // Large file - resize + compress
+  try {
+    const processed = await ImageManipulator.manipulateAsync(
+      asset.uri,
+      [{ resize: { width: 1920 } }],
+      {
+        compress: 0.85,
+        format: ImageManipulator.SaveFormat.JPEG,
+      }
+    )
+    
+    console.log('✅ Processed image:', processed.uri, 'size:', processed.width, '×', processed.height)
+    
+    return {
+      uri: processed.uri,
+      type: 'image/jpeg',
+      name: `upload_${Date.now()}.jpg`,
+    }
+  } catch (err) {
+    console.log('❌ Manipulator error:', err)
+    return { uri: asset.uri, type: 'image/jpeg', name: `upload_${Date.now()}.jpg` }
   }
 }
 
