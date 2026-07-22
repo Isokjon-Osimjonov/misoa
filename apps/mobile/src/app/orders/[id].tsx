@@ -17,7 +17,7 @@ import { Ionicons, Feather } from '@expo/vector-icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
-import { pickAndProcessImage } from '../../utils/image.utils'
+import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
 import { orderService } from '../../services/order.service'
 import { tokens } from '../../lib/tokens'
 import { formatKRW, formatUZS, formatCountdown, krwToUzs } from '../../lib/price'
@@ -104,22 +104,15 @@ export default function OrderDetailScreen() {
   }, [order?.paymentDeadline])
 
   const handleUploadReceipt = async () => {
-    const uri = await pickAndProcessImage()
-    if (!uri) return
-    setIsUploading(true)
     try {
-      // Step 1: Upload to Cloudinary
-      const formData = new FormData()
-      formData.append('receipt', {
-        uri: uri,
-        name: 'receipt.jpg',
-        type: 'image/jpeg',
-      } as any)
+      setIsUploading(true)
+      const image = await pickAndProcessImage({ source: 'library' })
+      if (!image) return
 
-      const uploadRes = await api.post('/upload/receipt', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      const receiptUrl = uploadRes.data.data.url
+      const result = await uploadImageToApi(image, '/upload/receipt', 'receipt')
+      
+      const receiptUrl = result?.data?.url ?? result?.url
+      if (!receiptUrl) throw new Error('URL not returned')
 
       // Step 2: Link to order
       const totalKrw = Number(order?.totalAmount ?? 0)
@@ -130,9 +123,10 @@ export default function OrderDetailScreen() {
         isUZB ? 'UZS' : 'KRW'
       )
       await refetch()
-      Alert.alert('✓', 'Chek muvaffaqiyatli yuklandi')
+      Alert.alert('✅', 'Chek muvaffaqiyatli yuklandi')
     } catch (err: any) {
-      Alert.alert('Xatolik', err?.response?.data?.error?.message ?? 'Xatolik')
+      console.log('Receipt error:', err)
+      Alert.alert('Xatolik', err?.response?.data?.error?.message ?? err.message ?? 'Kvitansiya yuklanmadi')
     } finally {
       setIsUploading(false)
     }

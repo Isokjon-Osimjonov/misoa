@@ -49,6 +49,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-secure-store',
     'expo-font',
     [
+      'expo-image-picker',
+      {
+        photosPermission: "Rasm yuklash uchun galereyaga kirish ruxsati kerak",
+        cameraPermission: "To'lov kvitansiyasini suratga olish uchun kamera ruxsati kerak"
+      }
+    ],
+    'expo-image-manipulator',
+    [
       'expo-splash-screen',
       {
         image: './assets/splash.png',

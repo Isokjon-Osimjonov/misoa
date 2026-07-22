@@ -291,11 +291,15 @@ function CheckoutScreen() {
       if (!image) return
       
       const result = await uploadImageToApi(image, '/upload/receipt', 'receipt')
-      if (result?.url) {
-        setReceiptUri(result.url)
-      }
+      
+      const url = result?.data?.url ?? result?.url
+      if (!url) throw new Error('URL not returned')
+
+      setReceiptUri(url)
+      Alert.alert('✅', 'Kvitansiya yuklandi!')
     } catch (err: any) {
-      Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
+      console.log('Receipt error:', err)
+      Alert.alert('Xatolik', err.message || 'Kvitansiya yuklanmadi')
     } finally {
       setReceiptUploading(false)
     }
