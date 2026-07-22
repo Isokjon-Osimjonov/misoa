@@ -43,6 +43,7 @@ export async function notifyNewOrder(data: {
 
 // Payment submitted alert
 export async function notifyPaymentSubmitted(data: {
+  orderId: string
   orderNumber: string
   customerName: string
   paymentMethod: string
@@ -52,7 +53,7 @@ export async function notifyPaymentSubmitted(data: {
     `💳 <b>TO'LOV YUKLANDI!</b>\n` +
       `📦 ${data.orderNumber} — ${escHtml(data.customerName)}\n` +
       `🏦 ${data.paymentMethod}: ${data.paymentAmount}\n` +
-      `✅ Tekshiring: admin.misoacosmetics.uz`
+      `✅ <a href="https://management.misoa.uz/orders/${data.orderId}">Buyurtmani ko'rish</a>`
   )
 }
 

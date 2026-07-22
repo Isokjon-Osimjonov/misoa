@@ -848,6 +848,7 @@ export async function uploadReceipt(orderId: string, customerId: string, dto: Up
     })
 
     await notifyPaymentSubmitted({
+      orderId: order.id,
       orderNumber: order.orderNumber,
       customerName: customer.firstName,
       paymentMethod: order.paymentMethod || 'UNKNOWN',
@@ -2252,7 +2253,7 @@ export async function getInvoiceData(orderId: string, userId: string, isAdmin: b
     },
     company: {
       name: 'Misoa Market',
-      website: 'misoacosmetics.uz',
+      website: 'misoa.uz',
       telegram: '@Jenshenkosmetikakoreaoptim',
     },
     exchangeRate: rate
