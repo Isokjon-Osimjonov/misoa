@@ -55,7 +55,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         cameraPermission: "To'lov kvitansiyasini suratga olish uchun kamera ruxsati kerak"
       }
     ],
-    'expo-image-manipulator',
     [
       'expo-splash-screen',
       {
