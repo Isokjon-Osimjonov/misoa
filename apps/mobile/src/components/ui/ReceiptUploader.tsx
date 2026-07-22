@@ -24,12 +24,14 @@ interface ReceiptUploaderProps {
   onUpload: (url: string) => void
   initialUrl?: string
   disabled?: boolean
+  onZoom?: () => void
 }
 
 export function ReceiptUploader({
   onUpload,
   initialUrl,
-  disabled = false
+  disabled = false,
+  onZoom
 }: ReceiptUploaderProps) {
   const [state, setState] =
     useState<UploadState>(
@@ -163,11 +165,15 @@ export function ReceiptUploader({
   // SUCCESS STATE - image preview
   return (
     <View style={styles.successContainer}>
-      <Image
-        source={{ uri: imageUrl! }}
-        style={styles.preview}
-        resizeMode="cover"
-      />
+      <TouchableOpacity
+        onPress={onZoom}
+        activeOpacity={0.9}>
+        <Image
+          source={{ uri: imageUrl! }}
+          style={styles.preview}
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
       <View style={styles.successRow}>
         <CheckCircle2
           size={14}

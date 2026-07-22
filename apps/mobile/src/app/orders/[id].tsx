@@ -9,10 +9,12 @@ import {
   ActivityIndicator,
   Linking,
   Modal,
+  Pressable,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import { Ionicons, Feather } from '@expo/vector-icons'
+import { Eye, X } from 'lucide-react-native'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -59,11 +61,10 @@ export default function OrderDetailScreen() {
   const exchangeRate = useExchangeStore((s) => s.rate)
   const isUZB = customer?.phoneRegion === 'UZB'
   const showUzs = isUZB
-  const queryClient = useQueryClient()
 
   const formatPrice = (amount: number, region?: 'UZB' | 'KOR') => {
     if (region === 'UZB') {
-      return `₩${Math.round(amount).toLocaleString('ko-KR')}` 
+      return `₩${Math.round(amount).toLocaleString('ko-KR')}`
     }
     return `₩${Math.round(amount).toLocaleString('ko-KR')}`
   }
@@ -88,6 +89,7 @@ export default function OrderDetailScreen() {
   const [timeLeft, setTimeLeft] = useState(0)
   const [isCanceling, setIsCanceling] = useState(false)
   const [isRefunding, setIsRefunding] = useState(false)
+  const [showReceiptModal, setShowReceiptModal] = useState(false)
 
   useEffect(() => {
     if (!order?.paymentDeadline) return
@@ -99,7 +101,6 @@ export default function OrderDetailScreen() {
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
   }, [order?.paymentDeadline])
-
 
   const handleCancel = () => {
     Alert.alert('Bekor qilish', 'Buyurtmani bekor qilmoqchimisiz?', [
@@ -189,7 +190,7 @@ export default function OrderDetailScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* HEADER */}
-      <ScreenHeader 
+      <ScreenHeader
         title={`#${order.orderNumber}`}
         rightElement={<StatusBadge status={order.status} />}
       />
@@ -341,10 +342,14 @@ export default function OrderDetailScreen() {
                 },
               ]}
             >
-              <Text style={[styles.priceLabel, { color: tokens.colors.success, fontWeight: '500' }]}>
+              <Text
+                style={[styles.priceLabel, { color: tokens.colors.success, fontWeight: '500' }]}
+              >
                 Tejadingiz
               </Text>
-              <Text style={[styles.priceValue, { color: tokens.colors.success, fontWeight: '500' }]}>
+              <Text
+                style={[styles.priceValue, { color: tokens.colors.success, fontWeight: '500' }]}
+              >
                 {formatPrice(order.discountAmount, order.deliveryRegion as any)}
               </Text>
             </View>
@@ -395,14 +400,26 @@ export default function OrderDetailScreen() {
                   )
                   await refetch()
                 } catch (err: any) {
-                  // Error handled inside component
-                  // but we need to update order status
                   console.error('Order update error:', err)
                 }
               }}
               initialUrl={order?.paymentReceiptUrl ?? undefined}
-              disabled={order?.status !== 'PENDING_PAYMENT'}
+              disabled={!['PENDING_PAYMENT', 'PAYMENT_REJECTED', 'PAYMENT_SUBMITTED'].includes(order?.status)}
+              onZoom={() => setShowReceiptModal(true)}
             />
+            {order?.paymentReceiptUrl && (
+              <TouchableOpacity
+                style={styles.viewReceiptBtn}
+                onPress={() => setShowReceiptModal(true)}>
+                <Eye
+                  size={16}
+                  color={tokens.colors.primary}
+                />
+                <Text style={styles.viewReceiptText}>
+                  Kvitansiyani ko'rish
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -453,7 +470,28 @@ export default function OrderDetailScreen() {
         )}
       </ScrollView>
 
-
+      <Modal
+        visible={showReceiptModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowReceiptModal(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowReceiptModal(false)}>
+          <View style={styles.modalContent}>
+            <Image
+              source={{ uri: order?.paymentReceiptUrl ?? undefined }}
+              style={styles.modalImage}
+              contentFit="contain"
+            />
+            <TouchableOpacity
+              style={styles.closeModal}
+              onPress={() => setShowReceiptModal(false)}>
+              <X size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -777,7 +815,29 @@ const styles = StyleSheet.create({
   },
   modalImage: {
     width: '100%',
-    height: '80%',
+    height: '100%',
+  },
+  closeModal: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewReceiptBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    justifyContent: 'center',
+  },
+  viewReceiptText: {
+    fontSize: 13,
+    color: tokens.colors.primary,
   },
   priceRow: {
     flexDirection: 'row',
