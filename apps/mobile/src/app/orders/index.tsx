@@ -13,6 +13,7 @@ import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
 import { ScreenHeader } from '../../components/ui'
+import { GuestPrompt } from '../../components/ui/GuestPrompt'
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
   PENDING_PAYMENT: { label: "To'lov kutilmoqda", bg: '#FFF7ED', color: '#C2410C' },
@@ -51,6 +52,9 @@ function SkeletonLoader() {
 }
 
 export default function OrdersScreen() {
+  const customer = useAuthStore((s) => s.customer)
+  if (!customer) return <GuestPrompt />
+
   const [refreshing, setRefreshing] = useState(false)
   const { requireAuth } = useRequireAuth()
 

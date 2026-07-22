@@ -17,8 +17,12 @@ import { useQuery } from '@tanstack/react-query'
 import EmptyState from '../../components/ui/EmptyState'
 import api from '../../lib/api'
 import { ScreenHeader } from '../../components/ui'
+import { GuestPrompt } from '../../components/ui/GuestPrompt'
+import { useAuthStore } from '../../lib/auth-store'
 
 export default function CouponsScreen() {
+  const customer = useAuthStore((s) => s.customer)
+  if (!customer) return <GuestPrompt />
   const [activeTab, setActiveTab] = useState<'available' | 'history'>('available')
 
   const {

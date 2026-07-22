@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import { Feather } from '@expo/vector-icons'
@@ -11,6 +11,7 @@ import { authService } from '../../services/auth.service'
 import { tokens } from '../../lib/tokens'
 import { useRegionStore } from '../../lib/region-store'
 import PrimaryButton from '../../components/ui/PrimaryButton'
+import { ScreenHeader } from '../../components/ui'
 
 export default function ProfileScreen() {
   const customer = useAuthStore((s) => s.customer)
@@ -151,44 +152,67 @@ export default function ProfileScreen() {
   ]
 
   if (!customer) {
-
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.guestContainer}>
-          <View style={styles.guestIconContainer}>
-            <Feather name="user" size={48} color={tokens.colors.primary} />
-          </View>
-          <Text style={styles.guestTitle}>Hisobingizga kiring</Text>
-          <Text style={styles.guestSubtitle}>
-            Buyurtmalarni kuzatish, sevimlilarni saqlash va boshqalar uchun
-          </Text>
-          <View style={{ marginTop: 24, width: '100%', paddingHorizontal: 24 }}>
-            <PrimaryButton 
-              label="Kirish / Ro'yxatdan o'tish" 
-              onPress={() => router.push({ pathname: '/auth/login', params: { returnTo: '/(tabs)/profile' } })} 
-            />
+        <ScreenHeader
+          title="Profil"
+          showBack={false}
+        />
+        <ScrollView>
+          {/* Guest login card */}
+          <View style={styles.guestCard}>
+            <Text style={styles.guestTitle}>
+              Misoa Marketga xush kelibsiz!
+            </Text>
+            <Text style={styles.guestSub}>
+              Buyurtmalar va shaxsiy ma'lumotlarni ko'rish uchun kiring
+            </Text>
+            <TouchableOpacity
+              style={styles.loginBtn}
+              onPress={() => router.push('/auth/login')}
+            >
+              <Text style={styles.loginText}>Kirish</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.registerBtn}
+              onPress={() => router.push('/auth/login')}
+            >
+              <Text style={styles.registerText}>Ro'yxatdan o'tish</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={{ marginTop: 60, alignItems: 'center' }}>
-            <Text style={{ fontFamily: 'Inter_400Regular', color: tokens.colors.textMuted, marginBottom: 16 }}>
-              Narxlarni ko'rish hududi:
-            </Text>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity 
-                style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: guestRegion === 'KOR' ? tokens.colors.primary : tokens.colors.surface, borderWidth: 1, borderColor: guestRegion === 'KOR' ? tokens.colors.primary : tokens.colors.border }}
-                onPress={() => setGuestRegion('KOR')}
-              >
-                <Text style={{ color: guestRegion === 'KOR' ? tokens.colors.white : tokens.colors.text }}>Korea (KRW)</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: guestRegion === 'UZB' ? tokens.colors.primary : tokens.colors.surface, borderWidth: 1, borderColor: guestRegion === 'UZB' ? tokens.colors.primary : tokens.colors.border }}
-                onPress={() => setGuestRegion('UZB')}
-              >
-                <Text style={{ color: guestRegion === 'UZB' ? tokens.colors.white : tokens.colors.text }}>O'zbekiston (UZS)</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Settings for guests */}
+          <View style={styles.menuSectionGuest}>
+            <TouchableOpacity
+              style={styles.menuItemGuest}
+              onPress={() => router.push('/help')}
+            >
+              <Feather name="help-circle" size={20} color={tokens.colors.primary} />
+              <Text style={styles.menuTextGuest}>Yordam</Text>
+              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItemGuest}
+              onPress={() => Linking.openURL('https://misoa.uz/privacy')}
+            >
+              <Feather name="shield" size={20} color={tokens.colors.primary} />
+              <Text style={styles.menuTextGuest}>Maxfiylik siyosati</Text>
+              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItemGuest}
+              onPress={() => router.push('/profile/about')}
+            >
+              <Feather name="info" size={20} color={tokens.colors.primary} />
+              <Text style={styles.menuTextGuest}>Ilova haqida</Text>
+              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
+            </TouchableOpacity>
           </View>
-        </View>
+
+          <Text style={styles.version}>Versiya 1.0.0</Text>
+        </ScrollView>
       </SafeAreaView>
     )
   }
@@ -278,37 +302,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
-  },
-  guestContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  guestIconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: tokens.colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  guestTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: tokens.colors.text,
-    fontFamily: 'Inter_400Regular',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  guestSubtitle: {
-    fontSize: 14,
-    color: tokens.colors.textMuted,
-    fontFamily: 'Inter_400Regular',
-    textAlign: 'center',
-    paddingHorizontal: 16,
-    lineHeight: 20,
   },
   header: {
     paddingHorizontal: 24,
@@ -414,5 +407,82 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
     color: tokens.colors.text,
+  },
+  guestCard: {
+    margin: 24,
+    padding: 24,
+    backgroundColor: tokens.colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: tokens.colors.border,
+    alignItems: 'center',
+  },
+  guestTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: tokens.colors.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  guestSub: {
+    fontSize: 14,
+    color: tokens.colors.textMuted,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  loginBtn: {
+    backgroundColor: tokens.colors.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  loginText: {
+    color: tokens.colors.white,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  registerBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: tokens.colors.border,
+  },
+  registerText: {
+    color: tokens.colors.text,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  menuSectionGuest: {
+    backgroundColor: tokens.colors.surface,
+    marginHorizontal: 24,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: tokens.colors.border,
+  },
+  menuItemGuest: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.border,
+  },
+  menuTextGuest: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 15,
+    color: tokens.colors.text,
+  },
+  version: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: tokens.colors.textMuted,
+    fontSize: 12,
   },
 })

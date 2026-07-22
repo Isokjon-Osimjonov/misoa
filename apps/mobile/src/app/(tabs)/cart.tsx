@@ -27,11 +27,13 @@ import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
 import { ScreenHeader } from '../../components/ui'
 import api from '../../lib/api'
+import { AuthBottomSheet } from '../../components/ui/AuthBottomSheet'
 
 export default function CartScreen() {
   const insets = useSafeAreaInsets()
   const { cart, isLoading, fetchCart, updateItem, removeItem, clearCart } = useCartStore()
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
   const { requireAuth } = useRequireAuth()
   const customer = useAuthStore((s) => s.customer)
   const exchangeRate = useExchangeStore((s) => s.rate)
@@ -286,6 +288,10 @@ export default function CartScreen() {
             label="Buyurtma berish"
             disabled={items.length === 0 || items.some((i) => !i.inStock) || isBelowMin}
             onPress={() => {
+              if (!customer) {
+                setShowAuth(true)
+                return
+              }
               requireAuth(() => {
                 router.push({
                   pathname: '/checkout',
@@ -295,6 +301,11 @@ export default function CartScreen() {
           />
         </View>
       </View>
+      <AuthBottomSheet
+        visible={showAuth}
+        onClose={() => setShowAuth(false)}
+        message="Buyurtma berish uchun tizimga kiring"
+      />
     </View>
   )
 }

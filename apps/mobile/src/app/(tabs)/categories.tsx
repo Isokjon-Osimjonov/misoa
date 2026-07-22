@@ -329,6 +329,9 @@ export default function CategoriesScreen() {
     if (isFetchingNextPage) {
       return <ActivityIndicator style={{ margin: 20 }} color={tokens.colors.primary} />
     }
+    if (!hasNextPage && products.length > 0) {
+      return <Text style={styles.endText}>Barcha mahsulotlar ko'rsatildi</Text>
+    }
     return <View style={{ height: 80 }} /> // bottom padding
   }
 
@@ -382,4 +385,5 @@ const styles = StyleSheet.create({
   paddingX: { paddingHorizontal: 24 },
   listContent: { paddingBottom: 20 },
   gridRow: { flexDirection: 'row', gap: 12, marginBottom: 12, paddingHorizontal: 24 },
+  endText: { textAlign: 'center', margin: 20, color: tokens.colors.textMuted },
 })

@@ -17,8 +17,12 @@ import { addressService, type Address } from '../../services/address.service'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import EmptyState from '../../components/ui/EmptyState'
 import { ScreenHeader } from '../../components/ui'
+import { GuestPrompt } from '../../components/ui/GuestPrompt'
+import { useAuthStore } from '../../lib/auth-store'
 
 export default function AddressesScreen() {
+  const customer = useAuthStore((s) => s.customer)
+  if (!customer) return <GuestPrompt />
   const queryClient = useQueryClient()
   const {
     data: addresses = [],

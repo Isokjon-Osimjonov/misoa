@@ -11,6 +11,7 @@ import { formatDate } from '../../lib/price'
 import { tokens } from '../../lib/tokens'
 import EmptyState from '../../components/ui/EmptyState'
 import { ScreenHeader } from '../../components/ui'
+import { GuestPrompt } from '../../components/ui/GuestPrompt'
 
 const TYPE_CONFIG: Record<string, { icon: string; color: string; bg: string }> = {
   ORDER_STATUS: {
@@ -51,6 +52,8 @@ const TYPE_CONFIG: Record<string, { icon: string; color: string; bg: string }> =
 }
 
 export default function NotificationsScreen() {
+  const customer = useAuthStore((s) => s.customer)
+  if (!customer) return <GuestPrompt />
   const [refreshing, setRefreshing] = useState(false)
   const queryClient = useQueryClient()
   const { requireAuth } = useRequireAuth()

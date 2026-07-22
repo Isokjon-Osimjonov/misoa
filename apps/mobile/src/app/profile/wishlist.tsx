@@ -20,8 +20,11 @@ import { ProductCard } from '../../components/ui/ProductCard'
 import { Toast, useToast } from '../../components/ui/Toast'
 import EmptyState from '../../components/ui/EmptyState'
 import { ScreenHeader } from '../../components/ui'
+import { GuestPrompt } from '../../components/ui/GuestPrompt'
 
 export default function WishlistScreen() {
+  const customer = useAuthStore((s) => s.customer)
+  if (!customer) return <GuestPrompt />
   const { items, isLoading, fetchWishlist } = useWishlistStore()
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
@@ -31,7 +34,6 @@ export default function WishlistScreen() {
     setIsRefreshing(false)
   }
   const toggle = useWishlistStore((s) => s.toggle)
-  const customer = useAuthStore((s) => s.customer)
   const exchangeRate = useExchangeStore((s) => s.rate)
   const addItem = useCartStore((s) => s.addItem)
   const { toast, showToast, hideToast } = useToast()

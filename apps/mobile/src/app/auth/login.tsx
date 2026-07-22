@@ -81,8 +81,14 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.bottom}>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/home')} style={styles.guestButton}>
-          <Text style={styles.guestText}>Mehmon sifatida davom etish</Text>
+        <TouchableOpacity
+          style={styles.guestBtn}
+          onPress={() =>
+            router.canGoBack()
+              ? router.back()
+              : router.replace('/(tabs)/home')}
+        >
+          <Text style={styles.guestText}>Mehmon sifatida davom etish →</Text>
         </TouchableOpacity>
         <Text style={styles.bottomText}>Telegram orqali OTP kodi yuboriladi</Text>
       </View>
@@ -143,17 +149,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 24,
   },
-  guestButton: {
-    marginBottom: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: tokens.colors.surface,
+  guestBtn: {
+    paddingVertical: 16,
+    alignItems: 'center',
   },
   guestText: {
-    fontFamily: 'Inter_500Medium',
+    color: tokens.colors.textMuted,
     fontSize: 14,
-    color: tokens.colors.primary,
   },
   bottomText: {
     fontFamily: 'Inter_400Regular',
