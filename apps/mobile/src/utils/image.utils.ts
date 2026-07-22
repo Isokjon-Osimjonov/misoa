@@ -13,19 +13,19 @@ export const pickAndProcessImage = async (
     allowsEditing?: boolean
   } = {}
 ): Promise<ProcessedImage | null> => {
-  console.log('📷 pickAndProcessImage:', options)
+
 
   try {
     // Request permissions
     if (options.source === 'camera') {
       const { status } = await ImagePicker.requestCameraPermissionsAsync()
-      console.log('Camera permission:', status)
+
       if (status !== 'granted') {
         throw new Error('Kamera ruxsati berilmadi')
       }
     } else {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      console.log('Library permission:', status)
+
       if (status !== 'granted') {
         throw new Error('Galereya ruxsati berilmadi')
       }
@@ -48,16 +48,14 @@ export const pickAndProcessImage = async (
           exif: false,
         })
 
-    console.log('Picker canceled:', result.canceled)
+
 
     if (result.canceled || !result.assets?.length) {
       return null
     }
 
     const asset = result.assets[0]
-    console.log('Asset URI:', asset.uri)
-    console.log('Asset size:', asset.fileSize)
-    console.log('Asset type:', asset.mimeType)
+
 
     // Process image
     let manipResult
@@ -74,9 +72,9 @@ export const pickAndProcessImage = async (
           format: ImageManipulator.SaveFormat.JPEG,
         }
       )
-      console.log('Processed:', manipResult.uri)
+
     } catch (manipErr) {
-      console.log('Manipulator failed, using original:', manipErr)
+
       manipResult = { uri: asset.uri }
     }
 
@@ -87,7 +85,7 @@ export const pickAndProcessImage = async (
     }
 
   } catch (err: any) {
-    console.log('❌ pickAndProcessImage error:', err)
+
     throw err
   }
 }
@@ -97,7 +95,7 @@ export const uploadImageToApi = async (
   endpoint: string,
   fieldName = 'file'
 ): Promise<any> => {
-  console.log('📤 uploadImageToApi:', endpoint, fieldName)
+
 
   const formData = new FormData()
 

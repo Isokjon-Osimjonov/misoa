@@ -16,8 +16,7 @@ import { Ionicons, Feather } from '@expo/vector-icons'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
-import * as ImagePicker from 'expo-image-picker'
-import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
+import { ReceiptUploader } from '../../components/ui/ReceiptUploader'
 import { orderService } from '../../services/order.service'
 import { tokens } from '../../lib/tokens'
 import { formatKRW, formatUZS, formatCountdown, krwToUzs } from '../../lib/price'
@@ -87,10 +86,8 @@ export default function OrderDetailScreen() {
   })
 
   const [timeLeft, setTimeLeft] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
   const [isRefunding, setIsRefunding] = useState(false)
-  const [receiptModalVisible, setReceiptModalVisible] = useState(false)
 
   useEffect(() => {
     if (!order?.paymentDeadline) return
@@ -103,34 +100,6 @@ export default function OrderDetailScreen() {
     return () => clearInterval(interval)
   }, [order?.paymentDeadline])
 
-  const handleUploadReceipt = async () => {
-    try {
-      setIsUploading(true)
-      const image = await pickAndProcessImage({ source: 'library' })
-      if (!image) return
-
-      const result = await uploadImageToApi(image, '/upload/receipt', 'receipt')
-      
-      const receiptUrl = result?.data?.url ?? result?.url
-      if (!receiptUrl) throw new Error('URL not returned')
-
-      // Step 2: Link to order
-      const totalKrw = Number(order?.totalAmount ?? 0)
-      await orderService.uploadReceipt(
-        id as string,
-        receiptUrl,
-        isUZB ? Math.round(totalKrw * exchangeRate) : totalKrw,
-        isUZB ? 'UZS' : 'KRW'
-      )
-      await refetch()
-      Alert.alert('✅', 'Chek muvaffaqiyatli yuklandi')
-    } catch (err: any) {
-      console.log('Receipt error:', err)
-      Alert.alert('Xatolik', err?.response?.data?.error?.message ?? err.message ?? 'Kvitansiya yuklanmadi')
-    } finally {
-      setIsUploading(false)
-    }
-  }
 
   const handleCancel = () => {
     Alert.alert('Bekor qilish', 'Buyurtmani bekor qilmoqchimisiz?', [
@@ -414,69 +383,26 @@ export default function OrderDetailScreen() {
         ) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>To'lov cheki</Text>
-            {order.paymentReceiptUrl && (
-              <View style={{ marginBottom: 12 }}>
-                <TouchableOpacity onPress={() => setReceiptModalVisible(true)}>
-                  <Image
-                    source={order.paymentReceiptUrl}
-                    style={styles.receiptImage}
-                    contentFit="cover"
-                  />
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Text style={styles.zoomText}>Kattalashtirish</Text>
-                    <Feather name="maximize-2" size={14} color={styles.zoomText.color} />
-                  </View>
-                </TouchableOpacity>
-                {order.status === 'PAYMENT_SUBMITTED' && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      Alert.alert(
-                        'Chekni almashtirmoqchimisiz?',
-                        "Yangi chek yuklaganingizda oldingisi o'chiriladi.",
-                        [
-                          { text: 'Bekor qilish', style: 'cancel' },
-                          { text: "O'zgartirish", onPress: handleUploadReceipt },
-                        ]
-                      )
-                    }}
-                    style={[styles.uploadBtn, { marginTop: 12 }]}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <ActivityIndicator color={tokens.colors.primary} />
-                    ) : (
-                      <>
-                        <Feather name="refresh-cw" size={16} color={tokens.colors.primary} />
-                        <Text style={styles.uploadText}>Chekni o'zgartirish</Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-
-            {order.status === 'PAYMENT_REJECTED' && (
-              <Text style={styles.receiptHint}>Chek rad etildi. Yangi chek yuklang</Text>
-            )}
-
-            {['PENDING_PAYMENT', 'PAYMENT_REJECTED'].includes(order.status) && (
-              <TouchableOpacity
-                onPress={handleUploadReceipt}
-                style={styles.uploadBtn}
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <ActivityIndicator color={tokens.colors.primary} />
-                ) : (
-                  <>
-                    <Feather name="upload" size={16} color={tokens.colors.primary} />
-                    <Text style={styles.uploadText}>
-                      {order.paymentReceiptUrl ? 'Qayta yuklash' : 'Chekni yuklash'}
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            )}
+            <ReceiptUploader
+              onUpload={async (url) => {
+                try {
+                  const totalKrw = Number(order?.totalAmount ?? 0)
+                  await orderService.uploadReceipt(
+                    id as string,
+                    url,
+                    isUZB ? Math.round(totalKrw * exchangeRate) : totalKrw,
+                    isUZB ? 'UZS' : 'KRW'
+                  )
+                  await refetch()
+                } catch (err: any) {
+                  // Error handled inside component
+                  // but we need to update order status
+                  console.error('Order update error:', err)
+                }
+              }}
+              initialUrl={order?.paymentReceiptUrl ?? undefined}
+              disabled={order?.status !== 'PENDING_PAYMENT'}
+            />
           </View>
         )}
 
@@ -527,36 +453,7 @@ export default function OrderDetailScreen() {
         )}
       </ScrollView>
 
-      {/* RECEIPT MODAL */}
-      <Modal
-        visible={receiptModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setReceiptModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity
-            style={styles.modalCloseArea}
-            activeOpacity={1}
-            onPress={() => setReceiptModalVisible(false)}
-          />
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalCloseBtn}
-              onPress={() => setReceiptModalVisible(false)}
-            >
-              <Feather name="x" size={24} color="white" />
-            </TouchableOpacity>
-            {order?.paymentReceiptUrl && (
-              <Image
-                source={order.paymentReceiptUrl}
-                style={styles.modalImage}
-                contentFit="contain"
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
+
     </SafeAreaView>
   )
 }

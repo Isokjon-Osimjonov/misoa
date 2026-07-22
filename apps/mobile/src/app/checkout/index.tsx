@@ -14,8 +14,8 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { useRouter, useLocalSearchParams } from 'expo-router'
-import * as ImagePicker from 'expo-image-picker'
 import { pickAndProcessImage, uploadImageToApi } from '../../utils/image.utils'
+import { ReceiptUploader } from '../../components/ui/ReceiptUploader'
 import { useAuthStore } from '../../lib/auth-store'
 import { useCartStore } from '../../lib/cart-store'
 import { tokens } from '../../lib/tokens'
@@ -53,10 +53,10 @@ function CheckoutScreen() {
   // CONFIG state (STATE 1 only):
   const [addresses, setAddresses] = useState<Address[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
-  
+
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId)
   const region = selectedAddress?.regionCode ?? customer?.phoneRegion ?? 'KOR'
-  
+
   const [boxes, setBoxes] = useState<Box[]>([])
   const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null)
   const [totalWeightG, setTotalWeightG] = useState(0)
@@ -69,7 +69,6 @@ function CheckoutScreen() {
 
   // RECEIPT state (STATE 2 only):
   const [receiptUri, setReceiptUri] = useState<string | null>(null)
-  const [receiptUploading, setReceiptUploading] = useState(false)
   const [receiptUploaded, setReceiptUploaded] = useState(false)
 
   // BANK INFO:
@@ -91,20 +90,19 @@ function CheckoutScreen() {
   } | null>(null)
 
   // Add state for shipping tiers (KOR only)
-  const [korShippingTiers, setKorShippingTiers] = useState<Array<{
-    maxOrderKrw: number | null
-    cargoFeeKrw: number
-    sortOrder: number
-  }>>([])
+  const [korShippingTiers, setKorShippingTiers] = useState<
+    Array<{
+      maxOrderKrw: number | null
+      cargoFeeKrw: number
+      sortOrder: number
+    }>
+  >([])
 
   // Add helper function
-  const getKorCargoFee = (
-    subtotal: number,
-    tiers: typeof korShippingTiers
-  ): number => {
+  const getKorCargoFee = (subtotal: number, tiers: typeof korShippingTiers): number => {
     if (!tiers.length) return 0
     const sorted = [...tiers].sort((a, b) => a.sortOrder - b.sortOrder)
-    const matched = sorted.find(t => t.maxOrderKrw === null || subtotal <= t.maxOrderKrw)
+    const matched = sorted.find((t) => t.maxOrderKrw === null || subtotal <= t.maxOrderKrw)
     const tier = matched ?? sorted[sorted.length - 1]
     return tier?.cargoFeeKrw ?? 0
   }
@@ -115,7 +113,7 @@ function CheckoutScreen() {
     uzbCargoUsdPerKg: number,
     usdToKrw: number
   ): number => {
-    const totalWeightKg = (productWeightG / 1000) + boxWeightKg
+    const totalWeightKg = productWeightG / 1000 + boxWeightKg
     const cargoUsd = totalWeightKg * uzbCargoUsdPerKg
     const cargoKrw = Math.round(cargoUsd * usdToKrw)
     return Math.round(cargoKrw / 100) * 100
@@ -126,11 +124,12 @@ function CheckoutScreen() {
   useEffect(() => {
     if (incomingCouponCode) {
       setCouponCode(incomingCouponCode)
-      cartService.validateCoupon(incomingCouponCode)
-        .then(res => {
+      cartService
+        .validateCoupon(incomingCouponCode)
+        .then((res) => {
           setCouponResult({
             code: incomingCouponCode,
-            discountAmount: Number(res.discountAmount)
+            discountAmount: Number(res.discountAmount),
           })
         })
         .catch(() => {
@@ -175,35 +174,42 @@ function CheckoutScreen() {
           0
         )
         setTotalWeightG(wg)
-        
+
         // Find recommended box and set if no box is currently selected
         const kg = wg / 1000
-        const rec = [...bxs]
-          .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
-          .find((b) => Number(b.maxWeightKg) >= kg)?.id ?? null
-        
+        const rec =
+          [...bxs]
+            .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
+            .find((b) => Number(b.maxWeightKg) >= kg)?.id ?? null
+
         if (rec && !selectedBoxId) {
           setSelectedBoxId(rec)
         }
 
-        api.get('/settings/public-config')
-          .then(res => setPublicConfig(res.data.data))
-          .catch(() => setPublicConfig({
-            uzbCargoUsdPerKg: 10,
-            usdToKrw: 1350,
-            minOrderKorKrw: 0,
-            minOrderUzbUzs: 0,
-            krwToUzs: 7.74,
-          }))
+        api
+          .get('/settings/public-config')
+          .then((res) => setPublicConfig(res.data.data))
+          .catch(() =>
+            setPublicConfig({
+              uzbCargoUsdPerKg: 10,
+              usdToKrw: 1350,
+              minOrderKorKrw: 0,
+              minOrderUzbUzs: 0,
+              krwToUzs: 7.74,
+            })
+          )
       } else if (region === 'KOR') {
-        api.get('/kor-shipping-tiers')
-          .then(res => {
+        api
+          .get('/kor-shipping-tiers')
+          .then((res) => {
             const tiers = res.data.data ?? []
-            setKorShippingTiers(tiers.map((t: any) => ({
-              maxOrderKrw: t.maxOrderKrw ? Number(t.maxOrderKrw) : null,
-              cargoFeeKrw: Number(t.cargoFeeKrw),
-              sortOrder: Number(t.sortOrder),
-            })))
+            setKorShippingTiers(
+              tiers.map((t: any) => ({
+                maxOrderKrw: t.maxOrderKrw ? Number(t.maxOrderKrw) : null,
+                cargoFeeKrw: Number(t.cargoFeeKrw),
+                sortOrder: Number(t.sortOrder),
+              }))
+            )
           })
           .catch(() => {})
       }
@@ -215,9 +221,11 @@ function CheckoutScreen() {
 
   const getRecommendedBoxId = (boxes: Box[], weightG: number): string | null => {
     const kg = weightG / 1000
-    return [...boxes]
-      .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
-      .find((b) => Number(b.maxWeightKg) >= kg)?.id ?? null
+    return (
+      [...boxes]
+        .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
+        .find((b) => Number(b.maxWeightKg) >= kg)?.id ?? null
+    )
   }
 
   const isBoxTooSmall = (box: Box, weightG: number): boolean =>
@@ -234,13 +242,18 @@ function CheckoutScreen() {
   const boxCost = selectedBox ? Number(selectedBox.costKrw) : 0
   const boxWeightKg = selectedBox ? Number(selectedBox.boxWeightKg) : 0
 
-  const uzbCargoFee = region === 'UZB' && publicConfig && selectedBoxId
-    ? getUzbCargoFee(totalWeightG, boxWeightKg, publicConfig.uzbCargoUsdPerKg, publicConfig.usdToKrw)
-    : null
+  const uzbCargoFee =
+    region === 'UZB' && publicConfig && selectedBoxId
+      ? getUzbCargoFee(
+          totalWeightG,
+          boxWeightKg,
+          publicConfig.uzbCargoUsdPerKg,
+          publicConfig.usdToKrw
+        )
+      : null
 
-  const korCargoFee = region === 'KOR'
-    ? getKorCargoFee(cartSubtotal - couponDiscount, korShippingTiers)
-    : 0
+  const korCargoFee =
+    region === 'KOR' ? getKorCargoFee(cartSubtotal - couponDiscount, korShippingTiers) : 0
 
   const cargoFeeDisplay = region === 'KOR' ? korCargoFee : uzbCargoFee
 
@@ -248,9 +261,10 @@ function CheckoutScreen() {
 
   // MIN ORDER WARNING COMPUTATION
   const minOrderKrw = region === 'KOR' ? (publicConfig?.minOrderKorKrw ?? 0) : 0
-  const minOrderUzbKrw = region === 'UZB' && publicConfig?.minOrderUzbUzs && publicConfig?.krwToUzs
-    ? Math.round(publicConfig.minOrderUzbUzs / publicConfig.krwToUzs)
-    : 0
+  const minOrderUzbKrw =
+    region === 'UZB' && publicConfig?.minOrderUzbUzs && publicConfig?.krwToUzs
+      ? Math.round(publicConfig.minOrderUzbUzs / publicConfig.krwToUzs)
+      : 0
 
   const effectiveMinKrw = region === 'KOR' ? minOrderKrw : region === 'UZB' ? minOrderUzbKrw : 0
   const isBelowMinOrder = effectiveMinKrw > 0 && cartSubtotal < effectiveMinKrw
@@ -270,10 +284,7 @@ function CheckoutScreen() {
       })
       setCouponCode('')
     } catch (err: any) {
-      Alert.alert(
-        'Kupon',
-        err.response?.data?.error?.message ?? "Kupon qo'llanilmadi"
-      )
+      Alert.alert('Kupon', err.response?.data?.error?.message ?? "Kupon qo'llanilmadi")
     } finally {
       setCouponLoading(false)
     }
@@ -284,26 +295,6 @@ function CheckoutScreen() {
     setCouponCode('')
   }
 
-  const handlePickReceipt = async (source: 'library' | 'camera' = 'library') => {
-    try {
-      setReceiptUploading(true)
-      const image = await pickAndProcessImage({ source })
-      if (!image) return
-      
-      const result = await uploadImageToApi(image, '/upload/receipt', 'receipt')
-      
-      const url = result?.data?.url ?? result?.url
-      if (!url) throw new Error('URL not returned')
-
-      setReceiptUri(url)
-      Alert.alert('✅', 'Kvitansiya yuklandi!')
-    } catch (err: any) {
-      console.log('Receipt error:', err)
-      Alert.alert('Xatolik', err.message || 'Kvitansiya yuklanmadi')
-    } finally {
-      setReceiptUploading(false)
-    }
-  }
 
   const handleSubmit = async () => {
     if (!selectedAddressId) {
@@ -333,7 +324,12 @@ function CheckoutScreen() {
       if (receiptUri) {
         try {
           const paymentCurrency = region === 'UZB' ? 'UZS' : 'KRW'
-          await orderService.uploadReceipt(order.id, receiptUri, Number(order.totalAmount), paymentCurrency)
+          await orderService.uploadReceipt(
+            order.id,
+            receiptUri,
+            Number(order.totalAmount),
+            paymentCurrency
+          )
           uploaded = true
         } catch (e) {
           Alert.alert('Diqqat', 'Buyurtma yaratildi, lekin kvitansiya ulanmadi.')
@@ -362,27 +358,11 @@ function CheckoutScreen() {
     }
   }
 
-  const handleUploadReceipt = async () => {
-    if (!orderResult || !receiptUri) return
-    setReceiptUploading(true)
-    try {
-      const paymentCurrency = region === 'UZB' ? 'UZS' : 'KRW'
-      await orderService.uploadReceipt(orderResult.id, receiptUri, orderResult.totalAmount, paymentCurrency)
-      setReceiptUploaded(true)
-    } catch (err: any) {
-      Alert.alert('Xatolik', 'Kvitansiya ulanmadi')
-    } finally {
-      setReceiptUploading(false)
-    }
-  }
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       {/* HEADER */}
-      <ScreenHeader 
-        title={orderResult ? "To'lov" : 'Buyurtma'} 
-        showBack={!orderResult} 
-      />
+      <ScreenHeader title={orderResult ? "To'lov" : 'Buyurtma'} showBack={!orderResult} />
 
       <ScrollView
         ref={scrollRef}
@@ -403,10 +383,7 @@ function CheckoutScreen() {
               {cartItems.map((item: any, i: number) => (
                 <View
                   key={item.productId}
-                  style={[
-                    styles.productRow,
-                    i < cartItems.length - 1 && styles.productRowBorder,
-                  ]}
+                  style={[styles.productRow, i < cartItems.length - 1 && styles.productRowBorder]}
                 >
                   {item.imageUrls?.[0] ? (
                     <Image
@@ -416,9 +393,7 @@ function CheckoutScreen() {
                       style={styles.productImage}
                     />
                   ) : (
-                    <View
-                      style={[styles.productImage, styles.productImagePlaceholder]}
-                    />
+                    <View style={[styles.productImage, styles.productImagePlaceholder]} />
                   )}
                   <View style={styles.productInfo}>
                     <Text style={styles.productName} numberOfLines={2}>
@@ -475,10 +450,7 @@ function CheckoutScreen() {
                   </Pressable>
                 </View>
               )}
-              <Pressable
-                onPress={() => router.push('/profile/coupons')}
-                style={{ marginTop: 10 }}
-              >
+              <Pressable onPress={() => router.push('/profile/coupons')} style={{ marginTop: 10 }}>
                 <Text style={styles.couponLink}>Mavjud kuponlar</Text>
               </Pressable>
             </View>
@@ -494,8 +466,7 @@ function CheckoutScreen() {
                   .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
                   .map((box) => {
                     const tooSmall = isBoxTooSmall(box, totalWeightG)
-                    const recommended =
-                      box.id === getRecommendedBoxId(boxes, totalWeightG)
+                    const recommended = box.id === getRecommendedBoxId(boxes, totalWeightG)
                     const selected = selectedBoxId === box.id
 
                     return (
@@ -547,11 +518,7 @@ function CheckoutScreen() {
 
                         {/* Check */}
                         {selected && (
-                          <Feather
-                            name="check-circle"
-                            size={20}
-                            color={tokens.colors.primary}
-                          />
+                          <Feather name="check-circle" size={20} color={tokens.colors.primary} />
                         )}
                       </Pressable>
                     )
@@ -572,19 +539,14 @@ function CheckoutScreen() {
                   ]}
                 >
                   <View
-                    style={[
-                      styles.radio,
-                      selectedAddressId === addr.id && styles.radioSelected,
-                    ]}
+                    style={[styles.radio, selectedAddressId === addr.id && styles.radioSelected]}
                   >
                     {selectedAddressId === addr.id && <View style={styles.radioDot} />}
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.addrName}>{addr.fullName}</Text>
                     <Text style={styles.addrDetail}>
-                      {[addr.addressLine1, addr.city, addr.province]
-                        .filter(Boolean)
-                        .join(', ')}
+                      {[addr.addressLine1, addr.city, addr.province].filter(Boolean).join(', ')}
                     </Text>
                     <Text style={styles.addrPhone}>{addr.phone}</Text>
                   </View>
@@ -608,9 +570,7 @@ function CheckoutScreen() {
 
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>Mahsulotlar</Text>
-                <Text style={styles.priceVal}>
-                  ₩{cartSubtotal.toLocaleString('ko-KR')}
-                </Text>
+                <Text style={styles.priceVal}>₩{cartSubtotal.toLocaleString('ko-KR')}</Text>
               </View>
 
               {couponDiscount > 0 && (
@@ -627,20 +587,18 @@ function CheckoutScreen() {
               {region === 'UZB' && boxCost > 0 && (
                 <View style={styles.priceRow}>
                   <Text style={styles.priceLabel}>Quti ({selectedBox?.name})</Text>
-                  <Text style={styles.priceVal}>
-                    ₩{boxCost.toLocaleString('ko-KR')}
-                  </Text>
+                  <Text style={styles.priceVal}>₩{boxCost.toLocaleString('ko-KR')}</Text>
                 </View>
               )}
 
               <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>
-                  Yetkazib berish
-                </Text>
-                <Text style={[
-                  styles.priceVal,
-                  cargoFeeDisplay === null && { color: tokens.colors.textMuted }
-                ]}>
+                <Text style={styles.priceLabel}>Yetkazib berish</Text>
+                <Text
+                  style={[
+                    styles.priceVal,
+                    cargoFeeDisplay === null && { color: tokens.colors.textMuted },
+                  ]}
+                >
                   {cargoFeeDisplay !== null
                     ? `₩${cargoFeeDisplay.toLocaleString('ko-KR')}`
                     : selectedBoxId
@@ -663,11 +621,9 @@ function CheckoutScreen() {
 
               <View style={styles.priceRow}>
                 <Text style={styles.totalLabel}>
-                  {cargoFeeDisplay !== null ? 'Jami to\'lov' : 'Taxminiy jami'}
+                  {cargoFeeDisplay !== null ? "Jami to'lov" : 'Taxminiy jami'}
                 </Text>
-                <Text style={styles.totalVal}>
-                  ₩{estimatedTotal.toLocaleString('ko-KR')}
-                </Text>
+                <Text style={styles.totalVal}>₩{estimatedTotal.toLocaleString('ko-KR')}</Text>
               </View>
 
               {region === 'UZB' && (
@@ -688,18 +644,14 @@ function CheckoutScreen() {
                   </View>
                   <View style={styles.bankRow}>
                     <Text style={styles.bankLabel}>Hisob raqami</Text>
-                    <Text style={styles.bankValue}>
-                      {bankInfo.accountNumber}
-                    </Text>
+                    <Text style={styles.bankValue}>{bankInfo.accountNumber}</Text>
                   </View>
                   <View style={styles.bankRow}>
                     <Text style={styles.bankLabel}>Egasi</Text>
                     <Text style={styles.bankValue}>{bankInfo.holderName}</Text>
                   </View>
                   <View style={[styles.bankRow, { marginTop: 8 }]}>
-                    <Text style={[styles.bankLabel, { fontWeight: '500' }]}>
-                      To'lov miqdori
-                    </Text>
+                    <Text style={[styles.bankLabel, { fontWeight: '500' }]}>To'lov miqdori</Text>
                     <Text style={[styles.bankValue, { fontSize: 17, fontWeight: '600' }]}>
                       {region === 'KOR' || cargoFeeDisplay !== null
                         ? `₩${estimatedTotal.toLocaleString('ko-KR')}`
@@ -712,35 +664,11 @@ function CheckoutScreen() {
 
             {/* RECEIPT UPLOAD (before order) */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Kvitansiya</Text>
-              <Text style={styles.receiptNote}>
-                To'lovni amalga oshirib, kvitansiyani yuklang
-              </Text>
-
-              {receiptUri ? (
-                <View>
-                  <Image
-                    source={{ uri: receiptUri }}
-                    style={styles.receiptPreview}
-                    resizeMode="cover"
-                  />
-                  <Pressable
-                    onPress={() => setReceiptUri(null)}
-                    style={styles.removeReceipt}
-                  >
-                    <Text style={styles.removeReceiptText}>Boshqa rasm tanlash</Text>
-                  </Pressable>
-                </View>
-              ) : (
-                <View style={styles.uploadRow}>
-                  <Pressable onPress={() => handlePickReceipt('library')} style={styles.uploadBtn}>
-                    <Text style={styles.uploadBtnText}>Galereyadan</Text>
-                  </Pressable>
-                  <Pressable onPress={() => handlePickReceipt('camera')} style={styles.uploadBtn}>
-                    <Text style={styles.uploadBtnText}>Kameradan</Text>
-                  </Pressable>
-                </View>
-              )}
+              <Text style={styles.sectionLabel}>To'lov kvitansiyasi *</Text>
+              <ReceiptUploader
+                onUpload={(url) => setReceiptUri(url)}
+                initialUrl={receiptUri ?? undefined}
+              />
             </View>
           </>
         )}
@@ -762,9 +690,7 @@ function CheckoutScreen() {
 
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>Mahsulotlar</Text>
-                <Text style={styles.priceVal}>
-                  ₩{orderResult.subtotal.toLocaleString('ko-KR')}
-                </Text>
+                <Text style={styles.priceVal}>₩{orderResult.subtotal.toLocaleString('ko-KR')}</Text>
               </View>
 
               {orderResult.discountAmount > 0 && (
@@ -789,9 +715,7 @@ function CheckoutScreen() {
 
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>Kargo</Text>
-                <Text style={styles.priceVal}>
-                  ₩{orderResult.cargoFee.toLocaleString('ko-KR')}
-                </Text>
+                <Text style={styles.priceVal}>₩{orderResult.cargoFee.toLocaleString('ko-KR')}</Text>
               </View>
 
               <View style={styles.priceDivider} />
@@ -818,7 +742,7 @@ function CheckoutScreen() {
                     <Pressable
                       onPress={async () => {
                         await Share.share({
-                          message: bankInfo.accountNumber ?? ''
+                          message: bankInfo.accountNumber ?? '',
                         })
                       }}
                     >
@@ -843,7 +767,7 @@ function CheckoutScreen() {
                     <Pressable
                       onPress={async () => {
                         await Share.share({
-                          message: orderResult.orderNumber
+                          message: orderResult.orderNumber,
                         })
                       }}
                     >
@@ -863,124 +787,40 @@ function CheckoutScreen() {
 
             {/* RECEIPT UPLOAD — STATE 2 */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>
-                Kvitansiya yuklash
-              </Text>
+              <Text style={styles.sectionLabel}>Kvitansiya yuklash</Text>
               <Text style={styles.receiptNote}>
-                To'lovni amalga oshirib, kvitansiyani
-                yuklang. Admin tekshirib,
-                buyurtmangizni tasdiqlaydi.
+                To'lovni amalga oshirib, kvitansiyani yuklang. Admin tekshirib, buyurtmangizni
+                tasdiqlaydi.
               </Text>
 
               {receiptUploaded ? (
                 // STATE D: Success
                 <View style={styles.uploadedBadge}>
-                  <Feather
-                    name="check-circle"
-                    size={20}
-                    color={tokens.colors.success}
-                  />
+                  <Feather name="check-circle" size={20} color={tokens.colors.success} />
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.uploadedTitle}>
-                      Kvitansiya yuborildi
-                    </Text>
-                    <Text style={styles.uploadedSub}>
-                      Admin tekshirib tasdiqlaydi
-                    </Text>
+                    <Text style={styles.uploadedTitle}>Kvitansiya yuborildi</Text>
+                    <Text style={styles.uploadedSub}>Admin tekshirib tasdiqlaydi</Text>
                   </View>
-                </View>
-              ) : receiptUri ? (
-                // STATE B & C: Image selected
-                <View>
-                  <View style={styles.receiptPreviewWrap}>
-                    <Image
-                      source={{ uri: receiptUri }}
-                      style={[
-                        styles.receiptPreview,
-                        receiptUploading && { opacity: 0.5 }
-                      ]}
-                      resizeMode="cover"
-                    />
-                    {receiptUploading && (
-                      <View style={styles.receiptOverlay}>
-                        <ActivityIndicator
-                          size="large"
-                          color={tokens.colors.primary}
-                        />
-                        <Text style={
-                          styles.receiptOverlayText}>
-                          Yuklanmoqda...
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {!receiptUploading && (
-                    <>
-                      <Pressable
-                        onPress={handleUploadReceipt}
-                        style={styles.uploadSubmitBtn}>
-                        <Text style={
-                          styles.uploadSubmitText}>
-                          Yuborish
-                        </Text>
-                      </Pressable>
-                      <Pressable
-                        onPress={() =>
-                          setReceiptUri(null)}
-                        style={styles.changeReceiptBtn}>
-                        <Text style={
-                          styles.changeReceiptText}>
-                          Boshqa rasm tanlash
-                        </Text>
-                      </Pressable>
-                    </>
-                  )}
                 </View>
               ) : (
-                // STATE A: No image yet
-                <View>
-                  {/* Skeleton placeholder */}
-                  <View style={styles.receiptSkeleton}>
-                    <Feather
-                      name="image"
-                      size={32}
-                      color={tokens.colors.border}
-                    />
-                    <Text style={
-                      styles.receiptSkeletonText}>
-                      Kvitansiya rasmi shu yerga
-                      yuklanadi
-                    </Text>
-                  </View>
-
-                  <View style={styles.uploadRow}>
-                    <Pressable
-                      onPress={() => handlePickReceipt('library')}
-                      style={styles.uploadBtn}>
-                      <Feather
-                        name="image"
-                        size={16}
-                        color={tokens.colors.primary}
-                      />
-                      <Text style={styles.uploadBtnText}>
-                        Galereya
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => handlePickReceipt('camera')}
-                      style={styles.uploadBtn}>
-                      <Feather
-                        name="camera"
-                        size={16}
-                        color={tokens.colors.primary}
-                      />
-                      <Text style={styles.uploadBtnText}>
-                        Kamera
-                      </Text>
-                    </Pressable>
-                  </View>
-                </View>
+                <ReceiptUploader
+                  onUpload={async (url) => {
+                    try {
+                      const paymentCurrency = region === 'UZB' ? 'UZS' : 'KRW'
+                      await orderService.uploadReceipt(
+                        orderResult.id,
+                        url,
+                        orderResult.totalAmount,
+                        paymentCurrency
+                      )
+                      setReceiptUri(url)
+                      setReceiptUploaded(true)
+                    } catch (e) {
+                      console.error(e)
+                    }
+                  }}
+                  initialUrl={receiptUri ?? undefined}
+                />
               )}
             </View>
           </>
@@ -1016,10 +856,7 @@ function CheckoutScreen() {
           </Pressable>
         ) : (
           // STATE 2 button
-          <Pressable
-            onPress={() => router.replace('/orders')}
-            style={styles.secondaryBtn}
-          >
+          <Pressable onPress={() => router.replace('/orders')} style={styles.secondaryBtn}>
             <Text style={styles.secondaryBtnText}>Buyurtmalarni ko'rish</Text>
           </Pressable>
         )}
@@ -1428,7 +1265,10 @@ const styles = StyleSheet.create({
   },
   receiptOverlay: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
