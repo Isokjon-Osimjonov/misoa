@@ -3,6 +3,7 @@ import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Pressable }
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
+import { pickAndProcessImage } from '../../utils/image.utils'
 import { tokens } from '../../lib/tokens'
 import PrimaryButton from '../../components/ui/PrimaryButton'
 import { Feather } from '@expo/vector-icons'
@@ -32,15 +33,9 @@ export default function ProfileSetupScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    })
-
-    if (!result.canceled) {
-      setPhoto(result.assets[0].uri)
+    const uri = await pickAndProcessImage({ allowsEditing: true, aspect: [1, 1] })
+    if (uri) {
+      setPhoto(uri)
     }
   }
 

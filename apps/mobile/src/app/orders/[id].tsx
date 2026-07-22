@@ -17,6 +17,7 @@ import { Ionicons, Feather } from '@expo/vector-icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
+import { pickAndProcessImage } from '../../utils/image.utils'
 import { orderService } from '../../services/order.service'
 import { tokens } from '../../lib/tokens'
 import { formatKRW, formatUZS, formatCountdown, krwToUzs } from '../../lib/price'
@@ -103,17 +104,14 @@ export default function OrderDetailScreen() {
   }, [order?.paymentDeadline])
 
   const handleUploadReceipt = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
-    })
-    if (result.canceled) return
+    const uri = await pickAndProcessImage()
+    if (!uri) return
     setIsUploading(true)
     try {
       // Step 1: Upload to Cloudinary
       const formData = new FormData()
       formData.append('receipt', {
-        uri: result.assets[0].uri,
+        uri: uri,
         name: 'receipt.jpg',
         type: 'image/jpeg',
       } as any)

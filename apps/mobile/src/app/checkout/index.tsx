@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
-
+import { pickAndProcessImage, captureAndProcessImage } from '../../utils/image.utils'
 import { useAuthStore } from '../../lib/auth-store'
 import { useCartStore } from '../../lib/cart-store'
 import { tokens } from '../../lib/tokens'
@@ -46,7 +46,6 @@ function CheckoutScreen() {
   const customer = useAuthStore((s) => s.customer)
   const { cart } = useCartStore()
   const cartItems = cart?.items || []
-  const region = customer?.phoneRegion ?? 'KOR'
 
   // Main state variables:
   const [orderResult, setOrderResult] = useState<OrderResult | null>(null)
@@ -54,6 +53,10 @@ function CheckoutScreen() {
   // CONFIG state (STATE 1 only):
   const [addresses, setAddresses] = useState<Address[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  
+  const selectedAddress = addresses.find((a) => a.id === selectedAddressId)
+  const region = selectedAddress?.regionCode ?? customer?.phoneRegion ?? 'KOR'
+  
   const [boxes, setBoxes] = useState<Box[]>([])
   const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null)
   const [totalWeightG, setTotalWeightG] = useState(0)
@@ -158,8 +161,12 @@ function CheckoutScreen() {
           })
         }
       } catch (err) {}
+    }
+    load()
+  }, [])
 
-      // Load boxes + calculate weight (UZB)
+  useEffect(() => {
+    const loadRegionData = async () => {
       if (region === 'UZB') {
         const bxs = await boxService.getBoxes()
         setBoxes(bxs)
@@ -168,22 +175,26 @@ function CheckoutScreen() {
           0
         )
         setTotalWeightG(wg)
-        const rec = getRecommendedBoxId(bxs, wg)
-        if (rec) setSelectedBoxId(rec)
+        
+        // Find recommended box and set if no box is currently selected
+        const kg = wg / 1000
+        const rec = [...bxs]
+          .sort((a, b) => Number(a.maxWeightKg) - Number(b.maxWeightKg))
+          .find((b) => Number(b.maxWeightKg) >= kg)?.id ?? null
+        
+        if (rec && !selectedBoxId) {
+          setSelectedBoxId(rec)
+        }
 
         api.get('/settings/public-config')
-          .then(res => {
-            setPublicConfig(res.data.data)
-          })
-          .catch(() => {
-            setPublicConfig({
-              uzbCargoUsdPerKg: 10,
-              usdToKrw: 1350,
-              minOrderKorKrw: 0,
-              minOrderUzbUzs: 0,
-              krwToUzs: 7.74,
-            })
-          })
+          .then(res => setPublicConfig(res.data.data))
+          .catch(() => setPublicConfig({
+            uzbCargoUsdPerKg: 10,
+            usdToKrw: 1350,
+            minOrderKorKrw: 0,
+            minOrderUzbUzs: 0,
+            krwToUzs: 7.74,
+          }))
       } else if (region === 'KOR') {
         api.get('/kor-shipping-tiers')
           .then(res => {
@@ -197,8 +208,10 @@ function CheckoutScreen() {
           .catch(() => {})
       }
     }
-    load()
-  }, [])
+    if (addresses.length > 0) {
+      loadRegionData()
+    }
+  }, [region, addresses.length])
 
   const getRecommendedBoxId = (boxes: Box[], weightG: number): string | null => {
     const kg = weightG / 1000
@@ -272,12 +285,9 @@ function CheckoutScreen() {
   }
 
   const handlePickReceipt = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-    })
-    if (!result.canceled && result.assets[0]) {
-      setReceiptUri(result.assets[0].uri)
+    const uri = await pickAndProcessImage()
+    if (uri) {
+      setReceiptUri(uri)
     }
   }
 
@@ -287,11 +297,9 @@ function CheckoutScreen() {
       Alert.alert('Kamera ruxsati kerak')
       return
     }
-    const result = await ImagePicker.launchCameraAsync({
-      quality: 0.8,
-    })
-    if (!result.canceled && result.assets[0]) {
-      setReceiptUri(result.assets[0].uri)
+    const uri = await captureAndProcessImage()
+    if (uri) {
+      setReceiptUri(uri)
     }
   }
 

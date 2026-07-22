@@ -2253,7 +2253,7 @@ export async function getInvoiceData(orderId: string, userId: string, isAdmin: b
     company: {
       name: 'Misoa Market',
       website: 'misoacosmetics.uz',
-      telegram: '@misoa_cosmetics_bot',
+      telegram: '@Jenshenkosmetikakoreaoptim',
     },
     exchangeRate: rate
       ? {

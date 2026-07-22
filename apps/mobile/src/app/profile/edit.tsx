@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import * as ImagePicker from 'expo-image-picker'
+import { pickAndProcessImage } from '../../utils/image.utils'
 import { Feather } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { useAuthStore } from '../../lib/auth-store'
@@ -47,14 +48,9 @@ export default function EditProfileScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const pickAvatar = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    })
-    if (!result.canceled) {
-      setAvatarUri(result.assets[0].uri)
+    const uri = await pickAndProcessImage({ allowsEditing: true, aspect: [1, 1] })
+    if (uri) {
+      setAvatarUri(uri)
     }
   }
 

@@ -13,8 +13,8 @@ export default function Index() {
     const check = async () => {
       try {
         // TEMP: remove before production
-        await SecureStore.deleteItemAsync('onboarding_complete')
         
+
         const seen = await SecureStore.getItemAsync('onboarding_complete')
         setHasSeen(seen === 'true')
       } catch {
