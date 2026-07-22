@@ -133,13 +133,13 @@ export default function WalkInSalesPage() {
         </div>
 
         {/* Jami */}
-        <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 flex items-center gap-3">
-          <div className="p-2 bg-pink-100 rounded-lg shrink-0">
-            <TrendingUp className="w-5 h-5 text-pink-600" />
+        <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2 bg-violet-100 rounded-lg shrink-0">
+            <TrendingUp className="w-5 h-5 text-violet-600" />
           </div>
           <div>
-            <p className="text-xs font-medium text-pink-600">Jami daromad</p>
-            <p className="text-lg font-bold text-pink-700">
+            <p className="text-xs font-medium text-violet-600">Jami daromad</p>
+            <p className="text-lg font-bold text-violet-700">
               {summary?.totalRevenue?.toLocaleString() || 0} UZS
             </p>
           </div>

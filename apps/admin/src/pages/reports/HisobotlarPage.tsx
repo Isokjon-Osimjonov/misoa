@@ -89,7 +89,7 @@ export function HisobotlarPage() {
       icon: '👥',
       title: 'Mijozlar hisoboti',
       desc: "Mijozlar ro'yxati, xarid tarixi, LTV",
-      color: 'border-pink-100 bg-pink-50/30',
+      color: 'border-violet-100 bg-violet-50/30',
     },
     {
       id: 'expenses',
