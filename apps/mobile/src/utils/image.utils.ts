@@ -21,14 +21,14 @@ export const pickAndProcessImage = async (options?: {
   // Pick image
   const pickerResult = options?.source === 'camera'
     ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: options?.allowsEditing ?? false,
         quality: 1, // pick full quality
         exif: false,
         base64: false,
       })
     : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: options?.allowsEditing ?? false,
         quality: 1,
         exif: false,

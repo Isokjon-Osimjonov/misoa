@@ -290,7 +290,7 @@ function CheckoutScreen() {
       const image = await pickAndProcessImage({ source })
       if (!image) return
       
-      const result = await uploadImageToApi(image, '/upload/receipt')
+      const result = await uploadImageToApi(image, '/upload/receipt', 'receipt')
       if (result?.url) {
         setReceiptUri(result.url)
       }
