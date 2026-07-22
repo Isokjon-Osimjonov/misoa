@@ -239,7 +239,7 @@ export default function ProfileScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Ma'lumot</Text>
 
-              <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/profile/help')}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/help')}>
                 <View style={[styles.menuIconContainer, { backgroundColor: '#F5F5F5' }]}>
                   <Feather name="help-circle" size={18} color="#6B7280" />
                 </View>
