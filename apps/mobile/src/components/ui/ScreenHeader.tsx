@@ -34,6 +34,13 @@ export function ScreenHeader({
 
   return (
     <View style={[styles.header, style]}>
+      {/* Center - title always centered via absolute positioning */}
+      <Text
+        style={styles.headerTitle}
+        numberOfLines={1}>
+        {title}
+      </Text>
+
       {/* Left - back button or spacer */}
       {showBack ? (
         <TouchableOpacity
@@ -49,13 +56,6 @@ export function ScreenHeader({
       ) : (
         <View style={styles.backBtn} />
       )}
-
-      {/* Center - title always centered */}
-      <Text
-        style={styles.headerTitle}
-        numberOfLines={1}>
-        {title}
-      </Text>
 
       {/* Right - action or spacer */}
       <View style={styles.rightSlot}>
@@ -73,24 +73,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: tokens.colors.background,
+    position: 'relative',
   },
   backBtn: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 1,
   },
   headerTitle: {
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
     fontSize: 18,
     fontWeight: '500',
     color: tokens.colors.text,
-    textAlign: 'center',
+    paddingHorizontal: 56, // 40px btn + 16px padding
   },
   rightSlot: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 'auto',
+    zIndex: 1,
   },
 })
