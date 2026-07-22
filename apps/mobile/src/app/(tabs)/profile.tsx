@@ -153,65 +153,125 @@ export default function ProfileScreen() {
 
   if (!customer) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScreenHeader
-          title="Profil"
-          showBack={false}
-        />
-        <ScrollView>
-          {/* Guest login card */}
-          <View style={styles.guestCard}>
-            <Text style={styles.guestTitle}>
-              Misoa Marketga xush kelibsiz!
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.guestContainer}>
+            <View style={styles.guestIconContainer}>
+              <Feather name="user" size={48} color={tokens.colors.primary} />
+            </View>
+            <Text style={styles.guestTitle}>Misoa Marketga xush kelibsiz!</Text>
+            <Text style={styles.guestSubtitle}>
+              Buyurtmalar, kuponlar va shaxsiy ma'lumotlarni ko'rish uchun kiring
             </Text>
-            <Text style={styles.guestSub}>
-              Buyurtmalar va shaxsiy ma'lumotlarni ko'rish uchun kiring
-            </Text>
-            <TouchableOpacity
-              style={styles.loginBtn}
-              onPress={() => router.push('/auth/login')}
-            >
-              <Text style={styles.loginText}>Kirish</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.registerBtn}
-              onPress={() => router.push('/auth/login')}
-            >
-              <Text style={styles.registerText}>Ro'yxatdan o'tish</Text>
-            </TouchableOpacity>
+            <View style={{ marginTop: 24, width: '100%', paddingHorizontal: 24 }}>
+              <PrimaryButton
+                label="Kirish"
+                onPress={() =>
+                  router.push({ pathname: '/auth/login', params: { returnTo: '/(tabs)/profile' } })
+                }
+              />
+              <TouchableOpacity
+                style={{ marginTop: 16, alignItems: 'center' }}
+                onPress={() =>
+                  router.push({ pathname: '/auth/login', params: { returnTo: '/(tabs)/profile' } })
+                }
+              ></TouchableOpacity>
+            </View>
+
+            <View style={{ marginTop: 40, alignItems: 'center' }}>
+              <Text
+                style={{
+                  fontFamily: 'Inter_400Regular',
+                  color: tokens.colors.textMuted,
+                  marginBottom: 16,
+                }}
+              >
+                Narxlarni ko'rish hududi:
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 16,
+                    borderRadius: 20,
+                    backgroundColor:
+                      guestRegion === 'KOR' ? tokens.colors.primary : tokens.colors.surface,
+                    borderWidth: 1,
+                    borderColor:
+                      guestRegion === 'KOR' ? tokens.colors.primary : tokens.colors.border,
+                  }}
+                  onPress={() => setGuestRegion('KOR')}
+                >
+                  <Text
+                    style={{
+                      color: guestRegion === 'KOR' ? tokens.colors.white : tokens.colors.text,
+                    }}
+                  >
+                    Korea (KRW)
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 16,
+                    borderRadius: 20,
+                    backgroundColor:
+                      guestRegion === 'UZB' ? tokens.colors.primary : tokens.colors.surface,
+                    borderWidth: 1,
+                    borderColor:
+                      guestRegion === 'UZB' ? tokens.colors.primary : tokens.colors.border,
+                  }}
+                  onPress={() => setGuestRegion('UZB')}
+                >
+                  <Text
+                    style={{
+                      color: guestRegion === 'UZB' ? tokens.colors.white : tokens.colors.text,
+                    }}
+                  >
+                    O'zbekiston (UZS)
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
 
-          {/* Settings for guests */}
-          <View style={styles.menuSectionGuest}>
-            <TouchableOpacity
-              style={styles.menuItemGuest}
-              onPress={() => router.push('/help')}
-            >
-              <Feather name="help-circle" size={20} color={tokens.colors.primary} />
-              <Text style={styles.menuTextGuest}>Yordam</Text>
-              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
-            </TouchableOpacity>
+          <View style={styles.menuContainer}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Ma'lumot</Text>
 
-            <TouchableOpacity
-              style={styles.menuItemGuest}
-              onPress={() => Linking.openURL('https://misoa.uz/privacy')}
-            >
-              <Feather name="shield" size={20} color={tokens.colors.primary} />
-              <Text style={styles.menuTextGuest}>Maxfiylik siyosati</Text>
-              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/profile/help')}>
+                <View style={[styles.menuIconContainer, { backgroundColor: '#F5F5F5' }]}>
+                  <Feather name="help-circle" size={18} color="#6B7280" />
+                </View>
+                <Text style={styles.menuLabel}>Yordam</Text>
+                <Feather name="chevron-right" size={16} color={tokens.colors.textLight} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.menuItemGuest}
-              onPress={() => router.push('/profile/about')}
-            >
-              <Feather name="info" size={20} color={tokens.colors.primary} />
-              <Text style={styles.menuTextGuest}>Ilova haqida</Text>
-              <Feather name="chevron-right" size={16} color={tokens.colors.textMuted} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => Linking.openURL('https://misoa.uz/privacy')}
+              >
+                <View style={[styles.menuIconContainer, { backgroundColor: '#F0FDF4' }]}>
+                  <Feather name="shield" size={18} color="#16A34A" />
+                </View>
+                <Text style={styles.menuLabel}>Maxfiylik siyosati</Text>
+                <Feather name="chevron-right" size={16} color={tokens.colors.textLight} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.menuItem, styles.lastMenuItem]}
+                onPress={() => router.push('/profile/about')}
+              >
+                <View style={[styles.menuIconContainer, { backgroundColor: '#EFF6FF' }]}>
+                  <Feather name="info" size={18} color="#3B82F6" />
+                </View>
+                <Text style={styles.menuLabel}>Ilova haqida</Text>
+                <Feather name="chevron-right" size={16} color={tokens.colors.textLight} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ height: 40 }} />
           </View>
-
-          <Text style={styles.version}>Versiya 1.0.0</Text>
         </ScrollView>
       </SafeAreaView>
     )
@@ -408,81 +468,36 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     color: tokens.colors.text,
   },
-  guestCard: {
-    margin: 24,
-    padding: 24,
-    backgroundColor: tokens.colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: tokens.colors.border,
+  guestContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 20,
+  },
+  guestIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: tokens.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
   guestTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '600',
     color: tokens.colors.text,
+    fontFamily: 'Inter_400Regular',
     marginBottom: 8,
     textAlign: 'center',
   },
-  guestSub: {
+  guestSubtitle: {
     fontSize: 14,
     color: tokens.colors.textMuted,
+    fontFamily: 'Inter_400Regular',
     textAlign: 'center',
-    marginBottom: 24,
-  },
-  loginBtn: {
-    backgroundColor: tokens.colors.primary,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  loginText: {
-    color: tokens.colors.white,
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  registerBtn: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: tokens.colors.border,
-  },
-  registerText: {
-    color: tokens.colors.text,
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  menuSectionGuest: {
-    backgroundColor: tokens.colors.surface,
-    marginHorizontal: 24,
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: tokens.colors.border,
-  },
-  menuItemGuest: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.border,
-  },
-  menuTextGuest: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 15,
-    color: tokens.colors.text,
-  },
-  version: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: tokens.colors.textMuted,
-    fontSize: 12,
+    paddingHorizontal: 16,
+    lineHeight: 20,
   },
 })
