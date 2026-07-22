@@ -49,42 +49,42 @@ export default function HelpScreen() {
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.contactCard}
-            onPress={() => Linking.openURL('https://t.me/Jenshenkosmetikakoreaoptim')}
+            onPress={() => Linking.openURL('https://t.me/koreya_kasmetikalar')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#E8F4FB' }]}>
               <Feather name="send" size={20} color="#229ED9" />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Telegram bot</Text>
-              <Text style={styles.contactSub}>@Jenshenkosmetikakoreaoptim</Text>
+              <Text style={styles.contactSub}>@koreya_kasmetikalar</Text>
             </View>
             <Feather name="chevron-right" size={20} color={tokens.colors.textLight} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.contactCard}
-            onPress={() => Linking.openURL('tel:+821089291996')}
+            onPress={() => Linking.openURL('tel:+821095614273')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#F0FDF4' }]}>
               <Feather name="phone" size={20} color="#16A34A" />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Telefon</Text>
-              <Text style={styles.contactSub}>+82 10-8929-1996</Text>
+              <Text style={styles.contactSub}>+82 10-9561-4273</Text>
             </View>
             <Feather name="chevron-right" size={20} color={tokens.colors.textLight} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.contactCard}
-            onPress={() => Linking.openURL('https://instagram.com/gulmira_koreancosmetics')}
+            onPress={() => Linking.openURL('https://www.instagram.com/misoa_wholesale/')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#FCE4EC' }]}>
               <Feather name="instagram" size={20} color="#E1306C" />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Instagram</Text>
-              <Text style={styles.contactSub}>@gulmira_koreancosmetics</Text>
+              <Text style={styles.contactSub}>@misoa_wholesale</Text>
             </View>
             <Feather name="chevron-right" size={20} color={tokens.colors.textLight} />
           </TouchableOpacity>

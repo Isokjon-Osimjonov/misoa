@@ -293,15 +293,7 @@ export default function CategoriesScreen() {
         )}
       </View>
       
-      {/* Sort Buttons */}
-      <View style={{ flexDirection: 'row', paddingHorizontal: 24, marginTop: 16, gap: 12 }}>
-        <TouchableOpacity onPress={() => setSortOption('newest')}>
-          <Text style={{ fontSize: 14, fontWeight: sortOption === 'newest' ? '600' : '400', color: sortOption === 'newest' ? tokens.colors.primary : tokens.colors.textMuted }}>Yangi</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSortOption('bestselling')}>
-          <Text style={{ fontSize: 14, fontWeight: sortOption === 'bestselling' ? '600' : '400', color: sortOption === 'bestselling' ? tokens.colors.primary : tokens.colors.textMuted }}>Ommabop</Text>
-        </TouchableOpacity>
-      </View>
+     
     </View>
   )
 
