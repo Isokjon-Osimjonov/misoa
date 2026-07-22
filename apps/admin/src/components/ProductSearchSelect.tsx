@@ -47,7 +47,9 @@ export function ProductSearchSelect({
     staleTime: 60000,
   })
 
-  const products = (data?.items ?? data ?? []).filter(
+  const rawProducts = data?.data ?? []
+  const productsArray = Array.isArray(rawProducts) ? rawProducts : []
+  const products = productsArray.filter(
     (p: any) => !selectedIds.includes(p.id)
   )
 
