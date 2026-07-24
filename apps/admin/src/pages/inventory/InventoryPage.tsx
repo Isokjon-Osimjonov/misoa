@@ -389,7 +389,7 @@ export function InventoryPage() {
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Tranzit</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">UZB</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Jami</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea qoldi</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden lg:table-cell">Band</th>
                     <th
                       className="px-4 py-3 text-center text-xs
@@ -455,7 +455,7 @@ export function InventoryPage() {
                         <span className="text-sm font-medium text-green-600">{item.uzbStock ?? 0} ta</span>
                       </td>
                       <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-foreground">{item.availableStock ?? 0} ta</span>
+                        <span className="text-sm font-medium text-foreground">{item.korStock ?? 0} ta</span>
                       </td>
                       <td className="px-4 py-3 text-center hidden lg:table-cell">
                         {(item.reservedStock ?? 0) > 0 ? (
