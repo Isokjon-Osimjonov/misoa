@@ -73,8 +73,8 @@ export default function UzbStockPage() {
             ) : (
               items.map((item: any) => (
                 <tr key={item.id} className="border sm:border-t sm:border-x-0 sm:border-b-0 block sm:table-row mb-4 sm:mb-0 rounded-md sm:rounded-none p-3 sm:p-0 bg-card">
-                  <td className="p-3 block sm:table-cell border-b sm:border-none pb-3 sm:pb-3">
-                    <div className="flex items-center gap-3">
+                  <td className="p-3 block sm:table-cell border-b sm:border-none pb-3 sm:pb-3 w-16">
+                    <div className="flex justify-center sm:justify-start">
                       {item.imageUrl || item.images?.[0]?.url || item.image ? (
                         <img 
                           src={item.imageUrl ?? item.images?.[0]?.url ?? item.image} 
@@ -85,8 +85,11 @@ export default function UzbStockPage() {
                       ) : (
                         <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs">Rasm</div>
                       )}
-                      <span className="font-medium text-base sm:text-sm line-clamp-2">{item.name}</span>
                     </div>
+                  </td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell font-medium text-base sm:text-sm border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground text-sm">Nomi:</span>
+                    <span className="line-clamp-2 text-right sm:text-left ml-4 sm:ml-0">{item.name}</span>
                   </td>
                   <td className="p-3 hidden sm:table-cell">{item.brandName || '-'}</td>
                   <td className="p-3 flex justify-between items-center sm:table-cell font-bold text-lg border-b sm:border-none">
