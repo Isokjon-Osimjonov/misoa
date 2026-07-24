@@ -1,5 +1,5 @@
 import { db } from '../../config/db'
-import { cargoShipments, cargoShipmentItems, inventoryBatches, products } from '@misoa/db'
+import { cargoShipments, cargoShipmentItems, inventoryBatches, products, expenses, expenseCategories } from '@misoa/db'
 import { eq, desc, sql, count, and, gt, asc } from 'drizzle-orm'
 import { sendAdminAlert } from '../../bot/helpers/notify'
 
@@ -246,6 +246,29 @@ export async function markCargoArrived(id: string, arrivedBy: string) {
     // Calculate total products
     const items = await tx.select({ qty: cargoShipmentItems.quantity }).from(cargoShipmentItems).where(eq(cargoShipmentItems.shipmentId, id))
     const totalQty = items.reduce((acc, item) => acc + item.qty, 0)
+    
+    // Auto-create cargo expense
+    if (shipment.cargoFeeKrw && shipment.cargoFeeKrw > 0) {
+      let [cargoCat] = await tx.select().from(expenseCategories).where(eq(expenseCategories.slug, 'cargo'))
+      if (!cargoCat) {
+        const [newCat] = await tx.insert(expenseCategories).values({
+          name: 'Yuk tashish (Kargo)',
+          slug: 'cargo',
+          isSystem: true
+        }).returning()
+        cargoCat = newCat
+      }
+      
+      await tx.insert(expenses).values({
+        categoryId: cargoCat.id,
+        amountKrw: BigInt(shipment.cargoFeeKrw),
+        description: `Kargo: ${shipment.shipmentNumber}`,
+        expenseDate: new Date().toISOString().split('T')[0],
+        createdBy: arrivedBy,
+        referenceType: 'CARGO_SHIPMENT',
+        referenceId: id,
+      })
+    }
     
     // 4. Send Telegram notification
     const dateStr = updatedShipment.dateArrived?.toISOString().split('T')[0]

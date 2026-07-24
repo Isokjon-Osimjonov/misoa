@@ -152,6 +152,20 @@ export async function getOverview(from: string, to: string) {
 
   const avgOrderValue = totalOrders > 0 ? netRevenue / totalOrders : 0
 
+  // 5. UZB Walk-in sales
+  const [uzbSalesData] = await db
+    .select({
+      totalUzs: sql<number>`COALESCE(SUM(${walkInSales.totalAmountUzs}), 0)`.mapWith(Number),
+      count: sql<number>`COUNT(*)`.mapWith(Number)
+    })
+    .from(walkInSales)
+    .where(
+      and(
+        gte(walkInSales.createdAt, startDate),
+        lte(walkInSales.createdAt, endDate)
+      )
+    )
+
   const result = {
     revenue: {
       gross: grossRevenue,
@@ -187,6 +201,8 @@ export async function getOverview(from: string, to: string) {
           : 0,
     },
     avgOrderValue,
+    uzbSalesUzs: uzbSalesData?.totalUzs || 0,
+    uzbSalesCount: uzbSalesData?.count || 0,
   }
 
   await setCache(cacheKey, result)

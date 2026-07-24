@@ -1,5 +1,5 @@
 import { db } from '../../config/db'
-import { walkInSales, walkInSaleItems, inventoryBatches, products } from '@misoa/db'
+import { walkInSales, walkInSaleItems, inventoryBatches, products, cargoShipmentItems } from '@misoa/db'
 import { eq, and, sql, desc, count, asc, sum } from 'drizzle-orm'
 import { sendAdminAlert } from '../../bot/helpers/notify'
 
@@ -223,11 +223,36 @@ export async function getWalkInSalesSummary(params: { from: Date; to: Date }) {
 
   const totalRevenue = totalCash + totalCard + totalDebt
 
+  const cogsData = await db
+    .select({
+      totalCogs: sql<number>`
+        COALESCE(SUM(
+          ${cargoShipmentItems.buyPriceKrw} *
+          ${walkInSaleItems.quantity}
+        ), 0)`.mapWith(Number)
+    })
+    .from(walkInSaleItems)
+    .leftJoin(
+      cargoShipmentItems,
+      eq(cargoShipmentItems.productId, walkInSaleItems.productId)
+    )
+    .leftJoin(
+      walkInSales,
+      eq(walkInSales.id, walkInSaleItems.saleId)
+    )
+    .where(
+      and(
+        sql`${walkInSales.createdAt} >= ${from.toISOString()}`,
+        sql`${walkInSales.createdAt} <= ${to.toISOString()}`
+      )
+    )
+
   return {
     totalCash,
     totalCard,
     totalDebt,
     totalRevenue,
-    totalSales
+    totalSales,
+    totalCogs: cogsData[0]?.totalCogs || 0
   }
 }

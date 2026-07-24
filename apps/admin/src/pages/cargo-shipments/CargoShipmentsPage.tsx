@@ -102,6 +102,26 @@ export default function CargoShipmentsPage() {
     }
   }, [shipments])
 
+  const cargoSummary = useMemo(() => {
+    const arrived = shipments?.filter((s: any) => s.status === 'ARRIVED') ?? []
+
+    const totalProductCost = arrived.reduce(
+      (sum: number, s: any) => sum + (Number(s.totalCostKrw) ?? 0), 0)
+
+    const totalCargoFee = arrived.reduce(
+      (sum: number, s: any) => sum + (Number(s.cargoFeeKrw) ?? 0), 0)
+
+    const totalSent = shipments?.reduce(
+      (sum: number, s: any) => sum + (Number(s.totalQuantity) ?? 0), 0) ?? 0
+
+    return {
+      totalProductCost,
+      totalCargoFee,
+      grandTotal: totalProductCost + totalCargoFee,
+      totalSent
+    }
+  }, [shipments])
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -171,6 +191,38 @@ export default function CargoShipmentsPage() {
           <div>
             <p className="text-xs font-medium text-purple-600">Jami mahsulotlar</p>
             <p className="text-lg font-bold text-purple-700">{stats.totalItems} ta</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 border rounded-xl bg-muted/20 mb-6">
+        <p className="text-sm font-medium mb-3">
+          Jami xarajatlar (faqat yetib kelgan)
+        </p>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Mahsulot xarajati
+            </p>
+            <p className="text-lg font-bold">
+              ₩{cargoSummary.totalProductCost.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Kargo narxi
+            </p>
+            <p className="text-lg font-bold">
+              ₩{cargoSummary.totalCargoFee.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Jami xarajat
+            </p>
+            <p className="text-lg font-bold text-primary">
+              ₩{cargoSummary.grandTotal.toLocaleString()}
+            </p>
           </div>
         </div>
       </div>

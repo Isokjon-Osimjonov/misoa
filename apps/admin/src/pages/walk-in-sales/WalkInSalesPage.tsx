@@ -138,6 +138,28 @@ export default function WalkInSalesPage() {
         </div>
       </div>
 
+      {summary && (
+        <div className="p-4 bg-muted/30 border border-border rounded-xl mb-6">
+          <p className="text-sm font-medium mb-3">
+            UZB Sotuvlar Xulosasi & Moliyaviy Holat
+          </p>
+          <div className="space-y-2 text-sm max-w-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Jami savdo (UZS):</span>
+              <span className="font-medium">
+                {summary.totalRevenue?.toLocaleString() ?? 0} UZS
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Mahsulot xarajati (₩):</span>
+              <span className="font-medium">
+                ₩{summary.totalCogs?.toLocaleString() ?? 0}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-2">
         <Button variant={filter === '' ? 'default' : 'outline'} onClick={() => setFilter('')}>Barchasi</Button>
         <Button variant={filter === 'CASH' ? 'default' : 'outline'} onClick={() => setFilter('CASH')}>Naqd</Button>

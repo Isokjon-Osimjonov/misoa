@@ -381,6 +381,27 @@ export function AnalitikPage() {
         </div>
       )}
 
+      {/* UZB Walk-in Sales Summary */}
+      {overview && (
+        <div className="bg-emerald-50 rounded-xl border-[0.5px] border-emerald-200 p-5">
+          <p className="text-sm font-semibold text-emerald-800 mb-3">UZB Savdolari (UZS):</p>
+          <div className="flex gap-8">
+            <div>
+              <p className="text-[11px] text-emerald-600 mb-1">Jami savdo</p>
+              <p className="text-lg font-bold text-emerald-900">
+                {overview.uzbSalesUzs?.toLocaleString()} UZS
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] text-emerald-600 mb-1">Sotuvlar soni</p>
+              <p className="text-lg font-bold text-emerald-900">
+                {overview.uzbSalesCount} ta sotuv
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Revenue chart */}
       <div className="bg-white rounded-xl border-[0.5px] border-border p-5">
         <div className="flex items-center justify-between mb-4">
