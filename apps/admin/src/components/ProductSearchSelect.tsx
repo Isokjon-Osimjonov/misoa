@@ -139,9 +139,9 @@ export function ProductSearchSelect({
                 className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left transition-colors border-b last:border-0"
               >
                 {/* Image */}
-                {product.images?.[0]?.url ? (
+                {product.imageUrls?.[0] ? (
                   <img
-                    src={product.images[0].url}
+                    src={product.imageUrls[0]}
                     alt={product.name}
                     className="w-9 h-9 rounded-md object-cover flex-shrink-0 border"
                   />

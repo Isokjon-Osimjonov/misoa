@@ -245,6 +245,35 @@ export async function getBatchesByProduct(productId: string) {
     .orderBy(asc(inventoryBatches.receivedAt))
 }
 
+export async function getProductCostPrice(productId: string) {
+  const batches = await db
+    .select({
+      costPrice: inventoryBatches.costPrice,
+      currentQty: inventoryBatches.currentQty
+    })
+    .from(inventoryBatches)
+    .where(
+      and(
+        eq(inventoryBatches.productId, productId),
+        eq(inventoryBatches.location, 'KOR_WAREHOUSE'),
+        gt(inventoryBatches.currentQty, 0)
+      )
+    )
+
+  if (!batches.length) return {
+    costPriceKrw: 0,
+    availableQty: 0
+  }
+
+  const totalQty = batches.reduce((sum, b) => sum + b.currentQty, 0)
+  const weightedCost = batches.reduce((sum, b) => sum + (Number(b.costPrice) * b.currentQty), 0)
+
+  return {
+    costPriceKrw: Math.round(weightedCost / totalQty),
+    availableQty: totalQty
+  }
+}
+
 export async function updateBatch(id: string, data: UpdateBatchDto, adminId: string) {
   return await db.transaction(async (tx) => {
     const [batch] = await tx

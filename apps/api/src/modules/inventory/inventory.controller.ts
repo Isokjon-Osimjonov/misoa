@@ -61,6 +61,16 @@ export async function getBatchesByProduct(req: Request, res: Response, next: Nex
   }
 }
 
+export async function getCostPrice(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { productId } = req.params
+    const result = await service.getProductCostPrice(productId)
+    res.json({ data: result, error: null })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export async function updateBatch(req: Request, res: Response, next: NextFunction) {
   try {
     const admin = req.user as AdminJwtPayload

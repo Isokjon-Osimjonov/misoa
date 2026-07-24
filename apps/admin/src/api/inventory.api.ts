@@ -24,6 +24,11 @@ export const inventoryApi = {
     return res.data.data
   },
 
+  getCostPrice: async (productId: string) => {
+    const res = await api.get(`/admin/inventory/cost-price/${productId}`)
+    return res.data.data
+  },
+
   addBatch: async (
     productId: string,
     payload: {

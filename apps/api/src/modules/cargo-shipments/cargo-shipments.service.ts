@@ -1,7 +1,60 @@
 import { db } from '../../config/db'
 import { cargoShipments, cargoShipmentItems, inventoryBatches, products } from '@misoa/db'
-import { eq, desc, sql, count } from 'drizzle-orm'
+import { eq, desc, sql, count, and, gt, asc } from 'drizzle-orm'
 import { sendAdminAlert } from '../../bot/helpers/notify'
+
+
+async function deductFromKorWarehouse(
+  productId: string,
+  quantityNeeded: number,
+  tx: any
+): Promise<void> {
+  const korBatches = await tx
+    .select()
+    .from(inventoryBatches)
+    .where(
+      and(
+        eq(inventoryBatches.productId, productId),
+        eq(inventoryBatches.location, 'KOR_WAREHOUSE'),
+        gt(inventoryBatches.currentQty, 0)
+      )
+    )
+    .orderBy(asc(inventoryBatches.createdAt))
+
+  const totalAvailable = korBatches.reduce((sum: number, b: any) => sum + b.currentQty, 0)
+
+  if (totalAvailable < quantityNeeded) {
+    const product = await tx
+      .select({ name: products.name })
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1)
+    
+    throw new Error(
+      `Koreya omborida yetarli mahsulot yo'q: ` +
+      `${product[0]?.name}. ` +
+      `Mavjud: ${totalAvailable}, ` +
+      `Kerak: ${quantityNeeded}`
+    )
+  }
+
+  let remaining = quantityNeeded
+  for (const batch of korBatches) {
+    if (remaining <= 0) break
+    
+    const deduct = Math.min(batch.currentQty, remaining)
+    
+    await tx
+      .update(inventoryBatches)
+      .set({
+        currentQty: batch.currentQty - deduct,
+        updatedAt: new Date()
+      })
+      .where(eq(inventoryBatches.id, batch.id))
+    
+    remaining -= deduct
+  }
+}
 
 export async function createCargoShipment(data: {
   shipmentNumber: string
@@ -42,6 +95,7 @@ export async function createCargoShipment(data: {
     const itemsToInsert = []
     const batchesToInsert = []
     for (const item of data.items) {
+      await deductFromKorWarehouse(item.productId, item.quantity, tx)
       const cargoShareKrw = Math.round(data.cargoFeeKrw / totalItems)
       const itemTotalCost = item.buyPriceKrw + cargoShareKrw
       totalCostKrw += itemTotalCost * item.quantity
