@@ -169,11 +169,6 @@ export function ProductSearchSelect({
                   </p>
                 </div>
 
-                <span className="text-xs text-muted-foreground flex-shrink-0">
-                  {product.availableQty
-                    ? `${product.availableQty} ta`
-                    : 'Stok yo\'q'}
-                </span>
               </button>
             ))}
           </div>

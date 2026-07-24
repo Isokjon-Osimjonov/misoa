@@ -309,8 +309,13 @@ export default function CargoShipmentsPage() {
         </div>
       )}
 
-      <Sheet open={showEdit} onOpenChange={setShowEdit}>
-        <SheetContent className="w-full sm:max-w-4xl overflow-y-auto">
+      <Sheet
+        open={showEdit}
+        onOpenChange={(open) => {
+          setShowEdit(open)
+          if (!open) setEditing(null)
+        }}>
+        <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Kargoni tahrirlash</SheetTitle>
           </SheetHeader>
@@ -319,8 +324,15 @@ export default function CargoShipmentsPage() {
               <CargoForm
                 mode="edit"
                 initialData={editingShipment}
-                onSuccess={() => setShowEdit(false)}
-                onCancel={() => setShowEdit(false)}
+                onSuccess={() => {
+                  setShowEdit(false)
+                  setEditing(null)
+                  qc.invalidateQueries({ queryKey: ['cargo-shipments'] })
+                }}
+                onCancel={() => {
+                  setShowEdit(false)
+                  setEditing(null)
+                }}
               />
             )}
           </div>
