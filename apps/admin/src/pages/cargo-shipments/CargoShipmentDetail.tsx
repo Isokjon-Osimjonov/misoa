@@ -68,7 +68,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
 
   return (
     <div className="space-y-6 pb-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-muted/30 p-4 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-muted/30 p-4 rounded-lg">
         <div>
           <p className="text-xs text-muted-foreground">Jo'natilgan</p>
           <p className="font-medium">{formatDate(shipment.dateSent)}</p>
