@@ -92,9 +92,6 @@ export async function getProductMovements(req: Request, res: Response, next: Nex
 
     const result = await service.getProductMovements({
       productId,
-      type,
-      dateFrom,
-      dateTo,
       page,
       limit,
     })

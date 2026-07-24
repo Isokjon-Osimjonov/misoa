@@ -12,6 +12,8 @@ import {
   stockReservations,
   waitlists,
   customers,
+  cargoShipments,
+  cargoShipmentItems,
 } from '@misoa/db'
 import {
   eq,
@@ -555,49 +557,54 @@ export async function getWriteOffHistory(params: {
 
 export async function getProductMovements(params: {
   productId: string
-  type?: string
-  dateFrom?: string
-  dateTo?: string
   page: number
   limit: number
 }) {
   const offset = (params.page - 1) * params.limit
 
-  let where = eq(stockMovements.productId, params.productId)
-  if (params.type) where = and(where, eq(stockMovements.movementType, params.type as any)) as any
-  if (params.dateFrom)
-    where = and(where, gte(stockMovements.createdAt, new Date(params.dateFrom))) as any
-  if (params.dateTo)
-    where = and(where, lte(stockMovements.createdAt, new Date(params.dateTo))) as any
-
-  const items = await db
+  // 1. Fetch stock_movements for KOR_WAREHOUSE batches
+  const movements = await db
     .select({
       id: stockMovements.id,
       type: stockMovements.movementType,
       quantityDelta: stockMovements.quantityDelta,
-      qtyBefore: stockMovements.qtyBefore,
-      qtyAfter: stockMovements.qtyAfter,
       reason: stockMovements.reason,
       createdAt: stockMovements.createdAt,
-      batch: { batchRef: inventoryBatches.batchRef },
-      admin: { fullName: adminUsers.fullName },
+      reference: inventoryBatches.batchRef,
     })
     .from(stockMovements)
     .innerJoin(inventoryBatches, eq(stockMovements.batchId, inventoryBatches.id))
-    .leftJoin(adminUsers, eq(stockMovements.performedBy, adminUsers.id))
-    .where(where)
-    .orderBy(desc(stockMovements.createdAt))
-    .limit(params.limit)
-    .offset(offset)
+    .where(
+      and(
+        eq(stockMovements.productId, params.productId),
+        eq(inventoryBatches.location, 'KOR_WAREHOUSE')
+      )
+    )
 
-  const [countRes] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(stockMovements)
-    .where(where)
-  const total = Number(countRes.count)
+  // 2. Fetch cargo_shipments for this product
+  const cargoItems = await db
+    .select({
+      id: cargoShipmentItems.id,
+      type: sql<string>`'CARGO_OUT'`,
+      quantityDelta: sql<number>`-1 * ${cargoShipmentItems.quantity}`,
+      reason: cargoShipments.notes,
+      createdAt: cargoShipments.dateSent,
+      reference: cargoShipments.shipmentNumber,
+    })
+    .from(cargoShipmentItems)
+    .innerJoin(cargoShipments, eq(cargoShipmentItems.shipmentId, cargoShipments.id))
+    .where(eq(cargoShipmentItems.productId, params.productId))
+
+  // 3. Merge and sort
+  let all = [...movements, ...cargoItems].sort((a: any, b: any) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
+  const total = all.length
+  all = all.slice(offset, offset + params.limit)
 
   return {
-    items,
+    items: all,
     meta: {
       page: params.page,
       limit: params.limit,

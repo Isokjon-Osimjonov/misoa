@@ -74,8 +74,16 @@ export default function CargoShipmentsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cargo-shipments'] })
       toast.success("Kargo o'chirildi")
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.error?.message ?? 'Xatolik')
     }
   })
+
+  const handleDelete = (id: string) => {
+    if (!confirm("Bu kargoni o'chirishni tasdiqlaysizmi?")) return
+    deleteMutation.mutate(id)
+  }
 
   const stats = useMemo(() => {
     const all = shipments ?? []
@@ -229,10 +237,13 @@ export default function CargoShipmentsPage() {
                       </Button>
                     )}
                     {s.status === 'SENT' && (
-                      <Button variant="destructive" size="sm" onClick={() => {
-                        if (confirm('Ochirishni xohlaysizmi?')) deleteMutation.mutate(s.id)
-                      }}>
-                        <Trash2 className="w-4 h-4" />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDelete(s.id)}
+                      >
+                        O'chirish
                       </Button>
                     )}
                   </td>
@@ -288,6 +299,19 @@ export default function CargoShipmentsPage() {
                       }
                     }}>
                       Yetdi
+                    </Button>
+                  )}
+                  {s.status === 'SENT' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1 text-xs text-destructive hover:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(s.id);
+                      }}
+                    >
+                      O'chirish
                     </Button>
                   )}
                 </div>

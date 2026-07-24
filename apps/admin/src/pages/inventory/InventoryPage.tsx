@@ -386,23 +386,9 @@ export function InventoryPage() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                       Mahsulot
                     </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Tranzit</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">UZB</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea qoldi</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden lg:table-cell">Band</th>
-                    <th
-                      className="px-4 py-3 text-center text-xs
-                                   font-medium text-muted-foreground
-                                   hidden md:table-cell"
-                    >
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea ombori</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">
                       Eng yaqin muddat
-                    </th>
-                    <th
-                      className="px-4 py-3 text-center text-xs
-                                   font-medium text-muted-foreground"
-                    >
-                      Holat
                     </th>
                     <th className="px-4 py-3 w-32" />
                   </tr>
@@ -446,40 +432,10 @@ export function InventoryPage() {
                       </td>
 
                       <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-blue-600">{item.korStock ?? 0} ta</span>
-                      </td>
-                      <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-amber-600">{item.transitStock ?? 0} ta</span>
-                      </td>
-                      <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-green-600">{item.uzbStock ?? 0} ta</span>
-                      </td>
-                      <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-foreground">{item.korStock ?? 0} ta</span>
-                      </td>
-                      <td className="px-4 py-3 text-center hidden lg:table-cell">
-                        {(item.reservedStock ?? 0) > 0 ? (
-                          <span
-                            className="text-xs text-blue-600
-                                           font-medium"
-                          >
-                            {item.reservedStock} band
-                          </span>
-                        ) : (
-                          <span
-                            className="text-xs
-                                           text-muted-foreground"
-                          >
-                            —
-                          </span>
-                        )}
+                        <span className="font-medium text-foreground">{item.korStock ?? 0} ta</span>
                       </td>
 
-                      {/* Nearest expiry */}
-                      <td
-                        className="px-4 py-3 text-center
-                                     hidden md:table-cell"
-                      >
+                      <td className="px-4 py-3 text-center hidden md:table-cell">
                         {item.nearestExpiry ? (
                           <span
                             className={cn(
@@ -493,18 +449,8 @@ export function InventoryPage() {
                             {formatDate(item.nearestExpiry)}
                           </span>
                         ) : (
-                          <span
-                            className="text-xs
-                                           text-muted-foreground"
-                          >
-                            —
-                          </span>
+                          <span className="text-xs text-muted-foreground">—</span>
                         )}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3 text-center">
-                        <StockBadge stock={item.availableStock ?? 0} />
                       </td>
 
                       {/* Actions */}
@@ -1007,21 +953,11 @@ export function InventoryPage() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <p className="text-xs text-blue-600 font-medium">Koreya ombori</p>
                 <p className="text-2xl font-bold text-blue-700">{selectedProduct?.korStock ?? 0}</p>
                 <p className="text-xs text-blue-500">ta mavjud</p>
-              </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-xs text-amber-600 font-medium">Yo'lda (Tranzit)</p>
-                <p className="text-2xl font-bold text-amber-700">{selectedProduct?.transitStock ?? 0}</p>
-                <p className="text-xs text-amber-500">ta jo'natilgan</p>
-              </div>
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <p className="text-xs text-green-600 font-medium">UZB ombori</p>
-                <p className="text-2xl font-bold text-green-700">{selectedProduct?.uzbStock ?? 0}</p>
-                <p className="text-xs text-green-500">ta mavjud</p>
               </div>
             </div>
 
@@ -1070,68 +1006,41 @@ export function InventoryPage() {
                     />
                   ) : (
                     <div className="space-y-4">
-                      {['KOR_WAREHOUSE', 'IN_TRANSIT', 'UZB_STORE'].map(loc => {
-                        const locBatches = productBatches.filter((b: any) => b.location === loc)
-                        if (locBatches.length === 0) return null
-                        
-                        const title = loc === 'KOR_WAREHOUSE' ? 'Koreya ombori' : loc === 'IN_TRANSIT' ? "Yo'lda (Tranzit)" : 'UZB ombori'
-                        
-                        return (
-                          <div key={loc} className="space-y-2">
-                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</h3>
-                            {locBatches.map((b: any) => (
-                              <div
-                                key={b.id}
-                                className="p-3 rounded-xl border-[0.5px] border-border bg-gray-50/50"
-                              >
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-gray-900">
-                                      {b.currentQty} ta
-                                    </span>
-                                    {b.currentQty !== b.initialQty && (
-                                      <span className="text-[11px] text-muted-foreground">
-                                        (jami: {b.initialQty})
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    {b.expiryDate && (
-                                      <span
-                                        className={cn(
-                                          'text-[11px] font-medium px-2 py-0.5',
-                                          'rounded-full',
-                                          new Date(b.expiryDate) <
-                                            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                            ? 'bg-red-50 text-red-600'
-                                            : 'bg-gray-100 text-gray-600'
-                                        )}
-                                      >
-                                        {formatDate(b.expiryDate)}
-                                      </span>
-                                    )}
-
-                                    {canWrite('inventory') && b.currentQty === b.initialQty && (
-                                      <button
-                                        onClick={() => setDeleteBatchTarget(b)}
-                                        className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </button>
-                                    )}
-                                  </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Koreya ombori</h3>
+                        {productBatches.filter((b: any) => b.location === 'KOR_WAREHOUSE').length === 0 ? (
+                          <p className="text-xs text-muted-foreground">Koreya omborida partiyalar yo'q</p>
+                        ) : (
+                          productBatches.filter((b: any) => b.location === 'KOR_WAREHOUSE').map((b: any) => (
+                            <div key={b.id} className="p-3 rounded-xl border-[0.5px] border-border bg-gray-50/50">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-bold text-gray-900">{b.currentQty} ta</span>
+                                  {b.currentQty !== b.initialQty && (
+                                    <span className="text-[11px] text-muted-foreground">(jami: {b.initialQty})</span>
+                                  )}
                                 </div>
-                                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                                  <span>Tannarx: {formatKRW(Number(b.costPrice))}</span>
-                                  <span>•</span>
-                                  <span>Qabul: {formatDate(b.receivedAt)}</span>
+                                <div className="flex items-center gap-2">
+                                  {b.expiryDate && (
+                                    <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full', new Date(b.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600')}>
+                                      {formatDate(b.expiryDate)}
+                                    </span>
+                                  )}
+                                  {canWrite('inventory') && (
+                                    <button onClick={() => setDeleteBatchTarget(b)} className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors">
+                                      <Trash2 className="h-3 w-3" />
+                                    </button>
+                                  )}
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        )
-                      })}
+                              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                                <span>Tannarx: {formatKRW(Number(b.costPrice))}</span><span>•</span><span>Qabul: {formatDate(b.receivedAt)}</span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      <p className="text-xs text-amber-600 font-medium">UZB ombori ma'lumotlari Kargo jo'natmalar sahifasida boshqariladi.</p>
                     </div>
                   ))}
 
@@ -1140,64 +1049,47 @@ export function InventoryPage() {
                   (movements.length === 0 ? (
                     <EmptyState message="Harakat yo'q" />
                   ) : (
-                    movements.map((m: any) => {
-                      const MOVEMENT_LABELS: Record<string, string> = {
-                        STOCK_IN: 'Kirim',
-                        RESERVED: 'Buyurtma band',
-                        DEDUCTED: 'Sotildi',
-                        RETURNED: 'Qaytarildi',
-                        ADJUSTED: 'Tuzatish',
-                      }
-                      const isPositive = m.quantityDelta > 0
-                      return (
-                        <div
-                          key={m.id}
-                          className="flex items-center gap-3 p-3
-                                      rounded-xl border-[0.5px]
-                                      border-border/50"
-                        >
-                          <div
-                            className={cn(
-                              'w-9 h-9 rounded-full flex items-center',
-                              'justify-center text-xs font-bold shrink-0',
-                              isPositive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
-                            )}
-                          >
-                            {isPositive ? '+' : ''}
-                            {m.quantityDelta}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs font-semibold text-gray-900">
-                                {MOVEMENT_LABELS[m.type] || REASON_LABELS[m.type] || m.type}
-                              </p>
-                              {m.orderNumber && (
-                                <span
-                                  className="text-[10px] text-primary font-mono cursor-pointer hover:underline"
-                                  onClick={() => {
-                                    setViewSheet(false)
-                                    navigate({
-                                      to: '/orders/$id',
-                                      params: { id: m.orderId },
-                                    } as any)
-                                  }}
-                                >
-                                  #{m.orderNumber}
-                                </span>
-                              )}
-                            </div>
-                            {m.reason && (
-                              <p className="text-[11px] text-muted-foreground truncate">
-                                {m.reason}
-                              </p>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-muted-foreground shrink-0">
-                            {formatRelative(m.createdAt)}
-                          </p>
-                        </div>
-                      )
-                    })
+                    <div className="overflow-x-auto rounded-xl border-[0.5px] border-border">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-gray-50 border-b border-border/50 text-muted-foreground">
+                          <tr>
+                            <th className="px-3 py-2">Sana</th>
+                            <th className="px-3 py-2">Tur</th>
+                            <th className="px-3 py-2">Miqdor</th>
+                            <th className="px-3 py-2">Hujjat</th>
+                            <th className="px-3 py-2">Izoh</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/30">
+                          {movements.map((m: any) => {
+                            const isPositive = m.quantityDelta > 0
+                            return (
+                              <tr key={m.id} className="hover:bg-gray-50/50">
+                                <td className="px-3 py-2 whitespace-nowrap">{formatDate(m.createdAt)}</td>
+                                <td className="px-3 py-2">
+                                  {isPositive ? (
+                                    <span className="text-green-600 font-medium">Kirdi</span>
+                                  ) : (
+                                    <span className="text-red-600 font-medium">Chiqdi</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2">
+                                  <span className={isPositive ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                                    {isPositive ? '+' : ''}{m.quantityDelta}
+                                  </span>
+                                </td>
+                                <td className="px-3 py-2 font-mono text-muted-foreground whitespace-nowrap">
+                                  {m.reference || m.batch?.batchRef || m.orderNumber || '—'}
+                                </td>
+                                <td className="px-3 py-2 text-muted-foreground truncate max-w-[120px]">
+                                  {m.reason || (isPositive ? 'Kirim' : "Kargo orqali jo'natildi")}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   ))}
 
                 {/* ── WRITEOFFS TAB ── */}
