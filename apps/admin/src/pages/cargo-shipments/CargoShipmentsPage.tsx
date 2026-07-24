@@ -236,8 +236,8 @@ export default function CargoShipmentsPage() {
       {viewMode === 'table' ? (
       <div className="rounded-lg border overflow-hidden bg-background">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm text-left">
-          <thead className="bg-muted text-muted-foreground">
+          <table className="w-full sm:min-w-[640px] text-sm text-left block sm:table">
+          <thead className="bg-muted text-muted-foreground hidden sm:table-header-group">
             <tr>
               <th className="p-3">#</th>
               <th className="p-3">Raqam</th>
@@ -248,24 +248,37 @@ export default function CargoShipmentsPage() {
               <th className="p-3">Amal</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="block sm:table-row-group">
             {isLoading ? (
               <tr><td colSpan={7} className="p-4 text-center">Yuklanmoqda...</td></tr>
             ) : shipments.length === 0 ? (
               <tr><td colSpan={7} className="p-4 text-center">Ma'lumot topilmadi</td></tr>
             ) : (
               shipments.map((s: any, idx: number) => (
-                <tr key={s.id} className="border-t">
-                  <td className="p-3">{idx + 1}</td>
-                  <td className="p-3 font-medium">{s.shipmentNumber}</td>
-                  <td className="p-3">{formatDate(s.dateSent)}</td>
-                  <td className="p-3">
+                <tr key={s.id} className="border sm:border-t sm:border-x-0 sm:border-b-0 block sm:table-row mb-4 sm:mb-0 rounded-md sm:rounded-none p-3 sm:p-0 bg-card">
+                  <td className="p-3 hidden sm:table-cell">{idx + 1}</td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell font-medium border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Raqam:</span>
+                    <span>{s.shipmentNumber}</span>
+                  </td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Sana:</span>
+                    <span>{formatDate(s.dateSent)}</span>
+                  </td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Status:</span>
                     <CargoStatusBadge status={s.status} />
                   </td>
-                  <td className="p-3 text-sm">{s.totalQuantity ?? 0} ta</td>
-                  <td className="p-3">₩{s.totalCostKrw?.toLocaleString()}</td>
-                  <td className="p-3 flex flex-wrap gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => {
+                  <td className="p-3 flex justify-between items-center sm:table-cell text-sm border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Mahsulotlar:</span>
+                    <span>{s.totalQuantity ?? 0} ta</span>
+                  </td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Kargo Narxi:</span>
+                    <span>₩{s.totalCostKrw?.toLocaleString()}</span>
+                  </td>
+                  <td className="p-3 flex flex-wrap gap-1 mt-2 sm:mt-0 sm:table-cell justify-end sm:justify-start">
+                    <Button variant="ghost" size="sm" className="w-full sm:w-auto" onClick={() => {
                       setSelectedShipment(s)
                       setShowDetail(true)
                     }}>

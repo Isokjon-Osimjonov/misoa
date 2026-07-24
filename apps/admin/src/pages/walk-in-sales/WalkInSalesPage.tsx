@@ -169,8 +169,8 @@ export default function WalkInSalesPage() {
 
       <div className="rounded-lg border overflow-hidden bg-background">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm text-left">
-          <thead className="bg-muted text-muted-foreground">
+          <table className="w-full sm:min-w-[640px] text-sm text-left block sm:table">
+          <thead className="bg-muted text-muted-foreground hidden sm:table-header-group">
             <tr>
               <th className="p-3">#</th>
               <th className="p-3">Raqam</th>
@@ -180,20 +180,35 @@ export default function WalkInSalesPage() {
               <th className="p-3">Summa</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="block sm:table-row-group">
             {isLoading ? (
               <tr><td colSpan={6} className="p-4 text-center">Yuklanmoqda...</td></tr>
             ) : sales.length === 0 ? (
               <tr><td colSpan={6} className="p-4 text-center">Ma'lumot topilmadi</td></tr>
             ) : (
               sales.map((s: any, idx: number) => (
-                <tr key={s.id} className="border-t">
-                  <td className="p-3">{idx + 1}</td>
-                  <td className="p-3 font-medium">{s.saleNumber}</td>
-                  <td className="p-3">{formatDate(s.createdAt)}</td>
-                  <td className="p-3 font-semibold">{s.paymentType === 'CASH' ? 'Naqd' : s.paymentType === 'CARD' ? 'Karta' : 'Nasiya'}</td>
-                  <td className="p-3">{s.customerName || '-'}</td>
-                  <td className="p-3 font-bold">{s.totalAmountUzs?.toLocaleString()} UZS</td>
+                <tr key={s.id} className="border sm:border-t sm:border-x-0 sm:border-b-0 block sm:table-row mb-4 sm:mb-0 rounded-md sm:rounded-none p-3 sm:p-0 bg-card">
+                  <td className="p-3 hidden sm:table-cell">{idx + 1}</td>
+                  <td className="p-3 flex justify-between sm:table-cell font-medium border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Raqam:</span>
+                    <span>{s.saleNumber}</span>
+                  </td>
+                  <td className="p-3 flex justify-between sm:table-cell border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Sana:</span>
+                    <span>{formatDate(s.createdAt)}</span>
+                  </td>
+                  <td className="p-3 flex justify-between sm:table-cell font-semibold border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">To'lov:</span>
+                    <span>{s.paymentType === 'CASH' ? 'Naqd' : s.paymentType === 'CARD' ? 'Karta' : 'Nasiya'}</span>
+                  </td>
+                  <td className="p-3 flex justify-between sm:table-cell border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground">Mijoz:</span>
+                    <span>{s.customerName || '-'}</span>
+                  </td>
+                  <td className="p-3 flex justify-between sm:table-cell font-bold">
+                    <span className="sm:hidden font-normal text-muted-foreground">Summa:</span>
+                    <span>{s.totalAmountUzs?.toLocaleString()} UZS</span>
+                  </td>
                 </tr>
               ))
             )}

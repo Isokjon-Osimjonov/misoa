@@ -55,8 +55,8 @@ export default function UzbStockPage() {
 
       <div className="rounded-lg border overflow-hidden bg-background">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm text-left">
-          <thead className="bg-muted text-muted-foreground">
+          <table className="w-full sm:min-w-[640px] text-sm text-left block sm:table">
+          <thead className="bg-muted text-muted-foreground hidden sm:table-header-group">
             <tr>
               <th className="p-3 w-16">Rasm</th>
               <th className="p-3">Nomi</th>
@@ -65,30 +65,36 @@ export default function UzbStockPage() {
               <th className="p-3">Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="block sm:table-row-group">
             {isLoading ? (
               <tr><td colSpan={5} className="p-4 text-center">Yuklanmoqda...</td></tr>
             ) : items.length === 0 ? (
               <tr><td colSpan={5} className="p-4 text-center">Ma'lumot topilmadi</td></tr>
             ) : (
               items.map((item: any) => (
-                <tr key={item.id} className="border-t">
-                  <td className="p-3">
-                    {item.imageUrl || item.images?.[0]?.url || item.image ? (
-                      <img 
-                        src={item.imageUrl ?? item.images?.[0]?.url ?? item.image} 
-                        alt={item.name} 
-                        className="w-10 h-10 object-cover rounded"
-                        onError={(e) => { e.currentTarget.style.display = 'none' }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-muted rounded flex items-center justify-center text-xs">Rasm yo'q</div>
-                    )}
+                <tr key={item.id} className="border sm:border-t sm:border-x-0 sm:border-b-0 block sm:table-row mb-4 sm:mb-0 rounded-md sm:rounded-none p-3 sm:p-0 bg-card">
+                  <td className="p-3 block sm:table-cell border-b sm:border-none pb-3 sm:pb-3">
+                    <div className="flex items-center gap-3">
+                      {item.imageUrl || item.images?.[0]?.url || item.image ? (
+                        <img 
+                          src={item.imageUrl ?? item.images?.[0]?.url ?? item.image} 
+                          alt={item.name} 
+                          className="w-12 h-12 object-cover rounded"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs">Rasm</div>
+                      )}
+                      <span className="font-medium text-base sm:text-sm line-clamp-2">{item.name}</span>
+                    </div>
                   </td>
-                  <td className="p-3 font-medium">{item.name}</td>
                   <td className="p-3 hidden sm:table-cell">{item.brandName || '-'}</td>
-                  <td className="p-3 font-bold text-lg">{item.uzbQty}</td>
-                  <td className="p-3">
+                  <td className="p-3 flex justify-between items-center sm:table-cell font-bold text-lg border-b sm:border-none">
+                    <span className="sm:hidden font-normal text-muted-foreground text-sm">UZB Qoldi:</span>
+                    <span>{item.uzbQty}</span>
+                  </td>
+                  <td className="p-3 flex justify-between items-center sm:table-cell">
+                    <span className="sm:hidden font-normal text-muted-foreground">Status:</span>
                     {item.uzbQty === 0 ? (
                       <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">🔴 Tugagan</span>
                     ) : item.uzbQty <= 5 ? (

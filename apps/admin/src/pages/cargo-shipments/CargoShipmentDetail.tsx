@@ -92,8 +92,8 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
       <div>
         <h3 className="font-medium mb-3">Mahsulotlar ({totalItems} ta)</h3>
         <div className="border rounded-md overflow-x-auto bg-background w-full min-w-0">
-          <table className="w-full min-w-[640px] text-sm text-left whitespace-nowrap">
-            <thead className="bg-muted text-muted-foreground">
+          <table className="w-full sm:min-w-[640px] text-sm text-left whitespace-nowrap sm:whitespace-normal block sm:table">
+            <thead className="bg-muted text-muted-foreground hidden sm:table-header-group">
               <tr>
                 <th className="p-2">Mahsulot</th>
                 <th className="p-2 text-right">Soni</th>
@@ -102,15 +102,15 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                 <th className="p-2 text-right">Jami xarajat ₩</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block sm:table-row-group">
               {items.map((item: any) => {
                 const cargoShareKrw = totalItems > 0 ? Math.round(cargoFeeKrw / totalItems) : 0
                 const costKrw = (item.buyPriceKrw || 0) + cargoShareKrw
                 const itemTotalCostKrw = costKrw * item.quantity
 
                 return (
-                  <tr key={item.id} className="border-t">
-                    <td className="p-2">
+                  <tr key={item.id} className="border sm:border-t sm:border-x-0 sm:border-b-0 block sm:table-row mb-4 sm:mb-0 rounded-md sm:rounded-none p-2 sm:p-0">
+                    <td className="p-2 block sm:table-cell border-b sm:border-b-0 pb-3 sm:pb-2">
                       <div className="flex items-center gap-2">
                         {item.imageUrl ? (
                           <img
@@ -125,26 +125,50 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                             <Package className="w-4 h-4 text-muted-foreground" />
                           </div>
                         )}
-                        <span className="text-sm">
+                        <span className="text-sm whitespace-normal sm:whitespace-nowrap line-clamp-2 sm:line-clamp-none">
                           {item.productName}
                         </span>
                       </div>
                     </td>
-                    <td className="p-2 text-right font-medium">{item.quantity}</td>
-                    <td className="p-2 text-right">₩{item.buyPriceKrw?.toLocaleString()}</td>
-                    <td className="p-2 text-right text-muted-foreground">₩{cargoShareKrw.toLocaleString()}</td>
-                    <td className="p-2 text-right font-medium">₩{itemTotalCostKrw.toLocaleString()}</td>
+                    <td className="p-2 flex justify-between sm:table-cell text-right font-medium">
+                      <span className="sm:hidden font-normal text-muted-foreground">Soni:</span>
+                      <span>{item.quantity}</span>
+                    </td>
+                    <td className="p-2 flex justify-between sm:table-cell text-right">
+                      <span className="sm:hidden font-normal text-muted-foreground">Olish ₩:</span>
+                      <span>₩{item.buyPriceKrw?.toLocaleString()}</span>
+                    </td>
+                    <td className="p-2 flex justify-between sm:table-cell text-right text-muted-foreground">
+                      <span className="sm:hidden font-normal text-muted-foreground">Kargo ₩:</span>
+                      <span>₩{cargoShareKrw.toLocaleString()}</span>
+                    </td>
+                    <td className="p-2 flex justify-between sm:table-cell text-right font-medium bg-muted/30 sm:bg-transparent mt-1 sm:mt-0 rounded sm:rounded-none">
+                      <span className="sm:hidden font-normal text-muted-foreground">Jami xarajat ₩:</span>
+                      <span>₩{itemTotalCostKrw.toLocaleString()}</span>
+                    </td>
                   </tr>
                 )
               })}
             </tbody>
-            <tfoot className="bg-muted font-bold">
-              <tr>
-                <td className="p-2">Jami</td>
-                <td className="p-2 text-right">{totalItems} ta</td>
-                <td className="p-2 text-right">₩{totalBuyPriceKrw.toLocaleString()}</td>
-                <td className="p-2 text-right">₩{cargoFeeKrw.toLocaleString()}</td>
-                <td className="p-2 text-right">₩{totalCostKrw.toLocaleString()}</td>
+            <tfoot className="bg-muted font-bold block sm:table-footer-group border rounded-md sm:border-none p-2 sm:p-0 mt-4 sm:mt-0">
+              <tr className="block sm:table-row">
+                <td className="p-2 hidden sm:table-cell">Jami</td>
+                <td className="p-2 flex justify-between sm:table-cell text-right border-b sm:border-none">
+                  <span className="sm:hidden font-normal text-muted-foreground">Jami Soni:</span>
+                  <span>{totalItems} ta</span>
+                </td>
+                <td className="p-2 flex justify-between sm:table-cell text-right border-b sm:border-none">
+                  <span className="sm:hidden font-normal text-muted-foreground">Jami Olish ₩:</span>
+                  <span>₩{totalBuyPriceKrw.toLocaleString()}</span>
+                </td>
+                <td className="p-2 flex justify-between sm:table-cell text-right border-b sm:border-none">
+                  <span className="sm:hidden font-normal text-muted-foreground">Jami Kargo ₩:</span>
+                  <span>₩{cargoFeeKrw.toLocaleString()}</span>
+                </td>
+                <td className="p-2 flex justify-between sm:table-cell text-right">
+                  <span className="sm:hidden font-normal text-muted-foreground">Jami Xarajat ₩:</span>
+                  <span>₩{totalCostKrw.toLocaleString()}</span>
+                </td>
               </tr>
             </tfoot>
           </table>
