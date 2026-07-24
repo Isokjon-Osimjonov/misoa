@@ -415,7 +415,7 @@ export default function CargoShipmentsPage() {
       </Sheet>
 
       <Dialog open={showDetail} onOpenChange={setShowDetail}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Jo'natma: {selectedShipment?.shipmentNumber}</DialogTitle>
           </DialogHeader>

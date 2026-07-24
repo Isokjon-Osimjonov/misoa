@@ -95,7 +95,7 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-1">
           <Label>Jo'natma raqami</Label>
           <Input {...register('shipmentNumber')} />
@@ -137,7 +137,7 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
 
         <div className="space-y-2 border rounded-md p-4 bg-muted/20">
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3 p-3 border rounded-lg">
+            <div key={field.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-lg">
               {field.imageUrl ? (
                 <img
                   src={field.imageUrl as string}
@@ -150,7 +150,7 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
                 </div>
               )}
               
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 w-full min-w-0">
                 <p className="text-sm font-medium truncate">{field.productName}</p>
                 <Input type="hidden" {...register(`items.${index}.productId`)} />
                 <Input type="hidden" {...register(`items.${index}.productName`)} />
@@ -160,15 +160,15 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
                   <p className="text-xs text-muted-foreground mt-1">Mavjud: {String(field.availableQty)} ta</p>
                 )}
               </div>
-              <div className="w-24">
+              <div className="w-full sm:w-24">
                 <Label className="text-xs">Soni</Label>
                 <Input type="number" {...register(`items.${index}.quantity`)} />
               </div>
-              <div className="w-32">
+              <div className="w-full sm:w-32">
                 <Label className="text-xs">Olish (₩)</Label>
                 <Input type="number" {...register(`items.${index}.buyPriceKrw`)} />
               </div>
-              <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+              <Button type="button" variant="destructive" size="icon" className="w-full sm:w-auto mt-2 sm:mt-0 shrink-0" onClick={() => remove(index)}>
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
@@ -178,9 +178,9 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>Bekor qilish</Button>
-        <Button type="submit" disabled={isPending}>Saqlash</Button>
+      <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel}>Bekor qilish</Button>
+        <Button type="submit" className="w-full sm:w-auto" disabled={isPending}>Saqlash</Button>
       </div>
     </form>
   )

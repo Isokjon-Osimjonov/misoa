@@ -68,7 +68,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
 
   return (
     <div className="space-y-6 pb-6">
-      <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-muted/30 p-4 rounded-lg">
         <div>
           <p className="text-xs text-muted-foreground">Jo'natilgan</p>
           <p className="font-medium">{formatDate(shipment.dateSent)}</p>
@@ -92,7 +92,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
       <div>
         <h3 className="font-medium mb-3">Mahsulotlar ({totalItems} ta)</h3>
         <div className="border rounded-md overflow-x-auto bg-background">
-          <table className="w-full text-sm text-left whitespace-nowrap">
+          <table className="w-full min-w-[640px] text-sm text-left whitespace-nowrap">
             <thead className="bg-muted text-muted-foreground">
               <tr>
                 <th className="p-2">Mahsulot</th>
