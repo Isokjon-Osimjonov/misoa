@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { cargoShipmentsApi } from '../../api/cargo-shipments.api'
 import { settingsApi } from '../../api/settings.api'
 import { formatDate } from '../../utils/date'
+import { Package } from 'lucide-react'
 
 interface CargoShipmentDetailProps {
   shipmentId: string
@@ -124,12 +125,20 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                   <tr key={item.id} className="border-t">
                     <td className="p-2">
                       <div className="flex items-center gap-2">
-                        {item.productImage ? (
-                          <img src={item.productImage} className="w-8 h-8 rounded object-cover" alt="" />
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            className="w-8 h-8 rounded object-cover border"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
                         ) : (
-                          <div className="w-8 h-8 bg-muted rounded"></div>
+                          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                            <Package className="w-4 h-4 text-muted-foreground" />
+                          </div>
                         )}
-                        <span className="font-medium max-w-[150px] truncate" title={item.productName}>
+                        <span className="text-sm">
                           {item.productName}
                         </span>
                       </div>
@@ -141,6 +150,11 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                     <td className="p-2 text-right text-muted-foreground">{costUzs.toLocaleString()}</td>
                     <td className={`p-2 text-right font-medium ${profitUzs > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {profitUzs > 0 ? '+' : ''}{profitUzs.toLocaleString()}
+                      {profitUzs < 0 && (
+                        <span className="text-xs text-red-500 ml-2 block">
+                          Zarar!
+                        </span>
+                      )}
                     </td>
                     <td className={`p-2 text-right ${marginPct > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {marginPct.toFixed(1)}%

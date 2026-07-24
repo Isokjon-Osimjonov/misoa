@@ -140,30 +140,20 @@ export function ProductSearchSelect({
               >
                 {/* Image */}
                 {(() => {
-                  const imageUrl =
-                    product.imageUrls?.[0] ??
-                    product.images?.[0]?.url ??
-                    product.images?.[0] ??
-                    product.imageUrl ??
-                    product.image ??
-                    null
+                  const imageUrl = product.imageUrls?.[0]
                   
-                  return (
-                    <div className="w-9 h-9 flex-shrink-0">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={product.name}
-                          className="w-9 h-9 rounded-md object-cover border"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none'
-                          }}
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center">
-                          <Package className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
+                  return imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={product.name}
+                      className="w-9 h-9 rounded-md object-cover border flex-shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                      <Package className="w-4 h-4 text-muted-foreground" />
                     </div>
                   )
                 })()}
@@ -179,12 +169,9 @@ export function ProductSearchSelect({
                   </p>
                 </div>
 
-                {/* Price */}
-                <span className="text-sm font-medium text-right flex-shrink-0">
-                  {filterUzbStock
-                    ? `${(product.priceUzs ?? 0).toLocaleString('uz-UZ')} UZS`
-                    : `₩${(product.priceKrw ?? 0).toLocaleString()}`
-                  }
+                {/* Show Korea retail price */}
+                <span className="text-sm font-medium text-right flex-shrink-0 text-muted-foreground">
+                  ₩{(product.retailPrice ?? 0).toLocaleString()}
                 </span>
               </button>
             ))}

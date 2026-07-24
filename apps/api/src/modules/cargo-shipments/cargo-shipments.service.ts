@@ -200,7 +200,7 @@ export async function getCargoShipment(id: string) {
     .select({
       item: cargoShipmentItems,
       productName: products.name,
-      productImage: sql`${products.imageUrls}[1]`
+      imageUrl: sql<string>`${products.imageUrls}->>0`
     })
     .from(cargoShipmentItems)
     .leftJoin(products, eq(cargoShipmentItems.productId, products.id))
@@ -209,7 +209,7 @@ export async function getCargoShipment(id: string) {
   const formattedItems = items.map(row => ({
     ...row.item,
     productName: row.productName,
-    productImage: row.productImage,
+    imageUrl: row.imageUrl,
     itemProfit: 0 // Placeholder logic for profit
   }))
 

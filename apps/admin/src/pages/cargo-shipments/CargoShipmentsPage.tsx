@@ -344,52 +344,56 @@ export default function CargoShipmentsPage() {
                   <ProductSearchSelect
                     placeholder="Mahsulot tanlang..."
                     selectedIds={fields.map((f: any) => f.productId)}
-                    onSelect={async (p: any) => {
-                      const exists = fields.find((f: any) => f.productId === p.id)
-                      if (!exists) {
-                        try {
-                          const costData = await inventoryApi.getCostPrice(p.id)
-                          append({ 
-                            productId: p.id, 
-                            productName: p.name, 
-                            imageUrl: p.imageUrls?.[0] ?? '',
-                            availableQty: costData?.availableQty ?? 0,
-                            quantity: 1, 
-                            buyPriceKrw: costData?.costPriceKrw ?? p.priceKrw ?? 0, 
-                            sellPriceUzs: p.priceUzs ?? 0 
-                          })
-                        } catch(e) {
-                          append({ 
-                            productId: p.id, 
-                            productName: p.name, 
-                            imageUrl: p.imageUrls?.[0] ?? '',
-                            availableQty: 0,
-                            quantity: 1, 
-                            buyPriceKrw: p.priceKrw ?? 0, 
-                            sellPriceUzs: p.priceUzs ?? 0 
-                          })
+                    onSelect={async (product: any) => {
+                      if (fields.find((f: any) => f.productId === product.id)) return
+
+                      let buyPriceKrw = product.retailPrice ?? 0
+                      let availableQty = 0
+
+                      try {
+                        const costData = await inventoryApi.getCostPrice(product.id)
+                        if (costData?.costPriceKrw) {
+                          buyPriceKrw = costData.costPriceKrw
+                          availableQty = costData.availableQty
                         }
-                      }
+                      } catch {}
+
+                      append({ 
+                        productId: product.id, 
+                        productName: product.name, 
+                        imageUrl: product.imageUrls?.[0] ?? '',
+                        availableQty,
+                        quantity: 1, 
+                        buyPriceKrw, 
+                        sellPriceUzs: 0 
+                      })
                     }}
                   />
                 </div>
 
                 <div className="space-y-2 border rounded-md p-4 bg-muted/20">
                   {fields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2 items-end">
-                      {field.imageUrl && (
-                        <div className="flex-shrink-0">
-                          <img src={field.imageUrl} className="w-10 h-10 rounded-md object-cover border" alt="" />
+                    <div key={field.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                      {field.imageUrl ? (
+                        <img
+                          src={field.imageUrl}
+                          alt={field.productName}
+                          className="w-10 h-10 rounded-md object-cover border flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                          <Package className="w-5 h-5 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="flex-1">
-                        <Label className="text-xs">{watch(`items.${index}.productName`)}</Label>
+                      
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{field.productName}</p>
                         <Input type="hidden" {...register(`items.${index}.productId`)} />
                         <Input type="hidden" {...register(`items.${index}.productName`)} />
                         <Input type="hidden" {...register(`items.${index}.imageUrl`)} />
                         <Input type="hidden" {...register(`items.${index}.availableQty`)} />
-                        {field.availableQty !== undefined && (
-                          <p className="text-[10px] text-muted-foreground mt-1">Mavjud: {String(field.availableQty)} ta</p>
+                        {field.availableQty !== undefined && Number(field.availableQty) > 0 && (
+                          <p className="text-xs text-muted-foreground mt-1">Mavjud: {String(field.availableQty)} ta</p>
                         )}
                       </div>
                       <div className="w-24">
@@ -403,6 +407,9 @@ export default function CargoShipmentsPage() {
                       <div className="w-32">
                         <Label className="text-xs">Sotish (UZS)</Label>
                         <Input type="number" {...register(`items.${index}.sellPriceUzs`)} />
+                        {Number(watch(`items.${index}.sellPriceUzs`)) > 0 && Number(watch(`items.${index}.sellPriceUzs`)) < 10000 && (
+                          <span className="text-[10px] text-red-500">Sotish narhi juda past</span>
+                        )}
                       </div>
                       <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
                         <Trash2 className="w-4 h-4" />
