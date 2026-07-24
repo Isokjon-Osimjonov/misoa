@@ -38,7 +38,7 @@ export default function UzbStockPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div className="p-4 border rounded-md shadow-sm bg-card text-card-foreground">
           <p className="text-sm text-muted-foreground">📦 Jami</p>
           <p className="text-xl font-bold">{totalItems} mahsulot</p>

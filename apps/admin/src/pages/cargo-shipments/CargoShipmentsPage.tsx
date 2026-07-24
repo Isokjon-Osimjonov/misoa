@@ -143,7 +143,7 @@ export default function CargoShipmentsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
           <div className="p-2 bg-amber-100 rounded-lg shrink-0">
             <Truck className="w-5 h-5 text-amber-600" />
