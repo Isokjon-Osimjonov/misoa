@@ -220,6 +220,23 @@ export async function getProducts(query: {
       wholesalePrice: productRegionalConfigs.wholesalePrice,
       isAvailable: productRegionalConfigs.isAvailable,
       totalStock: sql<number>`(SELECT COALESCE(SUM(current_qty), 0) FROM inventory_batches WHERE product_id = ${products.id})`,
+      avgCostKrw: sql<number>`(
+        SELECT ROUND(
+          SUM(ib.cost_price * ib.current_qty) /
+          NULLIF(SUM(ib.current_qty), 0)
+        )
+        FROM inventory_batches ib
+        WHERE ib.product_id = ${products.id}
+        AND ib.location = 'KOR_WAREHOUSE'
+        AND ib.current_qty > 0
+      )`.as('avg_cost_krw'),
+      availableQty: sql<number>`(
+        SELECT COALESCE(SUM(ib.current_qty), 0)
+        FROM inventory_batches ib
+        WHERE ib.product_id = ${products.id}
+        AND ib.location = 'KOR_WAREHOUSE'
+        AND ib.current_qty > 0
+      )`.as('available_qty'),
     })
     .from(products)
     .leftJoin(categories, eq(products.categoryId, categories.id))
@@ -249,6 +266,8 @@ export async function getProducts(query: {
       wholesalePrice: i.wholesalePrice ? Number(i.wholesalePrice) : null,
       totalStock: Number(i.totalStock || 0),
       isAvailable: i.isAvailable ?? true,
+      avgCostKrw: i.avgCostKrw ? Number(i.avgCostKrw) : null,
+      availableQty: i.availableQty ? Number(i.availableQty) : 0,
     })),
     meta: {
       total,

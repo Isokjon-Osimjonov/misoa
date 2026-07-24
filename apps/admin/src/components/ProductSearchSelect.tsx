@@ -168,6 +168,20 @@ export function ProductSearchSelect({
                     {filterUzbStock && product.uzbStock != null ? ` • ${product.uzbStock} ta mavjud` : ''}
                   </p>
                 </div>
+                
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {product.avgCostKrw
+                      ? `₩${Number(product.avgCostKrw).toLocaleString()}`
+                      : product.retailPrice
+                        ? `₩${Number(product.retailPrice).toLocaleString()}`
+                        : '—'
+                    }
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {Number(product.availableQty ?? 0)} ta mavjud
+                  </p>
+                </div>
 
               </button>
             ))}

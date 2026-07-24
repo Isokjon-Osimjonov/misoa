@@ -12,6 +12,7 @@ import { formatDate } from '../../utils/date'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ProductSearchSelect } from '../../components/ProductSearchSelect'
 import { CargoShipmentDetail } from './CargoShipmentDetail'
@@ -209,17 +210,15 @@ export default function CargoShipmentsPage() {
                     }}>
                       <Eye className="w-4 h-4 mr-1" /> Ko'rish
                     </Button>
-                    {s.status === 'SENT' && (
-                      <Button variant="outline" size="sm" onClick={async () => {
-                        try {
-                          const detail = await cargoShipmentsApi.getById(s.id);
-                          setEditing(detail);
-                          setShowEdit(true);
-                        } catch(e) {}
-                      }}>
-                        Tahrirlash
-                      </Button>
-                    )}
+                    <Button variant="outline" size="sm" onClick={async () => {
+                      try {
+                        const detail = await cargoShipmentsApi.getById(s.id);
+                        setEditing(detail);
+                        setShowEdit(true);
+                      } catch(e) {}
+                    }}>
+                      Tahrirlash
+                    </Button>
                     {s.status === 'SENT' && (
                       <Button variant="outline" size="sm" onClick={() => {
                         if (confirm(`Kargo #${s.shipmentNumber} yetib kelganligini tasdiqlaysizmi? Barcha mahsulotlar UZB omboriga o'tkaziladi.`)) {
@@ -271,18 +270,16 @@ export default function CargoShipmentsPage() {
                   <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={(e) => { e.stopPropagation(); setSelectedShipment(s); setShowDetail(true); }}>
                     Ko'rish
                   </Button>
-                  {s.status === 'SENT' && (
-                    <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        const detail = await cargoShipmentsApi.getById(s.id);
-                        setEditing(detail);
-                        setShowEdit(true);
-                      } catch(e) {}
-                    }}>
-                      Tahrirlash
-                    </Button>
-                  )}
+                  <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      const detail = await cargoShipmentsApi.getById(s.id);
+                      setEditing(detail);
+                      setShowEdit(true);
+                    } catch(e) {}
+                  }}>
+                    Tahrirlash
+                  </Button>
                   {s.status === 'SENT' && (
                     <Button size="sm" className="flex-1 text-xs" onClick={(e) => {
                       e.stopPropagation();
@@ -339,11 +336,11 @@ export default function CargoShipmentsPage() {
         </SheetContent>
       </Sheet>
 
-      <Sheet open={showDetail} onOpenChange={setShowDetail}>
-        <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Jo'natma: {selectedShipment?.shipmentNumber}</SheetTitle>
-          </SheetHeader>
+      <Dialog open={showDetail} onOpenChange={setShowDetail}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Jo'natma: {selectedShipment?.shipmentNumber}</DialogTitle>
+          </DialogHeader>
           <div className="mt-6">
             {selectedShipment && (
               <CargoShipmentDetail
@@ -352,8 +349,8 @@ export default function CargoShipmentsPage() {
               />
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

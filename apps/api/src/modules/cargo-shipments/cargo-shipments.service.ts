@@ -295,10 +295,6 @@ export async function updateCargoShipment(
       throw new Error('Kargo topilmadi')
     }
 
-    if (existing[0].status === 'ARRIVED') {
-      throw new Error('Yetib kelgan kargo tahrirlanmaydi')
-    }
-
     // Update shipment header
     await tx.update(cargoShipments)
       .set({
@@ -311,13 +307,15 @@ export async function updateCargoShipment(
       .where(eq(cargoShipments.id, id))
 
     if (data.items) {
+      const location = existing[0].status === 'ARRIVED' ? 'UZB_STORE' : 'IN_TRANSIT'
+
       // Get existing IN_TRANSIT batches
       const oldBatches = await tx
         .select()
         .from(inventoryBatches)
         .where(
           and(
-            eq(inventoryBatches.location, 'IN_TRANSIT'),
+            eq(inventoryBatches.location, location),
             sql`batch_ref = ${`CARGO-${existing[0].shipmentNumber}`}`
           )
         )
@@ -362,7 +360,7 @@ export async function updateCargoShipment(
       await tx.delete(inventoryBatches)
         .where(
           and(
-            eq(inventoryBatches.location, 'IN_TRANSIT'),
+            eq(inventoryBatches.location, location),
             sql`batch_ref = ${`CARGO-${existing[0].shipmentNumber}`}`
           )
         )
@@ -396,10 +394,12 @@ export async function updateCargoShipment(
             createdAt: new Date()
           })
 
+        const newLocation = existing[0].status === 'ARRIVED' ? 'UZB_STORE' : 'IN_TRANSIT'
+
         await tx.insert(inventoryBatches)
           .values({
             productId: item.productId,
-            location: 'IN_TRANSIT',
+            location: newLocation,
             initialQty: item.quantity,
             currentQty: item.quantity,
             costPrice: BigInt(itemTotalCost),

@@ -123,24 +123,13 @@ export function CargoForm({ mode, initialData, onSuccess, onCancel }: CargoFormP
             onSelect={async (product: any) => {
               if (fields.find((f: any) => f.productId === product.id)) return
 
-              let buyPriceKrw = product.retailPrice ?? 0
-              let availableQty = 0
-
-              try {
-                const costData = await inventoryApi.getCostPrice(product.id)
-                if (costData?.costPriceKrw) {
-                  buyPriceKrw = costData.costPriceKrw
-                  availableQty = costData.availableQty
-                }
-              } catch {}
-
               append({ 
                 productId: product.id, 
                 productName: product.name, 
                 imageUrl: product.imageUrls?.[0] ?? '',
-                availableQty,
                 quantity: 1, 
-                buyPriceKrw
+                buyPriceKrw: Number(product.avgCostKrw) || Number(product.retailPrice) || 0,
+                availableQty: Number(product.availableQty) || 0,
               })
             }}
           />
