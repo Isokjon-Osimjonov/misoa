@@ -91,7 +91,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
 
       <div>
         <h3 className="font-medium mb-3">Mahsulotlar ({totalItems} ta)</h3>
-        <div className="border rounded-md overflow-x-auto bg-background">
+        <div className="border rounded-md overflow-x-auto bg-background w-full min-w-0">
           <table className="w-full min-w-[640px] text-sm text-left whitespace-nowrap">
             <thead className="bg-muted text-muted-foreground">
               <tr>
