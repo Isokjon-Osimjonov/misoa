@@ -329,6 +329,60 @@ export async function updateCargoShipment(
       })
       .where(eq(cargoShipments.id, id))
 
+    // Sync cargo expense
+    if (data.cargoFeeKrw !== undefined) {
+      // Find existing expense for this cargo
+      const existingExpense = await tx
+        .select()
+        .from(expenses)
+        .where(
+          and(
+            eq(expenses.referenceType, 'CARGO_SHIPMENT'),
+            eq(expenses.referenceId, id)
+          )
+        )
+        .limit(1)
+
+      if (existingExpense.length > 0) {
+        // UPDATE existing expense
+        await tx.update(expenses)
+          .set({
+            amountKrw: BigInt(data.cargoFeeKrw),
+            description: `Kargo: ${data.shipmentNumber ?? existing[0].shipmentNumber}`,
+            updatedAt: new Date()
+          })
+          .where(eq(expenses.id, existingExpense[0].id))
+      } else if (data.cargoFeeKrw > 0) {
+        // CREATE new expense if not exists
+        let [cargoCat] = await tx
+          .select()
+          .from(expenseCategories)
+          .where(eq(expenseCategories.slug, 'cargo'))
+
+        if (!cargoCat) {
+          const [newCat] = await tx
+            .insert(expenseCategories)
+            .values({
+              name: 'Yuk tashish (Kargo)',
+              slug: 'cargo',
+              isSystem: true
+            })
+            .returning()
+          cargoCat = newCat
+        }
+
+        await tx.insert(expenses).values({
+          categoryId: cargoCat.id,
+          amountKrw: BigInt(data.cargoFeeKrw),
+          description: `Kargo: ${data.shipmentNumber ?? existing[0].shipmentNumber}`,
+          expenseDate: new Date().toISOString().split('T')[0],
+          createdBy: data.updatedBy,
+          referenceType: 'CARGO_SHIPMENT',
+          referenceId: id,
+        })
+      }
+    }
+
     if (data.items) {
       const location = existing[0].status === 'ARRIVED' ? 'UZB_STORE' : 'IN_TRANSIT'
 
