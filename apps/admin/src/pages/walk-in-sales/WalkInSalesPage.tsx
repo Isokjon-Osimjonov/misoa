@@ -75,11 +75,11 @@ export default function WalkInSalesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <ShoppingBag className="w-6 h-6" /> Sotuvlar (UZB)
         </h1>
-        <Button onClick={() => setShowForm(true)}>
+        <Button className="w-full sm:w-auto" onClick={() => setShowForm(true)}>
           <Plus className="w-4 h-4 mr-2" /> Yangi sotuv
         </Button>
       </div>
@@ -160,15 +160,16 @@ export default function WalkInSalesPage() {
         </div>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant={filter === '' ? 'default' : 'outline'} onClick={() => setFilter('')}>Barchasi</Button>
         <Button variant={filter === 'CASH' ? 'default' : 'outline'} onClick={() => setFilter('CASH')}>Naqd</Button>
         <Button variant={filter === 'CARD' ? 'default' : 'outline'} onClick={() => setFilter('CARD')}>Karta</Button>
         <Button variant={filter === 'DEBT' ? 'default' : 'outline'} onClick={() => setFilter('DEBT')}>Nasiya</Button>
       </div>
 
-      <div className="border rounded-md overflow-hidden bg-background">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-lg border overflow-hidden bg-background">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm text-left">
           <thead className="bg-muted text-muted-foreground">
             <tr>
               <th className="p-3">#</th>
@@ -198,6 +199,7 @@ export default function WalkInSalesPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {showForm && (
@@ -207,7 +209,7 @@ export default function WalkInSalesPage() {
             <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="space-y-6">
               <div className="space-y-2">
                 <Label>To'lov turi</Label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                   <label className="flex items-center gap-2 border p-3 rounded cursor-pointer hover:bg-muted">
                     <input type="radio" value="CASH" {...register('paymentType')} />
                     💵 Naqd
@@ -224,7 +226,7 @@ export default function WalkInSalesPage() {
               </div>
 
               {paymentType === 'DEBT' && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label>Mijoz ismi</Label>
                     <Input {...register('customerName')} />
@@ -255,26 +257,26 @@ export default function WalkInSalesPage() {
 
                 <div className="space-y-2 border rounded-md p-4 bg-muted/20">
                   {fields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2 items-end">
-                      <div className="flex-1">
+                    <div key={field.id} className="flex flex-col sm:flex-row gap-4 sm:gap-2 sm:items-end border-b sm:border-none pb-4 sm:pb-0">
+                      <div className="flex-1 w-full sm:w-auto">
                         <Label className="text-xs">{watch(`items.${index}.productName`)}</Label>
                         <Input type="hidden" {...register(`items.${index}.productId`)} />
                       </div>
-                      <div className="w-24">
+                      <div className="w-full sm:w-24">
                         <Label className="text-xs">Soni</Label>
                         <Input type="number" {...register(`items.${index}.quantity`)} />
                       </div>
-                      <div className="w-40">
+                      <div className="w-full sm:w-40">
                         <Label className="text-xs">Narx (UZS)</Label>
                         <Input type="number" {...register(`items.${index}.priceUzs`)} />
                       </div>
-                      <div className="w-40">
+                      <div className="w-full sm:w-40">
                         <Label className="text-xs">Jami</Label>
                         <div className="p-2 border rounded bg-muted">
                           {((Number(watch(`items.${index}.quantity`)) || 0) * (Number(watch(`items.${index}.priceUzs`)) || 0)).toLocaleString()}
                         </div>
                       </div>
-                      <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                      <Button type="button" variant="destructive" size="icon" className="w-full sm:w-auto shrink-0" onClick={() => remove(index)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -283,11 +285,11 @@ export default function WalkInSalesPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center pt-4 border-t">
                 <div className="text-xl font-bold">Jami: {formTotalUzs.toLocaleString()} UZS</div>
-                <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Bekor qilish</Button>
-                  <Button type="submit" disabled={createMutation.isPending}>Sotish</Button>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button type="button" variant="outline" className="flex-1 sm:flex-none" onClick={() => setShowForm(false)}>Bekor qilish</Button>
+                  <Button type="submit" className="flex-1 sm:flex-none" disabled={createMutation.isPending}>Sotish</Button>
                 </div>
               </div>
             </form>

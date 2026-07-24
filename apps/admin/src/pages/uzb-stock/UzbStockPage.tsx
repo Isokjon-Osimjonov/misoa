@@ -23,11 +23,11 @@ export default function UzbStockPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Warehouse className="w-6 h-6" /> UZB Ombor
         </h1>
-        <div className="relative w-64">
+        <div className="relative w-full sm:w-64">
           <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
           <Input 
             className="pl-9" 
@@ -38,7 +38,7 @@ export default function UzbStockPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="p-4 border rounded-md shadow-sm bg-card text-card-foreground">
           <p className="text-sm text-muted-foreground">📦 Jami</p>
           <p className="text-xl font-bold">{totalItems} mahsulot</p>
@@ -53,13 +53,14 @@ export default function UzbStockPage() {
         </div>
       </div>
 
-      <div className="border rounded-md overflow-hidden bg-background">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-lg border overflow-hidden bg-background">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm text-left">
           <thead className="bg-muted text-muted-foreground">
             <tr>
               <th className="p-3 w-16">Rasm</th>
               <th className="p-3">Nomi</th>
-              <th className="p-3">Brand</th>
+              <th className="p-3 hidden sm:table-cell">Brand</th>
               <th className="p-3">UZB Qoldi</th>
               <th className="p-3">Status</th>
             </tr>
@@ -85,7 +86,7 @@ export default function UzbStockPage() {
                     )}
                   </td>
                   <td className="p-3 font-medium">{item.name}</td>
-                  <td className="p-3">{item.brandName || '-'}</td>
+                  <td className="p-3 hidden sm:table-cell">{item.brandName || '-'}</td>
                   <td className="p-3 font-bold text-lg">{item.uzbQty}</td>
                   <td className="p-3">
                     {item.uzbQty === 0 ? (
@@ -101,6 +102,7 @@ export default function UzbStockPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

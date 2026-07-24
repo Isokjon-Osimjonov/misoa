@@ -124,11 +124,11 @@ export default function CargoShipmentsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Package className="w-6 h-6" /> Kargo jo'natmalar
         </h1>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-4">
           <div className="flex items-center gap-2">
             <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')}>
               <List className="w-4 h-4" />
@@ -143,7 +143,7 @@ export default function CargoShipmentsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
           <div className="p-2 bg-amber-100 rounded-lg shrink-0">
             <Truck className="w-5 h-5 text-amber-600" />
@@ -199,7 +199,7 @@ export default function CargoShipmentsPage() {
         <p className="text-sm font-medium mb-3">
           Jami xarajatlar (faqat yetib kelgan)
         </p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <p className="text-xs text-muted-foreground">
               Mahsulot xarajati
@@ -227,15 +227,16 @@ export default function CargoShipmentsPage() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant={filter === '' ? 'default' : 'outline'} onClick={() => setFilter('')}>Barcha</Button>
         <Button variant={filter === 'SENT' ? 'default' : 'outline'} onClick={() => setFilter('SENT')}>Yo'lda</Button>
         <Button variant={filter === 'ARRIVED' ? 'default' : 'outline'} onClick={() => setFilter('ARRIVED')}>Yetdi</Button>
       </div>
 
       {viewMode === 'table' ? (
-      <div className="border rounded-md overflow-hidden bg-background">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-lg border overflow-hidden bg-background">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm text-left">
           <thead className="bg-muted text-muted-foreground">
             <tr>
               <th className="p-3">#</th>
@@ -263,7 +264,7 @@ export default function CargoShipmentsPage() {
                   </td>
                   <td className="p-3 text-sm">{s.totalQuantity ?? 0} ta</td>
                   <td className="p-3">₩{s.totalCostKrw?.toLocaleString()}</td>
-                  <td className="p-3 flex gap-2">
+                  <td className="p-3 flex flex-wrap gap-1">
                     <Button variant="ghost" size="sm" onClick={() => {
                       setSelectedShipment(s)
                       setShowDetail(true)
@@ -304,6 +305,7 @@ export default function CargoShipmentsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -329,7 +331,7 @@ export default function CargoShipmentsPage() {
                     <p className="font-medium">₩{(s.cargoFeeKrw ?? 0).toLocaleString()}</p>
                   </div>
                 </div>
-                <div className="flex gap-2 mt-3 pt-3 border-t">
+                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t">
                   <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={(e) => { e.stopPropagation(); setSelectedShipment(s); setShowDetail(true); }}>
                     Ko'rish
                   </Button>
@@ -388,7 +390,7 @@ export default function CargoShipmentsPage() {
           setShowEdit(open)
           if (!open) setEditing(null)
         }}>
-        <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
+        <SheetContent className="w-full sm:w-[600px] sm:max-w-[600px] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Kargoni tahrirlash</SheetTitle>
           </SheetHeader>
