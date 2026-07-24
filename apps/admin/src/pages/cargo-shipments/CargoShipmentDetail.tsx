@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { cargoShipmentsApi } from '../../api/cargo-shipments.api'
+import { settingsApi } from '../../api/settings.api'
 import { formatDate } from '../../utils/date'
 
 interface CargoShipmentDetailProps {
@@ -36,10 +37,17 @@ const CargoStatusBadge = ({ status }: { status: string }) => {
 }
 
 export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
-  const { data: shipment, isLoading } = useQuery({
+  const { data: shipment, isLoading: shipmentLoading } = useQuery({
     queryKey: ['cargo-shipment', shipmentId],
     queryFn: () => cargoShipmentsApi.getById(shipmentId)
   })
+
+  const { data: rateData, isLoading: rateLoading } = useQuery({
+    queryKey: ['exchange-rate'],
+    queryFn: () => settingsApi.getExchangeRates(1)
+  })
+
+  const isLoading = shipmentLoading || rateLoading
 
   if (isLoading) {
     return <div className="p-4 text-center text-muted-foreground">Yuklanmoqda...</div>
@@ -100,16 +108,16 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
               {items.map((item: any) => {
                 const cargoShareKrw = totalItems > 0 ? Math.round(cargoFeeKrw / totalItems) : 0
                 const costKrw = (item.buyPriceKrw || 0) + cargoShareKrw
-                // Assuming 1 KRW ≈ 9.5 UZS for display (this should ideally come from exchange rate API, but since not provided, we just display the KRW value properly or use a fixed rate if needed. Actually the prompt says:
-                // costUzs = costKrw * exchangeRate
-                // Wait, exchange rate isn't defined. I'll use 9.5 temporarily, or just read it from somewhere. Let's use 9.5 as a dummy.
-                const exchangeRate = 9.5 
-                const costUzs = costKrw * exchangeRate
-                const sellPriceUzs = item.sellPriceUzs || 0
-                const profitUzs = sellPriceUzs - costUzs
-                const marginPct = sellPriceUzs > 0 ? (profitUzs / sellPriceUzs) * 100 : 0
+                
+                // Fetch rate from settingsApi response, fallback to 8.5
+                const exchangeRate = rateData?.[0]?.krwToUzs ?? 8.5
+                const costUzs = Math.round(costKrw * exchangeRate)
+                
+                const sellUzs = item.sellPriceUzs || 0
+                const profitUzs = sellUzs - costUzs
+                const marginPct = sellUzs > 0 ? ((profitUzs / sellUzs) * 100) : 0
 
-                totalRevenueUzs += sellPriceUzs * (item.quantity || 0)
+                totalRevenueUzs += sellUzs * (item.quantity || 0)
                 totalProfitUzs += profitUzs * (item.quantity || 0)
 
                 return (
@@ -129,7 +137,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                     <td className="p-2 text-right font-medium">{item.quantity}</td>
                     <td className="p-2 text-right">₩{item.buyPriceKrw?.toLocaleString()}</td>
                     <td className="p-2 text-right text-muted-foreground">₩{cargoShareKrw.toLocaleString()}</td>
-                    <td className="p-2 text-right font-medium">{sellPriceUzs.toLocaleString()}</td>
+                    <td className="p-2 text-right font-medium">{sellUzs.toLocaleString()}</td>
                     <td className="p-2 text-right text-muted-foreground">{costUzs.toLocaleString()}</td>
                     <td className={`p-2 text-right font-medium ${profitUzs > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {profitUzs > 0 ? '+' : ''}{profitUzs.toLocaleString()}

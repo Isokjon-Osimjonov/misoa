@@ -139,17 +139,34 @@ export function ProductSearchSelect({
                 className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left transition-colors border-b last:border-0"
               >
                 {/* Image */}
-                {product.imageUrls?.[0] ? (
-                  <img
-                    src={product.imageUrls[0]}
-                    alt={product.name}
-                    className="w-9 h-9 rounded-md object-cover flex-shrink-0 border"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                    <Package className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                )}
+                {(() => {
+                  const imageUrl =
+                    product.imageUrls?.[0] ??
+                    product.images?.[0]?.url ??
+                    product.images?.[0] ??
+                    product.imageUrl ??
+                    product.image ??
+                    null
+                  
+                  return (
+                    <div className="w-9 h-9 flex-shrink-0">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          className="w-9 h-9 rounded-md object-cover border"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      ) : (
+                        <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center">
+                          <Package className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
