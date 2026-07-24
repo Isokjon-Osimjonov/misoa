@@ -326,7 +326,7 @@ export function ProductsPage() {
                                    font-medium text-muted-foreground
                                    hidden md:table-cell"
                     >
-                      Stok
+                      Korea ombori
                     </th>
                     <th
                       className="px-4 py-3 text-center text-xs
@@ -424,14 +424,14 @@ export function ProductsPage() {
                           className={cn(
                             'text-xs font-semibold px-2 py-0.5',
                             'rounded-full',
-                            Number(p.totalStock || 0) === 0
+                            Number(p.availableQty || 0) === 0
                               ? 'bg-red-50 text-red-600'
-                              : Number(p.totalStock || 0) <= 10
+                              : Number(p.availableQty || 0) <= 10
                                 ? 'bg-amber-50 text-amber-600'
                                 : 'bg-green-50 text-green-700'
                           )}
                         >
-                          {p.totalStock ?? 0}
+                          {p.availableQty ?? 0}
                         </span>
                       </td>
 

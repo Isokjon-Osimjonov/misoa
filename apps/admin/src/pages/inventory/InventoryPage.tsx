@@ -949,7 +949,7 @@ export function InventoryPage() {
                   </p>
                 </div>
               </div>
-              <StockBadge stock={selectedProduct?.availableStock ?? 0} />
+              <StockBadge stock={selectedProduct?.korStock ?? 0} />
             </div>
 
             {/* Stats row */}
@@ -1014,10 +1014,11 @@ export function InventoryPage() {
                           productBatches.filter((b: any) => b.location === 'KOR_WAREHOUSE').map((b: any) => (
                             <div key={b.id} className="p-3 rounded-xl border-[0.5px] border-border bg-gray-50/50">
                               <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold text-gray-900">{b.currentQty} ta</span>
-                                  {b.currentQty !== b.initialQty && (
-                                    <span className="text-[11px] text-muted-foreground">(jami: {b.initialQty})</span>
+                                <div className="space-y-1">
+                                  <p className="font-medium text-gray-900">{b.currentQty} ta mavjud</p>
+                                  <p className="text-xs text-muted-foreground">Asl miqdor: {b.initialQty} ta</p>
+                                  {b.initialQty !== b.currentQty && (
+                                    <p className="text-xs text-amber-600">Jo'natilgan: {b.initialQty - b.currentQty} ta</p>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-2">
