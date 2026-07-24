@@ -1,0 +1,1 @@
+ALTER TABLE "cargo_shipment_items" DROP COLUMN "sell_price_uzs";

@@ -67,6 +67,24 @@ cargoShipmentsRouter.patch(
   }
 )
 
+cargoShipmentsRouter.patch(
+  '/:id',
+  requirePermission('cargo_shipments', 'write'),
+  async (req, res) => {
+    try {
+      const validated = createCargoShipmentSchema.parse(req.body)
+      const data = await service.updateCargoShipment(req.params.id, {
+        ...validated,
+        dateSent: new Date(validated.dateSent),
+        createdBy: req.user!.sub,
+      })
+      res.json({ data, error: null })
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || err, data: null })
+    }
+  }
+)
+
 cargoShipmentsRouter.delete(
   '/:id',
   requirePermission('cargo_shipments', 'write'),

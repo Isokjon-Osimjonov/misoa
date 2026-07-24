@@ -63,8 +63,8 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
   const cargoFeeKrw = shipment.cargoFeeKrw || 0
   
   // Totals
-  let totalRevenueUzs = 0
-  let totalProfitUzs = 0
+  const totalBuyPriceKrw = items.reduce((acc: number, item: any) => acc + (item.buyPriceKrw || 0) * (item.quantity || 0), 0)
+  const totalCostKrw = totalBuyPriceKrw + cargoFeeKrw
 
   return (
     <div className="space-y-6 pb-6">
@@ -99,27 +99,14 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                 <th className="p-2 text-right">Soni</th>
                 <th className="p-2 text-right">Olish ₩</th>
                 <th className="p-2 text-right">Kargo ₩</th>
-                <th className="p-2 text-right">Sotish UZS</th>
-                <th className="p-2 text-right">Xarajat UZS</th>
-                <th className="p-2 text-right">Foyda UZS</th>
-                <th className="p-2 text-right">%</th>
+                <th className="p-2 text-right">Jami xarajat ₩</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item: any) => {
                 const cargoShareKrw = totalItems > 0 ? Math.round(cargoFeeKrw / totalItems) : 0
                 const costKrw = (item.buyPriceKrw || 0) + cargoShareKrw
-                
-                // Fetch rate from settingsApi response, fallback to 8.5
-                const exchangeRate = rateData?.[0]?.krwToUzs ?? 8.5
-                const costUzs = Math.round(costKrw * exchangeRate)
-                
-                const sellUzs = item.sellPriceUzs || 0
-                const profitUzs = sellUzs - costUzs
-                const marginPct = sellUzs > 0 ? ((profitUzs / sellUzs) * 100) : 0
-
-                totalRevenueUzs += sellUzs * (item.quantity || 0)
-                totalProfitUzs += profitUzs * (item.quantity || 0)
+                const itemTotalCostKrw = costKrw * item.quantity
 
                 return (
                   <tr key={item.id} className="border-t">
@@ -146,19 +133,7 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
                     <td className="p-2 text-right font-medium">{item.quantity}</td>
                     <td className="p-2 text-right">₩{item.buyPriceKrw?.toLocaleString()}</td>
                     <td className="p-2 text-right text-muted-foreground">₩{cargoShareKrw.toLocaleString()}</td>
-                    <td className="p-2 text-right font-medium">{sellUzs.toLocaleString()}</td>
-                    <td className="p-2 text-right text-muted-foreground">{costUzs.toLocaleString()}</td>
-                    <td className={`p-2 text-right font-medium ${profitUzs > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {profitUzs > 0 ? '+' : ''}{profitUzs.toLocaleString()}
-                      {profitUzs < 0 && (
-                        <span className="text-xs text-red-500 ml-2 block">
-                          Zarar!
-                        </span>
-                      )}
-                    </td>
-                    <td className={`p-2 text-right ${marginPct > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {marginPct.toFixed(1)}%
-                    </td>
+                    <td className="p-2 text-right font-medium">₩{itemTotalCostKrw.toLocaleString()}</td>
                   </tr>
                 )
               })}
@@ -167,13 +142,9 @@ export function CargoShipmentDetail({ shipmentId }: CargoShipmentDetailProps) {
               <tr>
                 <td className="p-2">Jami</td>
                 <td className="p-2 text-right">{totalItems} ta</td>
-                <td className="p-2 text-right" colSpan={2}>₩{(shipment.totalCostKrw || 0).toLocaleString()}</td>
-                <td className="p-2 text-right text-primary">{totalRevenueUzs.toLocaleString()}</td>
-                <td className="p-2 text-right"></td>
-                <td className={`p-2 text-right ${totalProfitUzs > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {totalProfitUzs > 0 ? '+' : ''}{totalProfitUzs.toLocaleString()}
-                </td>
-                <td className="p-2"></td>
+                <td className="p-2 text-right">₩{totalBuyPriceKrw.toLocaleString()}</td>
+                <td className="p-2 text-right">₩{cargoFeeKrw.toLocaleString()}</td>
+                <td className="p-2 text-right">₩{totalCostKrw.toLocaleString()}</td>
               </tr>
             </tfoot>
           </table>

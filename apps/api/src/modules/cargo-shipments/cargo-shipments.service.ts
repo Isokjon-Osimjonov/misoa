@@ -65,7 +65,6 @@ export async function createCargoShipment(data: {
     productId: string
     quantity: number
     buyPriceKrw: number
-    sellPriceUzs: number
   }>
   createdBy: string
 }) {
@@ -106,7 +105,6 @@ export async function createCargoShipment(data: {
         quantity: item.quantity,
         buyPriceKrw: item.buyPriceKrw,
         cargoShareKrw,
-        sellPriceUzs: item.sellPriceUzs,
       })
 
       // 5. Create inventory_batches with location = 'IN_TRANSIT'
@@ -278,5 +276,146 @@ export async function deleteCargoShipment(id: string) {
 
     // Delete shipment
     await tx.delete(cargoShipments).where(eq(cargoShipments.id, id))
+  })
+}
+
+export async function updateCargoShipment(
+  id: string,
+  data: any
+) {
+  return await db.transaction(async (tx) => {
+    // Only SENT shipments can be edited
+    const existing = await tx
+      .select()
+      .from(cargoShipments)
+      .where(eq(cargoShipments.id, id))
+      .limit(1)
+
+    if (!existing[0]) {
+      throw new Error('Kargo topilmadi')
+    }
+
+    if (existing[0].status === 'ARRIVED') {
+      throw new Error('Yetib kelgan kargo tahrirlanmaydi')
+    }
+
+    // Update shipment header
+    await tx.update(cargoShipments)
+      .set({
+        shipmentNumber: data.shipmentNumber,
+        dateSent: new Date(data.dateSent),
+        cargoFeeKrw: data.cargoFeeKrw,
+        notes: data.notes,
+        updatedAt: new Date()
+      })
+      .where(eq(cargoShipments.id, id))
+
+    if (data.items) {
+      // Get existing IN_TRANSIT batches
+      const oldBatches = await tx
+        .select()
+        .from(inventoryBatches)
+        .where(
+          and(
+            eq(inventoryBatches.location, 'IN_TRANSIT'),
+            sql`batch_ref = ${`CARGO-${existing[0].shipmentNumber}`}`
+          )
+        )
+
+      // Restore KOR stock for old items
+      for (const batch of oldBatches) {
+        const korBatch = await tx
+          .select()
+          .from(inventoryBatches)
+          .where(
+            and(
+              eq(inventoryBatches.productId, batch.productId),
+              eq(inventoryBatches.location, 'KOR_WAREHOUSE')
+            )
+          )
+          .limit(1)
+
+        if (korBatch[0]) {
+          await tx.update(inventoryBatches)
+            .set({
+              currentQty: korBatch[0].currentQty + batch.currentQty,
+              updatedAt: new Date()
+            })
+            .where(eq(inventoryBatches.id, korBatch[0].id))
+        } else {
+          await tx.insert(inventoryBatches)
+            .values({
+              productId: batch.productId,
+              location: 'KOR_WAREHOUSE',
+              initialQty: batch.currentQty,
+              currentQty: batch.currentQty,
+              costPrice: batch.costPrice,
+              costCurrency: 'KRW',
+              batchRef: 'RESTORED',
+              createdAt: new Date(),
+              updatedAt: new Date()
+            })
+        }
+      }
+
+      // Delete old IN_TRANSIT batches
+      await tx.delete(inventoryBatches)
+        .where(
+          and(
+            eq(inventoryBatches.location, 'IN_TRANSIT'),
+            sql`batch_ref = ${`CARGO-${existing[0].shipmentNumber}`}`
+          )
+        )
+
+      // Delete old cargo items
+      await tx.delete(cargoShipmentItems)
+        .where(eq(cargoShipmentItems.shipmentId, id))
+
+      let totalItems = 0
+      for (const item of data.items) {
+        totalItems += item.quantity
+      }
+
+      let totalCostKrw = 0
+
+      // Add new items
+      for (const item of data.items) {
+        await deductFromKorWarehouse(item.productId, item.quantity, tx)
+
+        const cargoShareKrw = Math.round(data.cargoFeeKrw / totalItems)
+        const itemTotalCost = item.buyPriceKrw + cargoShareKrw
+        totalCostKrw += itemTotalCost * item.quantity
+
+        await tx.insert(cargoShipmentItems)
+          .values({
+            shipmentId: id,
+            productId: item.productId,
+            quantity: item.quantity,
+            buyPriceKrw: item.buyPriceKrw,
+            cargoShareKrw,
+            createdAt: new Date()
+          })
+
+        await tx.insert(inventoryBatches)
+          .values({
+            productId: item.productId,
+            location: 'IN_TRANSIT',
+            initialQty: item.quantity,
+            currentQty: item.quantity,
+            costPrice: BigInt(itemTotalCost),
+            costCurrency: 'KRW',
+            batchRef: `CARGO-${data.shipmentNumber}`,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+      }
+
+      // Update totalCostKrw
+      await tx.update(cargoShipments)
+        .set({ totalCostKrw })
+        .where(eq(cargoShipments.id, id))
+    }
+
+    return getCargoShipment(id)
   })
 }

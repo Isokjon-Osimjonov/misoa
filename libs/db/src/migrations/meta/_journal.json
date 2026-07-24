@@ -71,6 +71,13 @@
       "when": 1784462359877,
       "tag": "0009_clumsy_ultragirl",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784922368802,
+      "tag": "0010_nostalgic_ricochet",
+      "breakpoints": true
     }
   ]
 }

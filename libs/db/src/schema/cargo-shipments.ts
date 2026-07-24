@@ -52,8 +52,6 @@ export const cargoShipmentItems = pgTable(
     .default(0),
   cargoShareKrw: integer(
     'cargo_share_krw').default(0),
-  sellPriceUzs: integer(
-    'sell_price_uzs').default(0),
   createdAt: timestamp('created_at',
     { withTimezone: true })
     .defaultNow().notNull(),

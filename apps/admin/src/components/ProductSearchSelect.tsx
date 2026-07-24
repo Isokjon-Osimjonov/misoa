@@ -169,9 +169,10 @@ export function ProductSearchSelect({
                   </p>
                 </div>
 
-                {/* Show Korea retail price */}
-                <span className="text-sm font-medium text-right flex-shrink-0 text-muted-foreground">
-                  ₩{(product.retailPrice ?? 0).toLocaleString()}
+                <span className="text-xs text-muted-foreground flex-shrink-0">
+                  {product.availableQty
+                    ? `${product.availableQty} ta`
+                    : 'Stok yo\'q'}
                 </span>
               </button>
             ))}

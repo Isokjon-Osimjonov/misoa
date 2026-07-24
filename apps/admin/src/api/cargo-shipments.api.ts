@@ -13,6 +13,10 @@ export const cargoShipmentsApi = {
     const res = await api.post('/admin/cargo-shipments', data)
     return res.data.data
   },
+  update: async ({ id, ...data }: { id: string } & any) => {
+    const res = await api.patch(`/admin/cargo-shipments/${id}`, data)
+    return res.data.data
+  },
   markArrived: async (id: string) => {
     const res = await api.patch(`/admin/cargo-shipments/${id}/arrive`)
     return res.data.data

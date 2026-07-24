@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ProductSearchSelect } from '../../components/ProductSearchSelect'
 import { CargoShipmentDetail } from './CargoShipmentDetail'
+import { CargoForm } from './CargoForm'
 
 const CargoStatusBadge = ({ status }: { status: string }) => {
   const config: Record<string, { label: string, className: string }> = {
@@ -41,21 +42,6 @@ const CargoStatusBadge = ({ status }: { status: string }) => {
     </span>
   )
 }
-const schema = z.object({
-  shipmentNumber: z.string().min(1, 'Raqam kiritish shart'),
-  dateSent: z.string(),
-  cargoFeeKrw: z.coerce.number().min(0).default(0),
-  notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().uuid(),
-    productName: z.string(),
-    imageUrl: z.string().optional(),
-    availableQty: z.coerce.number().optional(),
-    quantity: z.coerce.number().min(1),
-    buyPriceKrw: z.coerce.number().min(0),
-    sellPriceUzs: z.coerce.number().min(0),
-  })).min(1, 'Kamida 1 ta mahsulot kerak')
-})
 
 export default function CargoShipmentsPage() {
   const qc = useQueryClient()
@@ -63,6 +49,8 @@ export default function CargoShipmentsPage() {
   const [showForm, setShowForm] = useState(false)
   const [selectedShipment, setSelectedShipment] = useState<any>(null)
   const [showDetail, setShowDetail] = useState(false)
+  const [editingShipment, setEditing] = useState<any>(null)
+  const [showEdit, setShowEdit] = useState(false)
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   
   const { data: shipmentsData, isLoading } = useQuery({
@@ -71,31 +59,6 @@ export default function CargoShipmentsPage() {
   })
   
   const shipments = (shipmentsData as any)?.data ?? []
-
-  const { register, control, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      dateSent: new Date().toISOString().split('T')[0],
-      items: []
-    }
-  })
-  
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'items'
-  })
-
-
-  const createMutation = useMutation({
-    mutationFn: cargoShipmentsApi.create,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['cargo-shipments'] })
-      toast.success("Kargo qo'shildi")
-      setShowForm(false)
-      reset()
-    },
-    onError: (err: any) => toast.error(err.message || 'Xatolik yuz berdi')
-  })
 
   const markArrivedMutation = useMutation({
     mutationFn: cargoShipmentsApi.markArrived,
@@ -247,6 +210,17 @@ export default function CargoShipmentsPage() {
                       <Eye className="w-4 h-4 mr-1" /> Ko'rish
                     </Button>
                     {s.status === 'SENT' && (
+                      <Button variant="outline" size="sm" onClick={async () => {
+                        try {
+                          const detail = await cargoShipmentsApi.getById(s.id);
+                          setEditing(detail);
+                          setShowEdit(true);
+                        } catch(e) {}
+                      }}>
+                        Tahrirlash
+                      </Button>
+                    )}
+                    {s.status === 'SENT' && (
                       <Button variant="outline" size="sm" onClick={() => {
                         if (confirm(`Kargo #${s.shipmentNumber} yetib kelganligini tasdiqlaysizmi? Barcha mahsulotlar UZB omboriga o'tkaziladi.`)) {
                           markArrivedMutation.mutate(s.id)
@@ -298,6 +272,18 @@ export default function CargoShipmentsPage() {
                     Ko'rish
                   </Button>
                   {s.status === 'SENT' && (
+                    <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const detail = await cargoShipmentsApi.getById(s.id);
+                        setEditing(detail);
+                        setShowEdit(true);
+                      } catch(e) {}
+                    }}>
+                      Tahrirlash
+                    </Button>
+                  )}
+                  {s.status === 'SENT' && (
                     <Button size="sm" className="flex-1 text-xs" onClick={(e) => {
                       e.stopPropagation();
                       if (confirm(`Kargo #${s.shipmentNumber} yetib kelganligini tasdiqlaysizmi?`)) {
@@ -318,117 +304,28 @@ export default function CargoShipmentsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-background rounded-lg shadow-xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Yangi kargo</h2>
-            <form onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, dateSent: new Date(d.dateSent).toISOString() }))} className="space-y-6">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <Label>Jo'natma raqami</Label>
-                  <Input {...register('shipmentNumber')} />
-                </div>
-                <div className="space-y-1">
-                  <Label>Sana</Label>
-                  <Input type="datetime-local" {...register('dateSent')} />
-                </div>
-                <div className="space-y-1">
-                  <Label>Kargo narxi (₩)</Label>
-                  <Input type="number" {...register('cargoFeeKrw')} />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <Label>Izoh</Label>
-                <Input {...register('notes')} />
-              </div>
-
-              <div>
-                <Label>Mahsulot qo'shish</Label>
-                <div className="mb-4">
-                  <ProductSearchSelect
-                    placeholder="Mahsulot tanlang..."
-                    selectedIds={fields.map((f: any) => f.productId)}
-                    onSelect={async (product: any) => {
-                      if (fields.find((f: any) => f.productId === product.id)) return
-
-                      let buyPriceKrw = product.retailPrice ?? 0
-                      let availableQty = 0
-
-                      try {
-                        const costData = await inventoryApi.getCostPrice(product.id)
-                        if (costData?.costPriceKrw) {
-                          buyPriceKrw = costData.costPriceKrw
-                          availableQty = costData.availableQty
-                        }
-                      } catch {}
-
-                      append({ 
-                        productId: product.id, 
-                        productName: product.name, 
-                        imageUrl: product.imageUrls?.[0] ?? '',
-                        availableQty,
-                        quantity: 1, 
-                        buyPriceKrw, 
-                        sellPriceUzs: 0 
-                      })
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2 border rounded-md p-4 bg-muted/20">
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      {field.imageUrl ? (
-                        <img
-                          src={field.imageUrl}
-                          alt={field.productName}
-                          className="w-10 h-10 rounded-md object-cover border flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                          <Package className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                      )}
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{field.productName}</p>
-                        <Input type="hidden" {...register(`items.${index}.productId`)} />
-                        <Input type="hidden" {...register(`items.${index}.productName`)} />
-                        <Input type="hidden" {...register(`items.${index}.imageUrl`)} />
-                        <Input type="hidden" {...register(`items.${index}.availableQty`)} />
-                        {field.availableQty !== undefined && Number(field.availableQty) > 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">Mavjud: {String(field.availableQty)} ta</p>
-                        )}
-                      </div>
-                      <div className="w-24">
-                        <Label className="text-xs">Soni</Label>
-                        <Input type="number" {...register(`items.${index}.quantity`)} />
-                      </div>
-                      <div className="w-32">
-                        <Label className="text-xs">Olish (₩)</Label>
-                        <Input type="number" {...register(`items.${index}.buyPriceKrw`)} />
-                      </div>
-                      <div className="w-32">
-                        <Label className="text-xs">Sotish (UZS)</Label>
-                        <Input type="number" {...register(`items.${index}.sellPriceUzs`)} />
-                        {Number(watch(`items.${index}.sellPriceUzs`)) > 0 && Number(watch(`items.${index}.sellPriceUzs`)) < 10000 && (
-                          <span className="text-[10px] text-red-500">Sotish narhi juda past</span>
-                        )}
-                      </div>
-                      <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  {fields.length === 0 && <p className="text-sm text-muted-foreground text-center">Mahsulot qo'shilmagan</p>}
-                  {errors.items && <p className="text-red-500 text-sm mt-1">{errors.items.message as string}</p>}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Bekor qilish</Button>
-                <Button type="submit" disabled={createMutation.isPending}>Saqlash</Button>
-              </div>
-            </form>
+            <CargoForm mode="create" onSuccess={() => setShowForm(false)} onCancel={() => setShowForm(false)} />
           </div>
         </div>
       )}
+
+      <Sheet open={showEdit} onOpenChange={setShowEdit}>
+        <SheetContent className="w-full sm:max-w-4xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Kargoni tahrirlash</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            {editingShipment && (
+              <CargoForm
+                mode="edit"
+                initialData={editingShipment}
+                onSuccess={() => setShowEdit(false)}
+                onCancel={() => setShowEdit(false)}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={showDetail} onOpenChange={setShowDetail}>
         <SheetContent className="w-[600px] sm:max-w-[600px] overflow-y-auto">
