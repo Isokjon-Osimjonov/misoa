@@ -121,13 +121,19 @@ export async function getOverview(from: string, to: string) {
   const grossMargin = grossRevenue > 0 ? (grossProfit / grossRevenue) * 100 : 0
 
   // 3. Expenses
-  const expResult = await db.execute(
-    sql`SELECT COALESCE(SUM(amount_krw)::text,'0')
-        as total FROM expenses
-        WHERE expense_date >= ${from || '2000-01-01'}::date
-        AND expense_date <= ${to || '2100-01-01'}::date`
-  )
-  const totalExpenses = Number((expResult.rows[0] as any)?.total || 0)
+  const expenseTotal = await db
+    .select({
+      total: sql<number>`COALESCE(SUM(${expenses.amountKrw}), 0)`.mapWith(Number)
+    })
+    .from(expenses)
+    .where(
+      and(
+        gte(expenses.expenseDate, startDate.toISOString().split('T')[0]),
+        lte(expenses.expenseDate, endDate.toISOString().split('T')[0])
+      )
+    )
+  
+  const totalExpenses = expenseTotal[0]?.total || 0
   
   const adjustedGrossProfit = grossProfit - totalDiscounts
   const netProfit = adjustedGrossProfit - totalExpenses

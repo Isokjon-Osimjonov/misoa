@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { format } from 'date-fns'
+import { format, startOfMonth, endOfMonth } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'
 import {
   AreaChart,
@@ -37,8 +37,8 @@ export function AnalitikPage() {
       {
         key: 'this_month',
         label: 'Bu oy',
-        from: format(new Date(now.getFullYear(), now.getMonth(), 1), 'yyyy-MM-dd'),
-        to: format(now, 'yyyy-MM-dd'),
+        from: format(startOfMonth(now), 'yyyy-MM-dd'),
+        to: format(endOfMonth(now), 'yyyy-MM-dd'),
       },
       {
         key: 'last_month',
