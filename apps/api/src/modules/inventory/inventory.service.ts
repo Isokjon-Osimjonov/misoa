@@ -60,6 +60,9 @@ export async function getStockSummary(
     .select({
       productId: inventoryBatches.productId,
       totalQty: sql<number>`SUM(${inventoryBatches.currentQty})`.as('total_qty'),
+      korStock: sql<number>`SUM(CASE WHEN ${inventoryBatches.location} = 'KOR_WAREHOUSE' THEN ${inventoryBatches.currentQty} ELSE 0 END)`.as('kor_stock'),
+      transitStock: sql<number>`SUM(CASE WHEN ${inventoryBatches.location} = 'IN_TRANSIT' THEN ${inventoryBatches.currentQty} ELSE 0 END)`.as('transit_stock'),
+      uzbStock: sql<number>`SUM(CASE WHEN ${inventoryBatches.location} = 'UZB_STORE' THEN ${inventoryBatches.currentQty} ELSE 0 END)`.as('uzb_stock'),
       nearestExpiry: min(inventoryBatches.expiryDate).as('nearest_expiry'),
     })
     .from(inventoryBatches)
@@ -109,6 +112,9 @@ export async function getStockSummary(
       brandName: products.brandName,
       imageUrl: sql<string>`${products.imageUrls}->>0`,
       availableStock: sql<number>`COALESCE(${statsSq.totalQty}, 0)`,
+      korStock: sql<number>`COALESCE(${statsSq.korStock}, 0)`,
+      transitStock: sql<number>`COALESCE(${statsSq.transitStock}, 0)`,
+      uzbStock: sql<number>`COALESCE(${statsSq.uzbStock}, 0)`,
       reservedStock: sql<number>`COALESCE(${reserveSq.reservedQty}, 0)`,
       nearestExpiry: statsSq.nearestExpiry,
     })

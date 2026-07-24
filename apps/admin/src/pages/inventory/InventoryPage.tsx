@@ -184,7 +184,7 @@ export function InventoryPage() {
   const { data: productBatches = [], isLoading: isLoadingBatches } = useQuery({
     queryKey: ['inventory', 'batches', selectedProduct?.productId],
     queryFn: () => inventoryApi.getProductBatches(selectedProduct!.productId),
-    enabled: !!selectedProduct?.productId && (batchSheet || writeOffSheet),
+    enabled: !!selectedProduct?.productId && (batchSheet || writeOffSheet || viewSheet),
   })
 
   const { data: movements = [], isLoading: isLoadingMovements } = useQuery({
@@ -383,26 +383,14 @@ export function InventoryPage() {
                                  bg-gray-50/80"
                   >
                     <th className="w-12 px-4 py-3" />
-                    <th
-                      className="px-4 py-3 text-left text-xs
-                                   font-medium text-muted-foreground"
-                    >
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                       Mahsulot
                     </th>
-                    <th
-                      className="px-4 py-3 text-center text-xs
-                                   font-medium text-muted-foreground
-                                   hidden md:table-cell"
-                    >
-                      Mavjud
-                    </th>
-                    <th
-                      className="px-4 py-3 text-center text-xs
-                                   font-medium text-muted-foreground
-                                   hidden lg:table-cell"
-                    >
-                      Band
-                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Korea</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Tranzit</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">UZB</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden md:table-cell">Jami</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground hidden lg:table-cell">Band</th>
                     <th
                       className="px-4 py-3 text-center text-xs
                                    font-medium text-muted-foreground
@@ -457,19 +445,19 @@ export function InventoryPage() {
                         </p>
                       </td>
 
-                      {/* Available */}
-                      <td
-                        className="px-4 py-3 text-center
-                                     hidden md:table-cell"
-                      >
-                        <StockBadge stock={item.availableStock ?? 0} />
+                      <td className="px-4 py-3 text-center hidden md:table-cell">
+                        <span className="text-sm font-medium text-blue-600">{item.korStock ?? 0} ta</span>
                       </td>
-
-                      {/* Reserved */}
-                      <td
-                        className="px-4 py-3 text-center
-                                     hidden lg:table-cell"
-                      >
+                      <td className="px-4 py-3 text-center hidden md:table-cell">
+                        <span className="text-sm font-medium text-amber-600">{item.transitStock ?? 0} ta</span>
+                      </td>
+                      <td className="px-4 py-3 text-center hidden md:table-cell">
+                        <span className="text-sm font-medium text-green-600">{item.uzbStock ?? 0} ta</span>
+                      </td>
+                      <td className="px-4 py-3 text-center hidden md:table-cell">
+                        <span className="text-sm font-medium text-foreground">{item.availableStock ?? 0} ta</span>
+                      </td>
+                      <td className="px-4 py-3 text-center hidden lg:table-cell">
                         {(item.reservedStock ?? 0) > 0 ? (
                           <span
                             className="text-xs text-blue-600
@@ -1019,24 +1007,21 @@ export function InventoryPage() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className="text-center p-2 rounded-lg bg-gray-50">
-                <p className="text-sm font-bold text-gray-900">
-                  {selectedProduct?.availableStock ?? 0}
-                </p>
-                <p className="text-[10px] text-muted-foreground">Jami</p>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-xs text-blue-600 font-medium">Koreya ombori</p>
+                <p className="text-2xl font-bold text-blue-700">{selectedProduct?.korStock ?? 0}</p>
+                <p className="text-xs text-blue-500">ta mavjud</p>
               </div>
-              <div className="text-center p-2 rounded-lg bg-blue-50">
-                <p className="text-sm font-bold text-blue-700">
-                  {selectedProduct?.reservedStock ?? 0}
-                </p>
-                <p className="text-[10px] text-muted-foreground">Band</p>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-xs text-amber-600 font-medium">Yo'lda (Tranzit)</p>
+                <p className="text-2xl font-bold text-amber-700">{selectedProduct?.transitStock ?? 0}</p>
+                <p className="text-xs text-amber-500">ta jo'natilgan</p>
               </div>
-              <div className="text-center p-2 rounded-lg bg-green-50">
-                <p className="text-sm font-bold text-green-700">
-                  {selectedProduct?.availableStock ?? 0}
-                </p>
-                <p className="text-[10px] text-muted-foreground">Mavjud</p>
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <p className="text-xs text-green-600 font-medium">UZB ombori</p>
+                <p className="text-2xl font-bold text-green-700">{selectedProduct?.uzbStock ?? 0}</p>
+                <p className="text-xs text-green-500">ta mavjud</p>
               </div>
             </div>
 
@@ -1077,7 +1062,6 @@ export function InventoryPage() {
               </div>
             ) : (
               <>
-                {/* ── BATCHES TAB ── */}
                 {viewTab === 'batches' &&
                   (productBatches.length === 0 ? (
                     <EmptyState
@@ -1085,63 +1069,70 @@ export function InventoryPage() {
                       description="Birinchi partiyani qo'shing"
                     />
                   ) : (
-                    productBatches.map((b: any) => (
-                      <div
-                        key={b.id}
-                        className="p-3 rounded-xl border-[0.5px]
-                                    border-border bg-gray-50/50"
-                      >
-                        <div
-                          className="flex items-center
-                                      justify-between mb-1"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-gray-900">
-                              {b.currentQty} ta
-                            </span>
-                            {b.currentQty !== b.initialQty && (
-                              <span className="text-[11px] text-muted-foreground">
-                                (jami: {b.initialQty})
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {b.expiryDate && (
-                              <span
-                                className={cn(
-                                  'text-[11px] font-medium px-2 py-0.5',
-                                  'rounded-full',
-                                  new Date(b.expiryDate) <
-                                    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                    ? 'bg-red-50 text-red-600'
-                                    : 'bg-gray-100 text-gray-600'
-                                )}
+                    <div className="space-y-4">
+                      {['KOR_WAREHOUSE', 'IN_TRANSIT', 'UZB_STORE'].map(loc => {
+                        const locBatches = productBatches.filter((b: any) => b.location === loc)
+                        if (locBatches.length === 0) return null
+                        
+                        const title = loc === 'KOR_WAREHOUSE' ? 'Koreya ombori' : loc === 'IN_TRANSIT' ? "Yo'lda (Tranzit)" : 'UZB ombori'
+                        
+                        return (
+                          <div key={loc} className="space-y-2">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</h3>
+                            {locBatches.map((b: any) => (
+                              <div
+                                key={b.id}
+                                className="p-3 rounded-xl border-[0.5px] border-border bg-gray-50/50"
                               >
-                                {formatDate(b.expiryDate)}
-                              </span>
-                            )}
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold text-gray-900">
+                                      {b.currentQty} ta
+                                    </span>
+                                    {b.currentQty !== b.initialQty && (
+                                      <span className="text-[11px] text-muted-foreground">
+                                        (jami: {b.initialQty})
+                                      </span>
+                                    )}
+                                  </div>
 
-                            {canWrite('inventory') && b.currentQty === b.initialQty && (
-                              <button
-                                onClick={() => setDeleteBatchTarget(b)}
-                                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            )}
+                                  <div className="flex items-center gap-2">
+                                    {b.expiryDate && (
+                                      <span
+                                        className={cn(
+                                          'text-[11px] font-medium px-2 py-0.5',
+                                          'rounded-full',
+                                          new Date(b.expiryDate) <
+                                            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                                            ? 'bg-red-50 text-red-600'
+                                            : 'bg-gray-100 text-gray-600'
+                                        )}
+                                      >
+                                        {formatDate(b.expiryDate)}
+                                      </span>
+                                    )}
+
+                                    {canWrite('inventory') && b.currentQty === b.initialQty && (
+                                      <button
+                                        onClick={() => setDeleteBatchTarget(b)}
+                                        className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                                  <span>Tannarx: {formatKRW(Number(b.costPrice))}</span>
+                                  <span>•</span>
+                                  <span>Qabul: {formatDate(b.receivedAt)}</span>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        </div>
-                        <div
-                          className="flex items-center gap-3
-                                      text-[11px] text-muted-foreground"
-                        >
-                          <span>Tannarx: {formatKRW(Number(b.costPrice))}</span>
-                          <span>•</span>
-                          <span>Qabul: {formatDate(b.receivedAt)}</span>
-                        </div>
-                      </div>
-                    ))
+                        )
+                      })}
+                    </div>
                   ))}
 
                 {/* ── MOVEMENTS TAB ── */}
