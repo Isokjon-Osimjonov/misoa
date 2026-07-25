@@ -88,7 +88,8 @@ export async function getAdminSettings(_req: Request, res: Response) {
 export async function updateAdminSettings(req: Request, res: Response) {
   try {
     const validated = updateSettingsSchema.parse(req.body)
-    const data = await service.updateSettings(validated)
+    const adminId = (req.user as any)?.sub
+    const data = await service.updateSettings(validated, adminId)
 
     // Emit socket event
     emit.settingsUpdated()
@@ -169,7 +170,7 @@ export async function getPublicConfig(req: Request, res: Response) {
     return res.json({
       data: {
         uzbCargoUsdPerKg: Number(appSettings?.uzbCargoUsdPerKg ?? 10),
-        usdToKrw: Number(rate?.usdToKrw ?? 1350),
+        usdToKrw: Number(rate?.usdToKrw ?? appSettings?.usdToKrw ?? 1350),
         minOrderKorKrw: Number(appSettings?.minOrderKorKrw ?? 0),
         minOrderUzbUzs: Number(appSettings?.minOrderUzbUzs ?? 0),
         krwToUzs: Number(rate?.krwToUzs ?? 7.74),

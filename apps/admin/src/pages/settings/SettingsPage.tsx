@@ -793,7 +793,9 @@ function OrderSettingsTab() {
               className="h-11 rounded-xl border-[0.5px] focus:ring-primary/20"
             />
             <p className="text-[11px] text-muted-foreground font-medium">
-              1 USD necha KRW ga teng (cargo hisoblash uchun)
+              1 USD necha KRW ga teng (cargo hisoblash uchun).
+              <br />
+              Bu qiymat saqlanganda yangi valyuta kursi snapshorti yaratiladi.
             </p>
           </div>
           <div className="space-y-2">

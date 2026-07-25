@@ -1,6 +1,6 @@
 import { db } from '../../config/db'
-import { settings, paymentMethods } from '@misoa/db'
-import { eq, asc } from 'drizzle-orm'
+import { settings, paymentMethods, exchangeRateSnapshots } from '@misoa/db'
+import { eq, asc, desc } from 'drizzle-orm'
 import type { UpdateSettingsDto } from './settings.schema'
 import { cacheGet, cacheSet, cacheDelete, CACHE_TTL } from '../../lib/cache'
 import { logger } from '../../config/logger'
@@ -139,7 +139,7 @@ export async function getPublicSettings() {
   }))
 }
 
-export async function updateSettings(data: UpdateSettingsDto) {
+export async function updateSettings(data: UpdateSettingsDto, adminId?: string) {
   const current = await getSettings()
 
   // Clean data to exclude protected fields
@@ -156,6 +156,29 @@ export async function updateSettings(data: UpdateSettingsDto) {
     .set({ ...cleanData, updatedAt: new Date() })
     .where(eq(settings.id, current.id))
     .returning()
+
+  if (data.usdToKrw !== undefined || data.uzbCargoUsdPerKg !== undefined) {
+    const usdToKrw = Number(updated.usdToKrw ?? 1350)
+    const uzbCargoUsdPerKg = Number(updated.uzbCargoUsdPerKg ?? 10)
+    const cargoRateKrwPerKg = Math.round(uzbCargoUsdPerKg * usdToKrw)
+
+    const latestSnapshot = await db
+      .select()
+      .from(exchangeRateSnapshots)
+      .orderBy(desc(exchangeRateSnapshots.createdAt))
+      .limit(1)
+
+    const krwToUzs = latestSnapshot[0]?.krwToUzs ?? '8.5'
+
+    await db.insert(exchangeRateSnapshots).values({
+      krwToUzs: String(krwToUzs),
+      usdToKrw: String(usdToKrw),
+      cargoRateKrwPerKg: String(cargoRateKrwPerKg),
+      source: 'MANUAL',
+      note: 'Sozlamalardan yangilandi',
+      createdBy: adminId || null,
+    })
+  }
 
   await cacheDelete(CACHE_KEY)
   return updated

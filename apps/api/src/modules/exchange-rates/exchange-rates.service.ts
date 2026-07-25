@@ -61,7 +61,12 @@ export async function createManualExchangeRate(dto: CreateExchangeRateDto, admin
       .orderBy(desc(exchangeRateSnapshots.createdAt))
       .limit(1)
 
-    usdToKrw = latest ? Number(latest.usdToKrw) : 1350
+    if (latest) {
+      usdToKrw = Number(latest.usdToKrw)
+    } else {
+      const [s] = await db.select({ usdToKrw: settings.usdToKrw }).from(settings).limit(1)
+      usdToKrw = Number(s?.usdToKrw ?? 1350)
+    }
   }
 
   const cargoRateKrwPerKg = Math.round(uzbCargoUsdPerKg * (usdToKrw as number))
@@ -78,7 +83,13 @@ export async function createManualExchangeRate(dto: CreateExchangeRateDto, admin
     })
     .returning()
 
+  await db.update(settings).set({
+    usdToKrw: dto.usdToKrw ?? Number(usdToKrw),
+    updatedAt: new Date()
+  })
+
   await cacheDelete(CACHE_KEY)
+  await cacheDelete('settings:singleton')
   return created
 }
 
