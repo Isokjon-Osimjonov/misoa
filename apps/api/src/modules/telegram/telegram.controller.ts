@@ -176,7 +176,8 @@ export async function updatePost(req: Request, res: Response) {
 
 export async function deletePost(req: Request, res: Response) {
   try {
-    const data = await service.deletePost(req.params.id)
+    const user = req.user as any
+    const data = await service.deletePost(req.params.id, user?.sub || '', user?.isSuperAdmin ?? false)
     return res.json({ data: { id: data.id, status: data.status }, error: null })
   } catch (e: any) {
     return res

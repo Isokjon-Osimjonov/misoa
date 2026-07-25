@@ -394,11 +394,11 @@ export async function updatePost(id: string, data: UpdatePostDto) {
   })
 }
 
-export async function deletePost(id: string) {
+export async function deletePost(id: string, deletedBy: string, isSuperAdmin: boolean = false) {
   const [post] = await db.select().from(telegramPosts).where(eq(telegramPosts.id, id)).limit(1)
   if (!post) throw { status: 404, code: 'POST_NOT_FOUND', message: 'Post topilmadi' }
-  if (post.status === 'SENT')
-    throw { status: 400, code: 'FORBIDDEN', message: "Yuborilgan postni o'chirib bo'lmaydi" }
+  if (post.status === 'SENT' && !isSuperAdmin)
+    throw { status: 400, code: 'SENT_POST_DELETE_FORBIDDEN', message: "Yuborilgan postni o'chirib bo'lmaydi. Faqat super admin o'chira oladi." }
 
   const [deleted] = await db
     .update(telegramPosts)
