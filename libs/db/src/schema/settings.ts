@@ -29,7 +29,6 @@ export const settings = pgTable(
     cargoTransitDaysMax: integer('cargo_transit_days_max').default(10).notNull(),
 
     uzbCargoUsdPerKg: integer('uzb_cargo_usd_per_kg').default(10).notNull(),
-    usdToKrw: integer('usd_to_krw').default(1350).notNull(),
 
     minOrderKorKrw: integer('min_order_kor_krw').default(0).notNull(),
     minOrderUzbUzs: integer('min_order_uzb_uzs').default(0).notNull(),

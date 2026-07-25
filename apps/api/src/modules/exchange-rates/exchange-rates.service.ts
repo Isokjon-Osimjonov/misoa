@@ -64,8 +64,7 @@ export async function createManualExchangeRate(dto: CreateExchangeRateDto, admin
     if (latest) {
       usdToKrw = Number(latest.usdToKrw)
     } else {
-      const [s] = await db.select({ usdToKrw: settings.usdToKrw }).from(settings).limit(1)
-      usdToKrw = Number(s?.usdToKrw ?? 1350)
+      usdToKrw = 1350
     }
   }
 
