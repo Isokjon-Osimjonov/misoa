@@ -51,7 +51,6 @@ export async function getExchangeRateHistory() {
 }
 
 export async function createManualExchangeRate(dto: CreateExchangeRateDto, adminId: string) {
-  const { uzbCargoUsdPerKg } = await getSettings()
 
   let usdToKrw = dto.usdToKrw
   if (!usdToKrw) {
@@ -70,8 +69,9 @@ export async function createManualExchangeRate(dto: CreateExchangeRateDto, admin
 
   let cargoRateKrwPerKg = dto.cargoRateKrwPerKg
   if (!cargoRateKrwPerKg) {
-    const { uzbCargoUsdPerKg } = await getSettings()
-    cargoRateKrwPerKg = Math.round(uzbCargoUsdPerKg * (usdToKrw as number))
+    const [latestSnapshot] = await db.select().from(exchangeRateSnapshots).orderBy(desc(exchangeRateSnapshots.createdAt)).limit(1)
+    const prevCargoUsd = latestSnapshot ? Math.round(Number(latestSnapshot.cargoRateKrwPerKg) / Number(latestSnapshot.usdToKrw)) : 10
+    cargoRateKrwPerKg = Math.round(prevCargoUsd * (usdToKrw as number))
   }
 
   const [created] = await db
@@ -126,8 +126,9 @@ export async function fetchAndSaveExchangeRate() {
     const krwToUzs = Number(data.conversion_rates.UZS.toFixed(2))
     const usdToKrw = Math.round(1 / data.conversion_rates.USD)
 
-    const { uzbCargoUsdPerKg } = await getSettings()
-    const cargoRateKrwPerKg = Math.round(uzbCargoUsdPerKg * usdToKrw)
+    const [latestSnapshot] = await db.select().from(exchangeRateSnapshots).orderBy(desc(exchangeRateSnapshots.createdAt)).limit(1)
+    const prevCargoUsd = latestSnapshot ? Math.round(Number(latestSnapshot.cargoRateKrwPerKg) / Number(latestSnapshot.usdToKrw)) : 10
+    const cargoRateKrwPerKg = Math.round(prevCargoUsd * usdToKrw)
 
     const [created] = await db
       .insert(exchangeRateSnapshots)

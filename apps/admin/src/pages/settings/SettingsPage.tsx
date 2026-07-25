@@ -558,11 +558,9 @@ function ExchangeRateTab() {
     if (rates[0] && !newRate) {
       setNewRate(rates[0].krwToUzs.toString())
       setUsdToKrw(rates[0].usdToKrw?.toString() || '14700')
+      setCargoUsd(Math.round(Number(rates[0].cargoRateKrwPerKg) / Number(rates[0].usdToKrw)).toString() || '10')
     }
-    if (orderSettings && !cargoUsd) {
-      setCargoUsd(orderSettings.uzbCargoUsdPerKg?.toString() || '10')
-    }
-  }, [rates, orderSettings])
+  }, [rates])
 
   const currentRate = rates[0]
 
@@ -572,7 +570,6 @@ function ExchangeRateTab() {
       const u2k = parseFloat(usdToKrw)
       const cargo = parseFloat(cargoUsd)
       
-      await settingsApi.updateOrderSettings({ uzbCargoUsdPerKg: cargo })
       return settingsApi.updateExchangeRate({
         krwToUzs,
         usdToKrw: u2k,

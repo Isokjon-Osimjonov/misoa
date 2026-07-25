@@ -3,14 +3,11 @@ import { z } from 'zod'
 export const updateSettingsSchema = z.object({
   paymentTimeoutMinutes: z.number().optional(),
   lowStockThreshold: z.number().optional(),
-  uzbCargoUsdPerKg: z.number().optional(),
+
 
   minOrderKorKrw: z.coerce.number().optional(),
   minOrderUzbUzs: z.coerce.number().optional(),
 
-  telegramUrl: z.string().url().optional().nullable(),
-  instagramUrl: z.string().url().optional().nullable(),
-  websiteUrl: z.string().url().optional().nullable(),
 })
 
 export const updatePaymentMethodSchema = z.object({

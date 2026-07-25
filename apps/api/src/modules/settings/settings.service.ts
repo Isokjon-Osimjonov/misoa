@@ -62,12 +62,9 @@ export async function getOrderSettings() {
     lowStockThreshold: s.lowStockThreshold,
     cargoTransitDaysMin: s.cargoTransitDaysMin,
     cargoTransitDaysMax: s.cargoTransitDaysMax,
-    uzbCargoUsdPerKg: s.uzbCargoUsdPerKg,
+
     minOrderKorKrw: Number(s.minOrderKorKrw),
     minOrderUzbUzs: Number(s.minOrderUzbUzs),
-    telegramUrl: s.telegramUrl,
-    instagramUrl: s.instagramUrl,
-    websiteUrl: s.websiteUrl,
   }
 }
 
@@ -80,12 +77,9 @@ export async function updateOrderSettings(data: any) {
   if (data.lowStockThreshold !== undefined) update.lowStockThreshold = data.lowStockThreshold
   if (data.cargoTransitDaysMin !== undefined) update.cargoTransitDaysMin = data.cargoTransitDaysMin
   if (data.cargoTransitDaysMax !== undefined) update.cargoTransitDaysMax = data.cargoTransitDaysMax
-  if (data.uzbCargoUsdPerKg !== undefined) update.uzbCargoUsdPerKg = data.uzbCargoUsdPerKg
+
   if (data.minOrderKorKrw !== undefined) update.minOrderKorKrw = data.minOrderKorKrw
   if (data.minOrderUzbUzs !== undefined) update.minOrderUzbUzs = data.minOrderUzbUzs
-  if (data.telegramUrl !== undefined) update.telegramUrl = data.telegramUrl
-  if (data.instagramUrl !== undefined) update.instagramUrl = data.instagramUrl
-  if (data.websiteUrl !== undefined) update.websiteUrl = data.websiteUrl
 
   await db.update(settings).set(update).where(eq(settings.id, current.id))
   await cacheDelete(CACHE_KEY)

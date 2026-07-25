@@ -1,0 +1,1 @@
+ALTER TABLE "settings" DROP COLUMN "uzb_cargo_usd_per_kg";
