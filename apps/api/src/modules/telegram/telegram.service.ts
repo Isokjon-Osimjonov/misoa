@@ -18,6 +18,7 @@ import type {
   UpdatePostDto,
 } from './telegram.schema'
 import { logger } from '../../config/logger'
+import { getSettings } from '../settings/settings.service'
 
 // ─── AI Caption ─────────────────────────────────────────────────────────
 
@@ -437,14 +438,49 @@ export async function sendPost(postId: string): Promise<void> {
       }
 
       let res: any
+      const settings = await getSettings()
+      
+      const buttons = []
+      
+      if (settings.telegramUrl) {
+        buttons.push({
+          text: 'Telegram',
+          url: settings.telegramUrl
+        })
+      }
+      if (settings.phoneNumber) {
+        buttons.push({
+          text: 'Telefon',
+          url: `tel:${settings.phoneNumber}`
+        })
+      }
+      if (settings.instagramUrl) {
+        buttons.push({
+          text: 'Instagram',
+          url: settings.instagramUrl
+        })
+      }
+      
+      // We also might have website, prompt said settings.websiteUrl -> 'Veb-sayt'
+      if (settings.websiteUrl) {
+        buttons.push({
+          text: 'Veb-sayt',
+          url: settings.websiteUrl
+        })
+      }
+
+      const reply_markup = buttons.length > 0 ? { inline_keyboard: [buttons] } : undefined
+
       if (post.imageUrl) {
         res = await bot.api.sendPhoto(chan.chatId, post.imageUrl, {
           caption: text,
           parse_mode: 'HTML',
+          reply_markup,
         })
       } else {
         res = await bot.api.sendMessage(chan.chatId, text, {
           parse_mode: 'HTML',
+          reply_markup,
         })
       }
 

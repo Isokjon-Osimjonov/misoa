@@ -71,8 +71,10 @@ export const settingsApi = {
     paymentTimeoutMinutes?: number
     minOrderKorKrw?: number
     minOrderUzbUzs?: number
-
-
+    telegramUrl?: string | null
+    instagramUrl?: string | null
+    websiteUrl?: string | null
+    phoneNumber?: string | null
   }) => {
     const res = await api.patch('/admin/settings/order', payload)
     return res.data

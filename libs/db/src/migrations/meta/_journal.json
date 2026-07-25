@@ -99,6 +99,13 @@
       "when": 1784973784814,
       "tag": "0013_massive_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1784974047319,
+      "tag": "0014_exotic_shooting_star",
+      "breakpoints": true
     }
   ]
 }

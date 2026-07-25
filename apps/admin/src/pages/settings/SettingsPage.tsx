@@ -15,6 +15,7 @@ import {
   Loader2,
   X,
   RefreshCw,
+  Phone,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { settingsApi } from '../../api/settings.api'
@@ -33,6 +34,7 @@ const TABS = [
   { id: 'shipping', label: 'Yetkazib berish', icon: Truck },
   { id: 'exchange', label: 'Valyuta kursi', icon: TrendingUp },
   { id: 'order', label: 'Buyurtma sozlamalari', icon: ShoppingCart },
+  { id: 'contact', label: 'Aloqa (Kontaktlar)', icon: Phone },
 ]
 
 export function SettingsPage() {
@@ -72,6 +74,7 @@ export function SettingsPage() {
           {tab === 'shipping' && <ShippingTiersTab />}
           {tab === 'exchange' && <ExchangeRateTab />}
           {tab === 'order' && <OrderSettingsTab />}
+          {tab === 'contact' && <ContactTab />}
         </div>
       </div>
     </div>
@@ -861,6 +864,133 @@ function OrderSettingsTab() {
           </Button>
         </div>
       </form>
+    </div>
+  )
+}
+
+function ContactTab() {
+  const { data: settings, isLoading } = useQuery({
+    queryKey: QK.ORDER_SETTINGS,
+    queryFn: settingsApi.getOrderSettings,
+  })
+
+  const [telegramUrl, setTelegramUrl] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [websiteUrl, setWebsiteUrl] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [saving, setSaving] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (settings) {
+      setTelegramUrl(settings.telegramUrl ?? '')
+      setInstagramUrl(settings.instagramUrl ?? '')
+      setWebsiteUrl(settings.websiteUrl ?? '')
+      setPhoneNumber(settings.phoneNumber ?? '')
+    }
+  }, [settings])
+
+  const handleSave = async (field: string, value: string) => {
+    if (settings?.[field as keyof typeof settings] === value) return
+
+    setSaving(field)
+    try {
+      await settingsApi.updateOrderSettings({
+        [field]: value || null,
+      })
+      toast.success('Saqlandi')
+    } catch {
+      toast.error('Xatolik')
+    } finally {
+      setSaving(null)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl border-[0.5px] border-border p-5 space-y-4 shadow-sm h-64 animate-pulse" />
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border-[0.5px] border-border p-5 space-y-6 shadow-sm">
+      <div className="space-y-4">
+        {/* Telegram */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Telegram havolasi</Label>
+          <div className="relative">
+            <Input
+              value={telegramUrl}
+              onChange={(e) => setTelegramUrl(e.target.value)}
+              onBlur={(e) => handleSave('telegramUrl', e.target.value)}
+              placeholder="https://t.me/kanal"
+              className="w-full px-3 py-2 h-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {saving === 'telegramUrl' && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                Saqlanmoqda...
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Instagram */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Instagram havolasi</Label>
+          <div className="relative">
+            <Input
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              onBlur={(e) => handleSave('instagramUrl', e.target.value)}
+              placeholder="https://instagram.com/..."
+              className="w-full px-3 py-2 h-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {saving === 'instagramUrl' && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                Saqlanmoqda...
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Website */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Veb-sayt havolasi</Label>
+          <div className="relative">
+            <Input
+              value={websiteUrl}
+              onChange={(e) => setWebsiteUrl(e.target.value)}
+              onBlur={(e) => handleSave('websiteUrl', e.target.value)}
+              placeholder="https://misoa.uz"
+              className="w-full px-3 py-2 h-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {saving === 'websiteUrl' && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                Saqlanmoqda...
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Phone */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Telefon raqami</Label>
+          <div className="relative">
+            <Input
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              onBlur={(e) => handleSave('phoneNumber', e.target.value)}
+              placeholder="+821095614273"
+              className="w-full px-3 py-2 h-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            {saving === 'phoneNumber' && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                Saqlanmoqda...
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

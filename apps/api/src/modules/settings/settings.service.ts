@@ -65,6 +65,11 @@ export async function getOrderSettings() {
 
     minOrderKorKrw: Number(s.minOrderKorKrw),
     minOrderUzbUzs: Number(s.minOrderUzbUzs),
+
+    telegramUrl: s.telegramUrl,
+    instagramUrl: s.instagramUrl,
+    websiteUrl: s.websiteUrl,
+    phoneNumber: s.phoneNumber,
   }
 }
 
@@ -80,6 +85,11 @@ export async function updateOrderSettings(data: any) {
 
   if (data.minOrderKorKrw !== undefined) update.minOrderKorKrw = data.minOrderKorKrw
   if (data.minOrderUzbUzs !== undefined) update.minOrderUzbUzs = data.minOrderUzbUzs
+
+  if (data.telegramUrl !== undefined) update.telegramUrl = data.telegramUrl
+  if (data.instagramUrl !== undefined) update.instagramUrl = data.instagramUrl
+  if (data.websiteUrl !== undefined) update.websiteUrl = data.websiteUrl
+  if (data.phoneNumber !== undefined) update.phoneNumber = data.phoneNumber
 
   await db.update(settings).set(update).where(eq(settings.id, current.id))
   await cacheDelete(CACHE_KEY)
