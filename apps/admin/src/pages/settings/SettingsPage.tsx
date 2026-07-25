@@ -870,9 +870,16 @@ function OrderSettingsTab() {
 
 function ContactTab() {
   const { data: settings, isLoading } = useQuery({
-    queryKey: QK.ORDER_SETTINGS,
-    queryFn: settingsApi.getOrderSettings,
+    queryKey: ['contact-settings'],
+    queryFn: async () => {
+      const { api } = await import('../../lib/api')
+      const res = await api.get('/admin/settings/order')
+      return res.data.data
+    },
   })
+
+  console.log('RAW settings:', settings)
+  console.log('telegramUrl:', settings?.telegramUrl)
 
   const [telegramUrl, setTelegramUrl] = useState('')
   const [instagramUrl, setInstagramUrl] = useState('')
