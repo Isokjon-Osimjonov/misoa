@@ -3,6 +3,7 @@ import { env } from '../../config/env'
 import { sendPushNotification } from '../../lib/push'
 import { db } from '../../config/db'
 import { notificationsLog } from '@misoa/db'
+import { getSettings } from '../../modules/settings/settings.service'
 
 const escHtml = (s: string) =>
   s.replace(/&/g,'&amp;')
@@ -13,8 +14,35 @@ const escHtml = (s: string) =>
 // Send message to admin group
 export async function sendAdminAlert(message: string): Promise<void> {
   try {
+    const settings = await getSettings()
+    const buttons = []
+
+    if (settings?.telegramUrl) buttons.push({
+      text: 'Telegram',
+      url: settings.telegramUrl
+    })
+    if (settings?.phoneNumber) buttons.push({
+      text: 'Telefon',
+      url: `tel:${settings.phoneNumber}`
+    })
+    if (settings?.instagramUrl) buttons.push({
+      text: 'Instagram',
+      url: settings.instagramUrl
+    })
+    if (settings?.websiteUrl) buttons.push({
+      text: 'Veb-sayt',
+      url: settings.websiteUrl
+    })
+
+    const replyMarkup = buttons.length > 0
+      ? {
+        inline_keyboard: [buttons]
+      }
+      : undefined
+
     await bot.api.sendMessage(env.ADMIN_GROUP_CHAT_ID, message, {
       parse_mode: 'HTML',
+      reply_markup: replyMarkup
     })
   } catch (err) {
     console.error('Admin alert failed:', err)

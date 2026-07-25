@@ -217,7 +217,12 @@ export async function updateTelegramPostSettings(data: {
   link3Label?: string
   link3Url?: string
 }) {
-  const [settings] = await db.select().from(telegramPostSettings).limit(1)
+  let [settings] = await db.select().from(telegramPostSettings).limit(1)
+  if (!settings) {
+    const inserted = await db.insert(telegramPostSettings).values(data).returning()
+    return inserted[0]
+  }
+
   const [updated] = await db
     .update(telegramPostSettings)
     .set({ ...data, updatedAt: new Date() })
