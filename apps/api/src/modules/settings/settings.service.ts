@@ -63,7 +63,6 @@ export async function getOrderSettings() {
     cargoTransitDaysMin: s.cargoTransitDaysMin,
     cargoTransitDaysMax: s.cargoTransitDaysMax,
     uzbCargoUsdPerKg: s.uzbCargoUsdPerKg,
-    usdToKrw: s.usdToKrw,
     minOrderKorKrw: Number(s.minOrderKorKrw),
     minOrderUzbUzs: Number(s.minOrderUzbUzs),
     telegramUrl: s.telegramUrl,
@@ -82,7 +81,6 @@ export async function updateOrderSettings(data: any) {
   if (data.cargoTransitDaysMin !== undefined) update.cargoTransitDaysMin = data.cargoTransitDaysMin
   if (data.cargoTransitDaysMax !== undefined) update.cargoTransitDaysMax = data.cargoTransitDaysMax
   if (data.uzbCargoUsdPerKg !== undefined) update.uzbCargoUsdPerKg = data.uzbCargoUsdPerKg
-  if (data.usdToKrw !== undefined) update.usdToKrw = data.usdToKrw
   if (data.minOrderKorKrw !== undefined) update.minOrderKorKrw = data.minOrderKorKrw
   if (data.minOrderUzbUzs !== undefined) update.minOrderUzbUzs = data.minOrderUzbUzs
   if (data.telegramUrl !== undefined) update.telegramUrl = data.telegramUrl
@@ -156,29 +154,6 @@ export async function updateSettings(data: UpdateSettingsDto, adminId?: string) 
     .set({ ...cleanData, updatedAt: new Date() })
     .where(eq(settings.id, current.id))
     .returning()
-
-  if (data.usdToKrw !== undefined || data.uzbCargoUsdPerKg !== undefined) {
-    const usdToKrw = Number(updated.usdToKrw ?? 1350)
-    const uzbCargoUsdPerKg = Number(updated.uzbCargoUsdPerKg ?? 10)
-    const cargoRateKrwPerKg = Math.round(uzbCargoUsdPerKg * usdToKrw)
-
-    const latestSnapshot = await db
-      .select()
-      .from(exchangeRateSnapshots)
-      .orderBy(desc(exchangeRateSnapshots.createdAt))
-      .limit(1)
-
-    const krwToUzs = latestSnapshot[0]?.krwToUzs ?? '8.5'
-
-    await db.insert(exchangeRateSnapshots).values({
-      krwToUzs: String(krwToUzs),
-      usdToKrw: String(usdToKrw),
-      cargoRateKrwPerKg: String(cargoRateKrwPerKg),
-      source: 'MANUAL',
-      note: 'Sozlamalardan yangilandi',
-      createdBy: adminId || null,
-    })
-  }
 
   await cacheDelete(CACHE_KEY)
   return updated

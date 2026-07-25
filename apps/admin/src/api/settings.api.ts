@@ -51,8 +51,8 @@ export const settingsApi = {
     return res.data.data
   },
 
-  updateExchangeRate: async (rate: number) => {
-    const res = await api.post('/admin/exchange-rates', { krwToUzs: rate })
+  updateExchangeRate: async (payload: { krwToUzs: number, usdToKrw: number, cargoRateKrwPerKg: number, note?: string }) => {
+    const res = await api.post('/admin/exchange-rates', payload)
     return res.data
   },
 

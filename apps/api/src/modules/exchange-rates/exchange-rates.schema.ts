@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const createExchangeRateSchema = z.object({
   krwToUzs: z.number().positive(),
   usdToKrw: z.number().positive().optional(),
+  cargoRateKrwPerKg: z.number().positive().optional(),
   note: z.string().optional(),
 })
 

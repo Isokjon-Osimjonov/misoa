@@ -536,24 +536,54 @@ function ShippingTiersTab() {
 
 function ExchangeRateTab() {
   const qc = useQueryClient()
-  const [newRate, setNewRate] = useState('')
-  const [fetching, setFetching] = useState(false)
-  const [liveRate, setLiveRate] = useState<number | null>(null)
-
-  const { data: rates = [], isLoading } = useQuery({
+  
+  const { data: rates = [], isLoading: ratesLoading } = useQuery({
     queryKey: QK.EXCHANGE_RATES,
     queryFn: () => settingsApi.getExchangeRates(7),
     placeholderData: (prev) => prev,
   })
+  
+  const { data: orderSettings, isLoading: orderLoading } = useQuery({
+    queryKey: QK.ORDER_SETTINGS,
+    queryFn: settingsApi.getOrderSettings,
+  })
+
+  const [newRate, setNewRate] = useState('')
+  const [usdToKrw, setUsdToKrw] = useState('')
+  const [cargoUsd, setCargoUsd] = useState('')
+  const [fetching, setFetching] = useState(false)
+  const [liveRate, setLiveRate] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (rates[0] && !newRate) {
+      setNewRate(rates[0].krwToUzs.toString())
+      setUsdToKrw(rates[0].usdToKrw?.toString() || '14700')
+    }
+    if (orderSettings && !cargoUsd) {
+      setCargoUsd(orderSettings.uzbCargoUsdPerKg?.toString() || '10')
+    }
+  }, [rates, orderSettings])
 
   const currentRate = rates[0]
 
   const updateMutation = useMutation({
-    mutationFn: () => settingsApi.updateExchangeRate(parseFloat(newRate)),
+    mutationFn: async () => {
+      const krwToUzs = parseFloat(newRate)
+      const u2k = parseFloat(usdToKrw)
+      const cargo = parseFloat(cargoUsd)
+      
+      await settingsApi.updateOrderSettings({ uzbCargoUsdPerKg: cargo })
+      return settingsApi.updateExchangeRate({
+        krwToUzs,
+        usdToKrw: u2k,
+        cargoRateKrwPerKg: Math.round(u2k * cargo),
+        note: 'Admin panelidan kiritildi'
+      })
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QK.EXCHANGE_RATES })
+      qc.invalidateQueries({ queryKey: QK.ORDER_SETTINGS })
       toast.success('Valyuta kursi yangilandi')
-      setNewRate('')
       setLiveRate(null)
     },
     onError: (err: any) => toast.error(getErrorMessage(err?.errorCode ?? '')),
@@ -573,11 +603,10 @@ function ExchangeRateTab() {
     }
   }
 
-  if (isLoading) return <div className="space-y-4 h-96 bg-white rounded-2xl animate-pulse" />
+  if (ratesLoading || orderLoading) return <div className="space-y-4 h-96 bg-white rounded-2xl animate-pulse" />
 
   return (
     <div className="space-y-4">
-      {/* Current rate card */}
       <div className="bg-white rounded-2xl border-[0.5px] border-border p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -589,96 +618,69 @@ function ExchangeRateTab() {
                 1 ₩ = {Number(currentRate.krwToUzs).toLocaleString()} so'm
               </p>
               <p className="text-xs text-muted-foreground mt-2 font-medium">
-                Yangilangan: {formatDateTime(currentRate.createdAt)}
+                USD/KRW: {Number(currentRate.usdToKrw).toLocaleString()} ₩
+                <span className="mx-2">•</span>
+                Kargo: {Number(currentRate.cargoRateKrwPerKg).toLocaleString()} ₩/kg
               </p>
             </>
           ) : (
             <p className="text-lg font-bold text-muted-foreground">Kurs belgilanmagan</p>
           )}
         </div>
-        {currentRate && (
-          <div className="bg-gray-50 rounded-2xl p-4 min-w-[200px] border-[0.5px] border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-              Misol hisob
-            </p>
-            <div className="space-y-1">
-              <p className="text-xs text-gray-600 font-medium">₩15,000 bo'lsa:</p>
-              <p className="text-xl font-bold text-primary">
-                ≈ {formatUZS(Math.round(15000 * Number(currentRate.krwToUzs)))}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="bg-white rounded-2xl border-[0.5px] border-border p-6 shadow-sm">
         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
           Kursni yangilash
         </p>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
-            <div className="flex-1 w-full">
-              <Label className="text-xs font-bold mb-2 block">Yangi kurs (1 ₩ = ? so'm)</Label>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Input
-                  value={newRate}
-                  onChange={(e) => setNewRate(e.target.value)}
-                  type="number"
-                  placeholder={currentRate ? Number(currentRate.krwToUzs).toString() : '12'}
-                  className="h-11 text-base font-bold rounded-xl border-[0.5px] focus:ring-primary/20 w-full sm:flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleFetchLive}
-                  disabled={fetching}
-                  className="h-11 w-full sm:w-auto rounded-xl gap-2 shrink-0 border-[0.5px] text-xs font-bold text-blue-600 border-blue-200 hover:bg-blue-50 px-4"
-                >
-                  {fetching ? (
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4" />
-                  )}
-                  Kursni olish
-                </Button>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-2 font-medium">
-                "Kursni olish" — open.er-api.com dan joriy kursni avtomatik yuklaydi
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <Label className="text-xs font-bold block">KRW → UZS kursi (1 ₩ = ? so'm)</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newRate}
+                onChange={(e) => setNewRate(e.target.value)}
+                type="number"
+                step="0.01"
+                className="h-11 font-bold rounded-xl border-[0.5px] focus:ring-primary/20"
+              />
+              <Button type="button" variant="outline" onClick={handleFetchLive} disabled={fetching} className="h-11 px-3">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
-
-            {newRate && !isNaN(parseFloat(newRate)) && (
-              <div className="pb-2 px-2 hidden sm:block">
-                <p className="text-[10px] font-bold uppercase text-muted-foreground">₩15,000 ≈</p>
-                <p className="text-lg font-bold text-gray-700">
-                  {formatUZS(Math.round(15000 * parseFloat(newRate)))}
-                </p>
-              </div>
-            )}
-
-            <Button
-              onClick={() => updateMutation.mutate()}
-              disabled={!newRate || parseFloat(newRate) <= 0 || updateMutation.isPending}
-              className="h-11 px-8 rounded-xl gap-2 font-bold w-full sm:w-auto"
-            >
-              {updateMutation.isPending ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Save className="h-5 w-5" />
-              )}
-              Saqlash
-            </Button>
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-xs font-bold block">USD → KRW kursi</Label>
+            <Input
+              value={usdToKrw}
+              onChange={(e) => setUsdToKrw(e.target.value)}
+              type="number"
+              className="h-11 font-bold rounded-xl border-[0.5px] focus:ring-primary/20"
+            />
           </div>
 
-          {liveRate && (
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border-[0.5px] border-blue-100 animate-in fade-in slide-in-from-top-1">
-              <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />
-              <p className="text-xs text-blue-700 font-bold">
-                API kurs: 1 ₩ = {liveRate.toLocaleString()} so'm · Saqlash tugmasini bosing
-              </p>
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label className="text-xs font-bold block">🇺🇿 UZB Kargo (USD/kg)</Label>
+            <Input
+              value={cargoUsd}
+              onChange={(e) => setCargoUsd(e.target.value)}
+              type="number"
+              step="0.1"
+              className="h-11 font-bold rounded-xl border-[0.5px] focus:ring-primary/20"
+            />
+          </div>
+        </div>
+        
+        <div className="mt-6 flex justify-end">
+          <Button
+            onClick={() => updateMutation.mutate()}
+            disabled={!newRate || !usdToKrw || !cargoUsd || updateMutation.isPending}
+            className="h-11 px-8 rounded-xl gap-2 font-bold w-full sm:w-auto"
+          >
+            {updateMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+            Saqlash va Snapshot Yaratish
+          </Button>
         </div>
       </div>
 
@@ -689,18 +691,16 @@ function ExchangeRateTab() {
           </p>
           <div className="divide-y divide-border/30">
             {rates.map((r: any, i: number) => (
-              <div
-                key={r.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors gap-2"
-              >
+              <div key={r.id} className="flex flex-col sm:flex-row justify-between px-6 py-4 hover:bg-gray-50/50 gap-2">
                 <div className="flex items-center gap-3">
                   {i === 0 && <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />}
-                  <p className="text-sm font-bold text-gray-900">
-                    1 ₩ = {Number(r.krwToUzs).toLocaleString()} so'm
-                  </p>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">1 ₩ = {Number(r.krwToUzs).toLocaleString()} so'm</p>
+                    <p className="text-xs text-muted-foreground">USD/KRW: {r.usdToKrw} | Kargo KRW: {r.cargoRateKrwPerKg}</p>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground font-medium sm:text-right">
-                  {formatDateTime(r.createdAt)}
+                  {new Date(r.createdAt).toLocaleString()}
                 </p>
               </div>
             ))}
@@ -710,7 +710,6 @@ function ExchangeRateTab() {
     </div>
   )
 }
-
 function OrderSettingsTab() {
   const qc = useQueryClient()
 
@@ -718,8 +717,6 @@ function OrderSettingsTab() {
     paymentTimeoutMinutes: z.coerce.number().int().min(5).max(1440),
     minOrderKorKrw: z.coerce.number().int().min(0),
     minOrderUzbUzs: z.coerce.number().int().min(0),
-    usdToKrw: z.coerce.number().min(0),
-    uzbCargoUsdPerKg: z.coerce.number().min(0),
     cargoTransitDaysMin: z.coerce.number().int().min(1),
     cargoTransitDaysMax: z.coerce.number().int().min(1),
     lowStockThreshold: z.coerce.number().int().min(1).max(1000).optional(),
@@ -779,39 +776,6 @@ function OrderSettingsTab() {
               5-1440 daqiqa oralig'ida bo'lishi kerak
             </p>
           )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-          <div className="space-y-2">
-            <Label className="text-sm font-bold text-gray-900">USD → KRW kursi</Label>
-            <Input
-              {...register('usdToKrw')}
-              type="number"
-              step="1"
-              min="0"
-              placeholder="1350"
-              className="h-11 rounded-xl border-[0.5px] focus:ring-primary/20"
-            />
-            <p className="text-[11px] text-muted-foreground font-medium">
-              1 USD necha KRW ga teng (cargo hisoblash uchun).
-              <br />
-              Bu qiymat saqlanganda yangi valyuta kursi snapshorti yaratiladi.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-bold text-gray-900">🇺🇿 UZB Kargo tarixi (USD/kg)</Label>
-            <Input
-              {...register('uzbCargoUsdPerKg')}
-              type="number"
-              step="0.1"
-              min="0"
-              placeholder="3"
-              className="h-11 rounded-xl border-[0.5px] focus:ring-primary/20"
-            />
-            <p className="text-[11px] text-muted-foreground font-medium">
-              1 kg yuk uchun USD narxi (Koreadan O'zbekistonga)
-            </p>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">

@@ -170,7 +170,7 @@ export async function getPublicConfig(req: Request, res: Response) {
     return res.json({
       data: {
         uzbCargoUsdPerKg: Number(appSettings?.uzbCargoUsdPerKg ?? 10),
-        usdToKrw: Number(rate?.usdToKrw ?? appSettings?.usdToKrw ?? 1350),
+        usdToKrw: Number(rate?.usdToKrw ?? 1350),
         minOrderKorKrw: Number(appSettings?.minOrderKorKrw ?? 0),
         minOrderUzbUzs: Number(appSettings?.minOrderUzbUzs ?? 0),
         krwToUzs: Number(rate?.krwToUzs ?? 7.74),
