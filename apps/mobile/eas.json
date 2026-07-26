@@ -11,7 +11,7 @@
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://172.30.1.48:4000/api/v1"
+        "EXPO_PUBLIC_API_URL": "http://172.30.1.4:4000/api/v1"
       }
     },
     "preview": {
