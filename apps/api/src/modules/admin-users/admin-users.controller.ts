@@ -86,3 +86,25 @@ export async function deleteAdminUser(req: Request, res: Response) {
       .json({ data: null, error: { message: e.message, code: e.code ?? 'INTERNAL_ERROR' } })
   }
 }
+
+export async function updateAdminUserStatus(req: Request, res: Response) {
+  try {
+    const { id } = req.params
+    const { isActive, roleId } = req.body
+
+    const updated = await service.updateAdminUserStatus(id, { isActive, roleId })
+
+    return res.json({
+      data: updated,
+      error: null,
+    })
+  } catch (e: any) {
+    return res.status(e.status ?? 500).json({
+      data: null,
+      error: {
+        message: e.message,
+        code: e.code ?? 'INTERNAL_ERROR',
+      },
+    })
+  }
+}

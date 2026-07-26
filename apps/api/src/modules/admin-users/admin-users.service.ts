@@ -47,6 +47,7 @@ export async function getAdminUsers(query: { page?: number; limit?: number }) {
       mustChangePassword: u.mustChangePassword,
       lastLoginAt: u.lastLoginAt,
       createdAt: u.createdAt,
+      roleId: u.roleId,
       role: u.roleId ? { id: u.roleId, name: u.roleName } : null,
     })),
     meta: { page, limit, total, hasNext: offset + limit < total, hasPrev: page > 1 },
@@ -193,4 +194,30 @@ export async function deleteAdminUser(id: string, targetId: string) {
     .where(eq(refreshTokens.adminUserId, targetId))
 
   return deleted
+}
+
+export async function updateAdminUserStatus(
+  id: string,
+  data: {
+    isActive?: boolean
+    roleId?: string | null
+  }
+) {
+  const [updated] = await db
+    .update(adminUsers)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(adminUsers.id, id))
+    .returning()
+
+  if (!updated)
+    throw {
+      status: 404,
+      code: 'USER_NOT_FOUND',
+      message: 'Admin topilmadi',
+    }
+
+  return updated
 }

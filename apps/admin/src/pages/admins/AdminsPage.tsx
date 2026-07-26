@@ -253,7 +253,9 @@ export function AdminsPage() {
           </div>
           <div className="divide-y divide-border/30">
             {roles.map((role: any) => {
-              const adminCount = admins.filter((a: any) => a.roleId === role.id).length
+              const adminCount = admins.filter(
+                (a: any) => a.roleId === role.id || a.role?.id === role.id
+              ).length
               return (
                 <div key={role.id} className="px-5 py-3">
                   <div className="flex items-center justify-between mb-1">
