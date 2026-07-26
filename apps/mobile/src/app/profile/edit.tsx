@@ -61,8 +61,6 @@ export default function EditProfileScreen() {
         'file'
       )
 
-      console.log('Avatar upload result:', JSON.stringify(result))
-
       const avatarUrl = result?.data?.url ?? result?.url ?? result?.data?.imageUrl
 
       if (!avatarUrl) {
@@ -80,7 +78,7 @@ export default function EditProfileScreen() {
       setAvatarUri(avatarUrl)
       Alert.alert('Muvaffaqiyatli', 'Rasm yangilandi!')
     } catch (err: any) {
-      console.log('Avatar error:', err)
+      console.error('Avatar error:', err)
       Alert.alert('Xatolik', err.message || 'Rasm yuklanmadi. Qayta urining.')
     } finally {
       setUploadingAvatar(false)
