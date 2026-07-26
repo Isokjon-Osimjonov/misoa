@@ -38,5 +38,6 @@ jobs:
             cd infra
             export IMAGE_TAG=${{ github.event.inputs.image_tag }}
             export GITHUB_REPOSITORY_OWNER=${{ steps.vars.outputs.owner }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             chmod +x deploy.sh
             ./deploy.sh
