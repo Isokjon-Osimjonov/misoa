@@ -23,7 +23,7 @@ import { useCartStore } from '../../lib/cart-store'
 import { useWishlistStore } from '../../lib/wishlist-store'
 import { formatKRW, formatUZS, krwToUzs } from '../../lib/price'
 import SkeletonLoader from '../../components/ui/SkeletonLoader'
-import { Toast, useToast } from '../../components/ui/Toast'
+import { useToast } from '../../components/ui/Toast'
 import CartBadgeIcon from '../../components/ui/CartBadgeIcon'
 import { useRequireAuth } from '../../hooks/useRequireAuth'
 
@@ -49,7 +49,7 @@ const WaitlistButton = ({ productId, showToast }: { productId: string; showToast
 
   const handlePress = async () => {
     if (isOnWaitlist) return
-    
+
     requireAuth(async () => {
       setIsLoading(true)
       try {
@@ -125,8 +125,6 @@ export default function ProductDetailScreen() {
 
   const showUzs = customer?.phoneRegion === 'UZB'
 
-
-
   const totalStock = Number(product?.totalStock ?? 0)
   const isOutOfStock = totalStock === 0
 
@@ -135,7 +133,7 @@ export default function ProductDetailScreen() {
     setIsAdding(true)
     try {
       await addItem(id as string, 1)
-      showToast('Savatga qo\'shildi', 'success')
+      showToast("Savatga qo'shildi", 'success')
     } catch (err: any) {
       const code = err?.response?.data?.error?.code
       if (code === 'REGION_MISMATCH') {
@@ -384,8 +382,6 @@ export default function ProductDetailScreen() {
           </View>
         )}
       </View>
-
-      <Toast message={toast.message} type={toast.type} visible={toast.visible} onHide={hideToast} />
     </View>
   )
 }

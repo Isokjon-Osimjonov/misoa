@@ -287,14 +287,15 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {isUZB && order.estimatedDeliveryStart && (
+        {isUZB && (
           <View style={styles.deliveryEstimateCard}>
             <Feather name="calendar" size={16} color={tokens.colors.primary} />
             <View style={{ flex: 1, marginLeft: 10 }}>
               <Text style={styles.deliveryEstimateLabel}>Taxminiy yetkazib berish</Text>
               <Text style={styles.deliveryEstimateDate}>
-                {order.estimatedDeliveryStart.split('T')[0]} —{' '}
-                {order.estimatedDeliveryEnd?.split('T')[0]}
+                {order.estimatedDeliveryStart && order.estimatedDeliveryEnd
+                  ? `${order.estimatedDeliveryStart.split('T')[0]} — ${order.estimatedDeliveryEnd.split('T')[0]}`
+                  : 'Belgilanmagan'}
               </Text>
             </View>
           </View>

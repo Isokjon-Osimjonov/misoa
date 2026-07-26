@@ -420,6 +420,15 @@ export async function createOrder(params: {
       ? null
       : new Date(Date.now() + appSettings.paymentTimeoutMinutes * 60000)
 
+    // Auto-calculate delivery dates
+    const today = new Date()
+    const estStartObj = new Date(today)
+    estStartObj.setDate(today.getDate() + (appSettings.cargoTransitDaysMin ?? 7))
+    const estEndObj = new Date(today)
+    estEndObj.setDate(today.getDate() + (appSettings.cargoTransitDaysMax ?? 14))
+    const estimatedDeliveryStart = estStartObj.toISOString().split('T')[0]
+    const estimatedDeliveryEnd = estEndObj.toISOString().split('T')[0]
+
     const [newOrder] = await tx
       .insert(orders)
       .values({
@@ -427,6 +436,8 @@ export async function createOrder(params: {
         customerId: params.customerId,
         profileRegion: params.region,
         deliveryRegion,
+        estimatedDeliveryStart,
+        estimatedDeliveryEnd,
         status: isImmediate ? 'PAYMENT_CONFIRMED' : 'PENDING_PAYMENT',
         paymentMode: params.paymentMode ?? 'RECEIPT',
         orderSource: params.source,
@@ -1159,6 +1170,8 @@ export async function adminGetOrders(query: {
     createdAt: row.order.createdAt,
     paymentDeadline: row.order.paymentDeadline,
     krwToUzsRate: row.krwToUzsRate,
+    estimatedDeliveryStart: row.order.estimatedDeliveryStart,
+    estimatedDeliveryEnd: row.order.estimatedDeliveryEnd,
   }))
 
   return { items, meta: { page, limit, total, hasNext: offset + limit < total, hasPrev: page > 1 } }
@@ -2136,6 +2149,8 @@ export async function adminGetOrderDetail(orderId: string) {
     createdAt: order.createdAt,
     paymentDeadline: order.paymentDeadline,
     deliveryRegion: order.deliveryRegion,
+    estimatedDeliveryStart: order.estimatedDeliveryStart,
+    estimatedDeliveryEnd: order.estimatedDeliveryEnd,
     paymentConfirmedAt: order.paymentConfirmedAt,
     krwToUzsRate: rateSnapshot?.krwToUzs || null,
 
