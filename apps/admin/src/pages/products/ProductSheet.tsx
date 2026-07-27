@@ -176,7 +176,7 @@ export function ProductSheet({ open, onClose, product, categories, onSuccess }: 
         minWholesaleQty: 5,
       })
     }
-  }, [product, reset])
+  }, [product, open, reset])
 
   // Create/Update mutation
   const saveMutation = useMutation({
@@ -207,6 +207,24 @@ export function ProductSheet({ open, onClose, product, categories, onSuccess }: 
     },
     onSuccess: () => {
       toast.success(isEdit ? 'Mahsulot yangilandi' : 'Mahsulot yaratildi')
+
+      // Reset form if creating new product
+      if (!isEdit) {
+        reset({
+          name: '',
+          barcode: '',
+          sku: '',
+          brandName: '',
+          isActive: true,
+          isNew: false,
+          isFeatured: false,
+          imageUrls: [],
+          skinTypes: [],
+          minOrderQty: 1,
+          minWholesaleQty: 5,
+        })
+      }
+
       onSuccess()
     },
     onError: (err: any) => {
