@@ -34,10 +34,10 @@ function buildDeepLink(token: string): string {
 
 // ─── Request OTP ──────────────────────────────────────────────
 const DEMO_PHONES = [
-  process.env.DEMO_PHONE_KOR ?? '+821000000000',
-  process.env.DEMO_PHONE_UZB ?? '+998000000000',
-]
-const DEMO_OTP = process.env.DEMO_OTP ?? '000000'
+  env.DEMO_PHONE_KOR,
+  env.DEMO_PHONE_UZB,
+].filter(Boolean)
+const DEMO_OTP = env.DEMO_OTP
 
 export async function requestOtp(dto: RequestOtpDto, deviceInfo?: string, ipAddress?: string) {
   const { phone } = dto
@@ -101,14 +101,30 @@ export async function verifyOtp(dto: VerifyOtpDto, deviceInfo?: string, ipAddres
   const phone = (dto as any).phone
 
   if (phone && DEMO_PHONES.includes(phone) && otp === DEMO_OTP) {
-    const [demoCustomer] = await db
+    let [demoCustomer] = await db
       .select()
       .from(customers)
       .where(eq(customers.phone, phone))
       .limit(1)
 
     if (!demoCustomer) {
-      throw { status: 404, code: 'DEMO_NOT_FOUND', message: 'Demo account not found' }
+      const [newCustomer] = await db
+        .insert(customers)
+        .values({
+          phone,
+          phoneRegion: getRegion(phone),
+          firstName: 'Demo',
+          lastName: 'User',
+          isVerified: true,
+          referralCode: generateToken().slice(0, 8).toUpperCase(),
+        })
+        .returning()
+
+      await db.insert(userNotificationSettings).values({
+        customerId: newCustomer.id,
+      })
+
+      demoCustomer = newCustomer
     }
 
     const accessToken = signAccess({

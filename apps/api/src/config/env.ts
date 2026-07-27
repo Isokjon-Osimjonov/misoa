@@ -57,6 +57,11 @@ const envSchema = z.object({
   DB_POOL_IDLE_MS: z.coerce.number().default(30000),
   DB_TIMEOUT_MS: z.coerce.number().default(30000),
   ADMIN_QUEUE_KEY: z.string().min(16).default('misoa-queue-secret-key'),
+
+  // ─── Demo Bypass (App Store Review) ────────────────────
+  DEMO_PHONE_KOR: z.string().optional().default('+821000000000'),
+  DEMO_PHONE_UZB: z.string().optional().default('+998000000000'),
+  DEMO_OTP: z.string().optional().default('000000'),
 })
 
 const parsed = envSchema.safeParse(process.env)
